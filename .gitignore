@@ -1,0 +1,18 @@
+# NUNCA commitear credenciales
+.env
+*.env.local
+*.env.production
+
+# Outputs del scraper (se regeneran en cada corrida)
+catalogo.json
+catalogo.csv
+_checkpoint_*.json
+errores_insercion.json
+
+# Caches y temporales
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+.vscode/
+.idea/

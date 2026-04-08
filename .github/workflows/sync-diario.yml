@@ -1,0 +1,51 @@
+name: Sync diario catalogo Seminuevos
+
+on:
+  schedule:
+    # Cron en UTC. 10:03 UTC = 04:03 hora Guadalajara (CST UTC-6).
+    # Minuto 03 deliberado: evitar el :00 donde todos los crons del mundo pegan al mismo tiempo.
+    - cron: '3 10 * * *'
+  workflow_dispatch:  # Permite correrlo manualmente desde la pestaña Actions
+
+concurrency:
+  group: sync-catalogo
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Crear .env desde secrets
+        run: |
+          cat > .env <<EOF
+          AIRTABLE_PAT=${{ secrets.AIRTABLE_PAT }}
+          AIRTABLE_BASE_ID=${{ secrets.AIRTABLE_BASE_ID }}
+          AIRTABLE_TABLE_ID=${{ secrets.AIRTABLE_TABLE_ID }}
+          EOF
+
+      - name: Run scraper
+        run: python3 scraper_seminuevos.py
+
+      - name: Run upserter (Airtable sync)
+        run: python3 upsert_airtable.py
+
+      - name: Subir resumen como artifact (debug)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-output-${{ github.run_id }}
+          path: |
+            resumen_carga.txt
+            errores_insercion.json
+          if-no-files-found: ignore
+          retention-days: 14

@@ -1,0 +1,21 @@
+{
+  "baseId": "appDrSPzp5214PFj1",
+  "tableId": "tblaDmOqRZ2LlLsK1",
+  "tableName": "Inventario",
+  "primaryField": "TITULO",
+  "lookupKey": "ID_AUTO",
+  "campos_editables_no_tocar_en_sync": ["DESTACADO", "NOTAS_INTERNAS"],
+  "fecha_creacion": "2026-04-07",
+  "piloto_otero": {
+    "descripcion": "Alcance del MVP/piloto: lote unico Av. Lopez Mateos Sur 2600 / Mariano Otero, Jardines del Sol, Zapopan. Fisicamente bajo control directo de Chucho.",
+    "agencia_ids": [3852, 4199],
+    "agencias": [
+      {"id": 3852, "nombre": "Seminuevos Plasencia Lopez Mateos", "calle": "Av. Lopez Mateos Sur", "rol": "Lote multimarca de seminuevos"},
+      {"id": 4199, "nombre": "Mazda Plasencia", "calle": "Av. Mariano Otero", "rol": "Concesionaria Mazda contigua"}
+    ],
+    "filter_by_formula": "OR({AGENCIA_ID}=3852,{AGENCIA_ID}=4199)",
+    "view_sugerida": "Piloto Otero",
+    "total_autos_a_la_carga": 84,
+    "marcas_focales_piloto": ["Hyundai", "Ford", "Mazda"]
+  }
+}
