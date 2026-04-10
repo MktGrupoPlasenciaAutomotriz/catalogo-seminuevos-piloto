@@ -288,6 +288,7 @@ body {
 }
 .v-card-badge.fair { background: linear-gradient(135deg, var(--color-warning), #B7791F); box-shadow: 0 6px 14px -4px rgba(214,158,46,0.55); }
 .v-card-badge.good { background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover)); color: #1A1A1A; box-shadow: var(--shadow-brand); }
+.v-card-badge.bono { background: linear-gradient(135deg, #E53E3E, #C53030); color: #fff; box-shadow: 0 6px 14px -4px rgba(229,62,62,0.55); }
 .v-card-loc {
   position: absolute; top: 12px; right: 12px;
   background: rgba(11,18,40,0.78);
@@ -1042,9 +1043,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <section class="hero">
   <div class="container">
     <div class="hero-content">
-      <div class="hero-tagline"><span class="dot"></span> Promociones de abril 2026</div>
-      <h1>Encuentra tu auto<br><span class="gradient">seminuevo certificado</span></h1>
-      <p class="hero-sub">Selecciona un vehículo para ver tu promoción: a mayor enganche, mayor descuento. Financiamiento de 12 a 60 meses. Vigencia limitada al mes en curso.</p>
+      <div class="hero-tagline"><span class="dot"></span> Vigencia del 1 al 30 de abril de 2026</div>
+      <h1>Tu seminuevo de<br><span class="gradient">vacaciones</span></h1>
+      <p class="hero-sub">Bonos de hasta $15,000 en vehiculos seleccionados. Financiamiento desde 25% de enganche a 12-60 meses. Credito sujeto a aprobacion bancaria.</p>
       <div class="hero-stats">
         <div class="hero-stat">
           <div class="hero-stat-num">40+</div>
@@ -1450,8 +1451,8 @@ let currentFilter = 'all';
 function fmt(n) { return '$' + n.toLocaleString('es-MX'); }
 
 function badgeClass(b) {
-  if (b === 'Precio Justo') return 'fair';
-  if (b === 'Buena Oferta') return 'good';
+  if (b && b.startsWith('Bono')) return 'bono';
+  if (b === 'Destacado') return 'good';
   return '';
 }
 

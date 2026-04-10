@@ -97,9 +97,44 @@ def get_loc(fields):
         return "Mazda Plasencia"
     return "Lopez Mateos"
 
+# --- Bonos de la oferta comercial Abril 2026 (Ford Plasencia) ---
+# Fuente: artes de Meta Ads entregados por Jose Reyes
+# Regla: autos del lote Ford (agencia 3852) tienen bono segun precio
+# Hyundai (agencia 4199) no tiene bonos
+BONOS_FORD = {
+    # precio_range: bono
+    # $15,000 para: Expedition, Suburban, Gladiator, Expedition 2021
+    # $10,000 para: Maverick, Koleos, CX9, Bronco, Explorer
+    # $7,500 para: Silverado, Ranger
+    # $5,000 para: el resto
+}
+
+def get_bono(fields):
+    """Asigna bono segun oferta comercial abril 2026."""
+    aid = fields.get("AGENCIA_ID")
+    if aid != 3852:  # Solo lote Ford/multimarca tiene bonos
+        return 0
+    price = fields.get("PRECIO", 0) or 0
+    marca = (fields.get("MARCA", "") or "").lower()
+    modelo = (fields.get("MODELO", "") or "").lower()
+    # Bonos altos para vehiculos premium
+    if price >= 750000:
+        return 15000
+    if price >= 450000:
+        return 10000
+    if price >= 350000:
+        return 7500
+    return 5000
+
 def transform(fields):
     destacado = fields.get("DESTACADO", False)
-    badge = "Destacado" if destacado else ""
+    bono = get_bono(fields)
+    if bono > 0:
+        badge = f"Bono ${bono:,}"
+    elif destacado:
+        badge = "Destacado"
+    else:
+        badge = ""
 
     return {
         "id": fields.get("ID_AUTO", 0),
