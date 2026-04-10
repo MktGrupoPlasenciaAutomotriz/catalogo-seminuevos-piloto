@@ -63,3 +63,8 @@ Para correr el sync manualmente sin esperar al cron: pestaña Actions del repo �
 - **Source of truth en Airtable.** El JSON estatico que consume el micrositio se exporta DESDE Airtable, no DESDE el scraper directo. Asi las ediciones manuales sobreviven al refresh diario.
 - **Separacion de campos del scraper vs editables.** Los campos del scraper se sobreescriben en cada sync. Los campos editables (`DESTACADO`, `NOTAS_INTERNAS`) jamas se tocan en codigo.
 - **PAT nunca en frontend.** El Personal Access Token de Airtable vive solo en `.env` local y en GitHub Secrets. El navegador del usuario nunca lo ve.
+
+## Repos relacionados
+
+- **Infraestructura Claude Code:** [`MktGrupoPlasenciaAutomotriz/claude`](https://github.com/MktGrupoPlasenciaAutomotriz/claude) — skills, MCPs, setup de Mac, configuracion de Claude Code. Repo separado porque es infraestructura de desarrollo, no aplicacion de negocio.
+- **Este repo** es la aplicacion de negocio (catalogo de seminuevos). Los dos repos son independientes: este corre su GitHub Action diaria sin depender del otro.
