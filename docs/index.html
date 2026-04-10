@@ -1480,7 +1480,7 @@ function renderCards(filter) {
     <div class="v-card" onclick="openModal(${v.id})">
       <div class="v-card-img-wrap">
         <img class="v-card-img" src="${v.img}" alt="${v.name}" loading="lazy">
-        <div class="v-card-badge ${badgeClass(v.badge)}">${v.badge}</div>
+        ${v.badge ? `<div class="v-card-badge ${badgeClass(v.badge)}">${v.badge}</div>` : ''}
         <div class="v-card-loc">${PIN_SVG} ${v.loc}</div>
         <div class="v-card-photos">${CAM_SVG} ${v.photos}</div>
       </div>
