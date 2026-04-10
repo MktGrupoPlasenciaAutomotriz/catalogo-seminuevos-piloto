@@ -39,6 +39,17 @@ jobs:
       - name: Run upserter (Airtable sync)
         run: python3 upsert_airtable.py
 
+      - name: Export catalogo piloto (Airtable → JSON)
+        run: python3 export_catalogo_piloto.py
+
+      - name: Commit y push catalogo-piloto.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/catalogo-piloto.json
+          git diff --cached --quiet && echo "Sin cambios en catalogo" || git commit -m "sync: catalogo-piloto.json $(date -u +%Y-%m-%d)"
+          git push
+
       - name: Subir resumen como artifact (debug)
         if: always()
         uses: actions/upload-artifact@v4

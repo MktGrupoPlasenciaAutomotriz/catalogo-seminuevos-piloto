@@ -1,75 +1,75 @@
 Catalogo Seminuevos Plasencia
-Fecha ejecucion: 2026-04-07T10:39:15.681870
-Fecha update origen: {'date': '2026-04-07T15:56:38.313Z'}
-Total normalizados: 681
+Fecha ejecucion: 2026-04-10T10:23:25.594215
+Fecha update origen: {'date': '2026-04-10T16:03:39.551Z'}
+Total normalizados: 684
 Errores: 0
 Rango anios: 2007 - 2026
 Rango precios: $79,900 - $3,289,000
 
-Marcas (42):
-  Chevrolet: 166
-  Mazda: 74
-  Nissan: 55
+Marcas (41):
+  Chevrolet: 165
+  Mazda: 77
+  Nissan: 54
   Ford: 47
   Hyundai: 38
-  Kia: 31
-  Renault: 31
+  Kia: 29
   Volkswagen: 28
+  Renault: 28
   Jeep: 25
-  GMC: 24
+  GMC: 25
   Buick: 21
   MG: 19
+  Mitsubishi: 17
   Toyota: 15
-  Mitsubishi: 15
   Suzuki: 11
-  GWM: 9
-  Dodge: 8
+  GWM: 10
   BMW: 8
+  GAC: 7
   Peugeot: 7
-  Seat: 5
+  Seat: 6
+  Dodge: 6
   HAVAL: 5
+  Honda: 4
   JAC: 4
-  GAC: 4
   Mercedes-Benz: 4
-  BYD: 3
-  Honda: 3
   RAM: 3
+  BYD: 3
+  Chirey: 2
+  Changan: 2
   Volvo: 2
-  Omoda: 2
   King Long: 2
-  Cupra: 1
-  Fiat: 1
-  Porsche: 1
   Lincoln: 1
+  Cupra: 1
+  Omoda: 1
+  Porsche: 1
   Chrysler: 1
-  Changan: 1
   Lexus: 1
   Geely: 1
-  Chirey: 1
   Jetour: 1
   Baic: 1
   Land Rover: 1
 
-Agencias (22):
-  [3891] Chevrolet Aeropuerto | Venustiano Carranza | 130 autos
-  [4054] Seminuevos Plasencia Bugambilias | Zapopan | 77 autos
+Agencias (23):
+  [3891] Chevrolet Aeropuerto | Venustiano Carranza | 131 autos
+  [4054] Seminuevos Plasencia Bugambilias | Zapopan | 80 autos
   [3889] Buick Gmc Coapa | Tlalpan | 63 autos
-  [3852] Seminuevos Plasencia Lopez Mateos | Zapopan | 59 autos
-  [3895] Seminuevos Certificados Chevrolet tepic | Tepic | 41 autos
+  [3852] Seminuevos Plasencia Lopez Mateos | Zapopan | 58 autos
   [3893] Chevrolet Huauchinango | Huauchinango | 40 autos
-  [3883] Seminuevos Plasencia Colima | Colima | 35 autos
-  [3736] Mazda Américas | Guadalajara | 26 autos
-  [4199] Mazda Plasencia | Zapopan | 25 autos
-  [3886] Mazda Galerias | Zapopan | 23 autos
-  [3962] Seminuevos Certificados Buick/Gmc Tepic | Tepic | 21 autos
+  [3883] Seminuevos Plasencia Colima | Colima | 39 autos
+  [3895] Seminuevos Certificados Chevrolet tepic | Tepic | 39 autos
+  [3736] Mazda Américas | Guadalajara | 28 autos
+  [3886] Mazda Galerias | Zapopan | 27 autos
+  [3962] Seminuevos Certificados Buick/Gmc Tepic | Tepic | 22 autos
+  [4199] Mazda Plasencia | Zapopan | 21 autos
   [3888] Mazda Acueducto | Zapopan | 20 autos
   [3913] Ford Plasencia Mazatlan | Mazatlán | 18 autos
-  [3938] Seminuevos Plasencia Puerto Vallarta | Puerto Vallarta | 17 autos
-  [3882] Hyundai Lomas | San Luis Potosí | 16 autos
-  [3887] Mazda Plasencia Vallarta | Puerto Vallarta | 15 autos
-  [3885] Mazda Santa Anita  | Tlajomulco de Zúñiga | 14 autos
-  [3890] Seminuevos Plasencia Tepic | Tepic | 14 autos
-  [3737] Mazda González Gallo | Guadalajara | 10 autos
+  [3882] Hyundai Lomas | San Luis Potosí | 17 autos
+  [3885] Mazda Santa Anita  | Tlajomulco de Zúñiga | 13 autos
+  [4319] Ford Plasencia Puerto Vallarta | Puerto Vallarta | 13 autos
+  [3890] Seminuevos Plasencia Tepic | Tepic | 13 autos
+  [3887] Mazda Plasencia Vallarta | Puerto Vallarta | 10 autos
+  [3737] Mazda González Gallo | Guadalajara | 9 autos
   [3954] Ford Tepic | Tepic | 8 autos
+  [3938] Hyundai Plasencia Puerto Vallarta | Puerto Vallarta | 6 autos
   [4293] Hyundai Carretera 57 | San Luis Potosí | 6 autos
   [3905] Mazda Manzanillo | Manzanillo | 3 autos
