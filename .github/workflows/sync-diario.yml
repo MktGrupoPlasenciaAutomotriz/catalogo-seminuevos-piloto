@@ -11,6 +11,9 @@ concurrency:
   group: sync-catalogo
   cancel-in-progress: false
 
+permissions:
+  contents: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
