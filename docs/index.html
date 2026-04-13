@@ -11,6 +11,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Seminuevos Plasencia | Encuentra tu auto ideal</title>
+<meta property="og:title" content="Seminuevos Plasencia — Autos certificados con garantia 6 meses">
+<meta property="og:description" content="79 vehiculos desde $158K. Bonos de hasta $15,000. Financiamiento desde 25% de enganche. Agenda tu cita gratis.">
+<meta property="og:image" content="https://mktgrupoplasenciaautomotriz.github.io/catalogo-seminuevos-piloto/og-seminuevos.jpg">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mktgrupoplasenciaautomotriz.github.io/catalogo-seminuevos-piloto/">
+<meta property="og:locale" content="es_MX">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
@@ -313,7 +319,7 @@ body {
 .v-card-price-row { display: flex; align-items: baseline; justify-content: space-between; padding-top: 14px; border-top: 1px dashed var(--ink-200); }
 .v-card-price { font-family: var(--font-display); font-size: 24px; font-weight: 900; color: var(--ink-900); letter-spacing: -0.02em; }
 .v-card-monthly { font-size: 12px; color: var(--color-success-dark); font-weight: 700; }
-.v-card-monthly span { color: var(--ink-400); font-weight: 500; }
+.v-card-monthly span { color: var(--ink-600); font-weight: 500; }
 
 /* ── MODAL / DETAIL ── */
 .modal-overlay {
@@ -549,7 +555,9 @@ body {
   background: var(--ink-200); color: var(--ink-600);
   font-size: 11px; font-weight: 800; cursor: help;
 }
-.tip:hover .tip-content { display: block; }
+.tip:hover .tip-content,
+.tip:focus .tip-content,
+.tip:focus-within .tip-content { display: block; }
 .tip-content {
   display: none; position: absolute; bottom: 125%; left: 50%;
   transform: translateX(-50%);
@@ -663,7 +671,7 @@ body {
   transition: all var(--duration-fast) var(--ease); outline: none; width: 100%;
 }
 .form-input:focus { border-color: var(--color-accent); box-shadow: 0 0 0 4px rgba(66,153,225,0.12); }
-.form-input::placeholder { color: var(--ink-400); }
+.form-input::placeholder { color: var(--ink-500); }
 
 select.form-input {
   -webkit-appearance: none; appearance: none;
@@ -744,9 +752,9 @@ select.form-input {
 
 /* ── UPPERCASE FIELDS ── */
 input.form-input[type="text"], input.form-input[type="email"], input.form-input[type="tel"] { text-transform: uppercase; }
-input.form-input[type="text"]::placeholder, input.form-input[type="email"]::placeholder, input.form-input[type="tel"]::placeholder { text-transform: none; color: var(--ink-400); }
+input.form-input[type="text"]::placeholder, input.form-input[type="email"]::placeholder, input.form-input[type="tel"]::placeholder { text-transform: none; color: var(--ink-500); }
 
-.form-privacy { font-size: 11px; color: var(--ink-400); text-align: center; margin-top: 14px; line-height: 1.6; }
+.form-privacy { font-size: 11px; color: var(--ink-600); text-align: center; margin-top: 14px; line-height: 1.6; }
 
 /* ── CONFIRMATION ── */
 .confirmation { display: none; text-align: center; padding: 12px 4px; }
@@ -1018,6 +1026,174 @@ body { font-size: 15px; }
   display: none;
 }
 .cita-summary.show { display: block; }
+
+/* ── SKIP LINK ── */
+.skip-link {
+  position: absolute; left: -9999px; top: auto;
+  width: 1px; height: 1px; overflow: hidden; z-index: 999;
+}
+.skip-link:focus {
+  position: fixed; top: 10px; left: 10px;
+  width: auto; height: auto;
+  padding: 12px 24px;
+  background: #fff; color: var(--ink-900);
+  font-size: 16px; font-weight: 700;
+  border-radius: var(--radius-sm); box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 10000;
+}
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ── FOCUS VISIBLE ── */
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.form-input:focus-visible { outline: none; }
+.modal-close:focus-visible, .filter-chip:focus-visible, .calc-term-btn:focus-visible,
+.v-card:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+
+/* ── HERO CTA ── */
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-top: 32px;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+  color: #1A1A1A; border: none; border-radius: var(--radius-full);
+  font-family: var(--font-display); font-size: 16px; font-weight: 800;
+  cursor: pointer; text-decoration: none; letter-spacing: 0.3px;
+  box-shadow: 0 12px 28px -8px rgba(251,198,69,0.55);
+  transition: transform var(--duration-fast) var(--ease), box-shadow var(--duration-fast) var(--ease);
+  min-height: 52px;
+}
+.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px -8px rgba(251,198,69,0.65); }
+.hero-cta svg { width: 18px; height: 18px; }
+
+/* ── FORM PROGRESS BAR ── */
+.form-progress {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 24px; padding: 0 4px;
+}
+.form-progress-step {
+  display: flex; align-items: center; gap: 8px;
+  flex: 1; position: relative;
+}
+.form-progress-step:not(:last-child)::after {
+  content: ''; flex: 1; height: 2px;
+  background: var(--ink-200); margin: 0 8px;
+  border-radius: 2px;
+  transition: background var(--duration-normal) var(--ease);
+}
+.form-progress-step.active:not(:last-child)::after,
+.form-progress-step.completed:not(:last-child)::after {
+  background: var(--color-accent);
+}
+.form-step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--ink-100); color: var(--ink-500);
+  font-family: var(--font-display); font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  border: 2px solid var(--ink-200);
+  transition: all var(--duration-normal) var(--ease);
+}
+.form-progress-step.active .form-step-num {
+  background: var(--color-accent); color: #1A1A1A;
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 12px -4px rgba(251,198,69,0.5);
+}
+.form-progress-step.completed .form-step-num {
+  background: var(--color-success); color: #fff;
+  border-color: var(--color-success);
+}
+.form-step-label {
+  font-size: 11px; font-weight: 700; color: var(--ink-500);
+  letter-spacing: 0.3px; white-space: nowrap;
+}
+.form-progress-step.active .form-step-label { color: var(--ink-900); }
+.form-progress-step.completed .form-step-label { color: var(--color-success-dark); }
+@media(max-width:559px){ .form-step-label { display: none; } }
+
+/* ── FORM STEPS ── */
+.form-step { display: none; }
+.form-step.active { display: block; }
+.form-step-nav {
+  display: flex; gap: 12px; margin-top: 20px;
+}
+.btn-step-next, .btn-step-prev {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 24px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display); font-size: 14px; font-weight: 800;
+  cursor: pointer; min-height: 48px;
+  transition: all var(--duration-fast) var(--ease);
+  letter-spacing: 0.3px; text-transform: uppercase;
+  border: none;
+}
+.btn-step-next {
+  flex: 1;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+  color: #1A1A1A;
+  box-shadow: 0 8px 20px -6px rgba(251,198,69,0.45);
+}
+.btn-step-next:hover { transform: translateY(-1px); box-shadow: 0 12px 26px -6px rgba(251,198,69,0.55); }
+.btn-step-prev {
+  background: var(--ink-100); color: var(--ink-600);
+  border: 1.5px solid var(--ink-200);
+}
+.btn-step-prev:hover { background: var(--ink-200); }
+
+/* ── FIELD VALID CHECKMARK ── */
+.form-input.valid {
+  border-color: var(--color-success);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2348BB78' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; background-size: 16px;
+  padding-right: 40px;
+}
+select.form-input.valid { background-position: right 40px center; }
+
+/* ── POST-CONFIRMATION STEPS ── */
+.next-steps {
+  display: grid; grid-template-columns: 1fr; gap: 12px;
+  margin: 20px 0; text-align: left;
+}
+.next-step-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px;
+  background: var(--ink-50); border: 1px solid var(--ink-200);
+  border-radius: var(--radius-md);
+}
+.next-step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+  color: #1A1A1A; font-family: var(--font-display);
+  font-size: 12px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.next-step-text { font-size: 13px; color: var(--ink-700); font-weight: 600; line-height: 1.4; }
+
+/* ── TRUST BAR PROMINENCE ── */
+.trust-bar .trust-item {
+  padding: 8px 16px;
+  background: rgba(251,198,69,0.06);
+  border: 1px solid rgba(251,198,69,0.15);
+  border-radius: var(--radius-full);
+}
+
+/* ── PREFERS REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  html { scroll-behavior: auto; }
+}
 </style>
 </head>
 <body>
@@ -1025,6 +1201,8 @@ body { font-size: 15px; }
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKV7LZ7T"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+
+<a href="#main-content" class="skip-link">Saltar al contenido</a>
 
 <!-- ════ HEADER ════ -->
 <header class="header">
@@ -1039,27 +1217,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </header>
 
+<main id="main-content">
+
 <!-- ════ HERO ════ -->
 <section class="hero">
   <div class="container">
     <div class="hero-content">
-      <div class="hero-tagline"><span class="dot"></span> Vigencia del 1 al 30 de abril de 2026</div>
-      <h1>Tu seminuevo de<br><span class="gradient">vacaciones</span></h1>
-      <p class="hero-sub">Bonos de hasta $15,000 en vehiculos seleccionados en Seminuevos Plasencia Lopez Mateos, Zapopan. Mas de 19 marcas disponibles. Financiamiento desde 25% de enganche. Credito sujeto a aprobacion bancaria.</p>
+      <div class="hero-tagline"><span class="dot"></span> Oferta abril — Bonos hasta $15,000</div>
+      <h1>Tu proximo auto<br><span class="gradient">esta aqui</span></h1>
+      <p class="hero-sub">Bonos de hasta $15,000 en vehiculos seleccionados. 19+ marcas, todos certificados con garantia 6 meses. Financiamiento desde 25% de enganche.</p>
       <div class="hero-stats">
         <div class="hero-stat">
           <div class="hero-stat-num">19+</div>
-          <div class="hero-stat-label">Marcas disponibles</div>
+          <div class="hero-stat-label">Marcas en lote</div>
         </div>
         <div class="hero-stat">
           <div class="hero-stat-num">79</div>
-          <div class="hero-stat-label">Vehiculos en lote</div>
+          <div class="hero-stat-label">Autos ahora mismo</div>
         </div>
         <div class="hero-stat">
           <div class="hero-stat-num">$158K</div>
-          <div class="hero-stat-label">Desde</div>
+          <div class="hero-stat-label">El mas accesible</div>
         </div>
       </div>
+      <button class="hero-cta" onclick="document.querySelector('.inventory-section').scrollIntoView({behavior:'smooth'})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Ver inventario
+      </button>
     </div>
   </div>
 </section>
@@ -1067,11 +1251,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ════ TRUST BAR ════ -->
 <div class="trust-bar">
   <div class="container">
-    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Inspección 150 puntos</div>
-    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Garantía 6 meses</div>
-    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> 7 días de devolución</div>
-    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Financiamiento desde 12 meses</div>
-    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Historial verificado</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> 150 puntos de inspeccion</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 6 meses de garantia mecanica</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> 7 dias para devolver, sin letra chica</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Credito desde 12 meses</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Factura original verificada</div>
   </div>
 </div>
 
@@ -1080,11 +1264,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="container">
     <div class="filters-wrap">
       <div class="filters-row" id="filterRow">
-        <button class="filter-chip active" onclick="filterCars('all', this)">Todos</button>
-        <button class="filter-chip" onclick="filterCars('suv', this)">SUV</button>
-        <button class="filter-chip" onclick="filterCars('sedan', this)">Sedán</button>
-        <button class="filter-chip" onclick="filterCars('pickup', this)">Pick-up</button>
-        <button class="filter-chip" onclick="filterCars('hatchback', this)">Hatchback</button>
+        <button class="filter-chip active" onclick="filterCars('all', this)" aria-pressed="true">Todos</button>
+        <button class="filter-chip" onclick="filterCars('suv', this)" aria-pressed="false">SUV</button>
+        <button class="filter-chip" onclick="filterCars('sedan', this)" aria-pressed="false">Sedan</button>
+        <button class="filter-chip" onclick="filterCars('pickup', this)" aria-pressed="false">Pick-up</button>
+        <button class="filter-chip" onclick="filterCars('hatchback', this)" aria-pressed="false">Hatchback</button>
       </div>
       <div class="filters-count"><strong id="carCount">15</strong> vehículos</div>
     </div>
@@ -1095,14 +1279,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <section class="inventory-section">
   <div class="container">
     <div class="section-head">
-      <div class="section-eyebrow">Inventario certificado</div>
-      <div class="section-title">Catálogo del mes</div>
+      <span class="section-eyebrow">Inventario certificado</span>
+      <h2 class="section-title">Catalogo del mes</h2>
     </div>
     <div class="inventory-grid" id="inventoryGrid">
       <!-- JS rendered -->
     </div>
   </div>
 </section>
+
+</main>
 
 <!-- ════ FOOTER ════ -->
 <footer class="footer">
@@ -1116,12 +1302,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <p><strong>Seminuevos Plasencia</strong> &middot; Un legado de excelencia automotriz<br>Av. López Mateos Sur No. 2600, Col. La Calma, Zapopan, Jalisco<br>Lun a Vie 9:00 a 18:00 &middot; Sáb 9:00 a 14:00 &middot; Tel. (33) 3344 4400</p>
     <div style="margin-top:14px;"><a href="https://grupoplasencia.com/aviso_de_privacidad/" target="_blank" rel="noopener" style="color: rgba(255,255,255,0.5); text-decoration: underline; font-size: 12px;">Aviso de Privacidad</a></div>
-    <p style="margin-top:14px;font-size:11px;opacity:0.55;">© 2026 Grupo Plasencia Automotriz. Todos los derechos reservados.</p>
+    <p style="margin-top:14px;font-size:11px;opacity:0.65;">Precios, equipamiento e imagenes de referencia. Sujetos a disponibilidad. Promociones vigentes del 1 al 30 de abril de 2026.</p>
+    <p style="margin-top:8px;font-size:11px;opacity:0.65;">&copy; 2026 Grupo Plasencia Automotriz. Todos los derechos reservados.</p>
   </div>
 </footer>
 
 <!-- ════ VEHICLE DETAIL MODAL ════ -->
-<div class="modal-overlay" id="vehicleModal" role="dialog" aria-modal="true">
+<div class="modal-overlay" id="vehicleModal" role="dialog" aria-modal="true" aria-labelledby="modalName">
   <div class="modal-content">
     <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -1159,7 +1346,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="calc-head">
             <div class="calc-head-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="12" y1="10" x2="14" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="12" y1="14" x2="14" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="10" y2="18"/><line x1="12" y1="18" x2="14" y2="18"/></svg></div>
             <div>
-              <div class="calc-title">Calcula tu mensualidad</div>
+              <h3 class="calc-title">Calcula tu mensualidad</h3>
               <div class="calc-sub">Ajusta el enganche y el plazo a tu medida</div>
             </div>
           </div>
@@ -1169,7 +1356,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <span>Enganche</span>
               <span class="calc-label-value" id="downLabel">20%</span>
             </div>
-            <input type="range" class="calc-slider" id="downSlider" min="20" max="70" value="20" step="5" oninput="updateCalc()">
+            <input type="range" class="calc-slider" id="downSlider" min="20" max="70" value="20" step="5" oninput="updateCalc()" aria-label="Porcentaje de enganche" aria-valuemin="20" aria-valuemax="70" aria-valuenow="20" aria-valuetext="20% de enganche">
             <div class="calc-slider-ticks">
               <span>20%</span><span>30%</span><span>40%</span><span>50%</span><span>60%</span><span>70%</span>
             </div>
@@ -1206,7 +1393,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="qualify-head">
             <div class="qualify-head-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></div>
             <div>
-              <div class="qualify-title">Personaliza tu cotización</div>
+              <h3 class="qualify-title">Personaliza tu cotizacion</h3>
               <div class="qualify-sub">Para ofrecerte el mejor esquema fiscal y financiero</div>
             </div>
           </div>
@@ -1215,12 +1402,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="form-group full">
               <div class="label-with-tip">
                 Tipo de persona
-                <span class="tip">?
-                  <span class="tip-content">Personas físicas con actividad empresarial y morales pueden acreditar el IVA y deducir el vehículo si lo destinan a su actividad. Nos sirve para ofrecerte el mejor esquema (factura, leasing, crédito empresarial).</span>
+                <span class="tip" tabindex="0" aria-label="Informacion sobre tipo de persona">?
+                  <span class="tip-content">Personas fisicas con actividad empresarial y morales pueden acreditar el IVA y deducir el vehiculo si lo destinan a su actividad. Nos sirve para ofrecerte el mejor esquema (factura, leasing, credito empresarial).</span>
                 </span>
               </div>
-              <select class="form-input" id="fTipoPersona" onchange="onTipoPersonaChange()">
-                <option value="">Selecciona (opcional)</option>
+              <select class="form-input" id="fTipoPersona" onchange="onTipoPersonaChange()" aria-describedby="fTipoPersona-error">
+                <option value="" disabled selected>Selecciona (opcional)</option>
                 <option value="PERSONA FISICA">Persona física</option>
                 <option value="PERSONA FISICA CON ACTIVIDAD EMPRESARIAL">Persona física con actividad empresarial</option>
                 <option value="PERSONA MORAL">Persona moral</option>
@@ -1232,19 +1419,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   <span>Como persona con actividad empresarial o moral, puedes acreditar el IVA y deducir tu vehículo. Te preparamos el mejor esquema en tu cita.</span>
                 </div>
               </div>
+              <div class="form-error-msg" id="fTipoPersona-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Selecciona el tipo de persona</div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">¿Necesitas financiamiento? <span class="req">*</span></label>
-              <select class="form-input" id="fBuscaFinanciamiento" onchange="toggleIngresos()">
-                <option value="">Selecciona</option>
-                <option value="SI">Sí</option>
-                <option value="NO (CONTADO)">No (contado)</option>
+              <label class="form-label" for="fBuscaFinanciamiento">¿Como piensas pagar? <span class="req">*</span></label>
+              <select class="form-input" id="fBuscaFinanciamiento" onchange="toggleIngresos()" required aria-required="true" aria-describedby="fBuscaFinanciamiento-error">
+                <option value="" disabled selected>Selecciona</option>
+                <option value="SI">Si, necesito financiamiento</option>
+                <option value="NO (CONTADO)">No, pago de contado</option>
               </select>
+              <div class="form-error-msg" id="fBuscaFinanciamiento-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Selecciona como piensas pagar</div>
             </div>
 
             <div class="form-group" id="ingresosWrap" style="display:none;">
-              <label class="form-label">¿Puedes comprobar ingresos?</label>
+              <label class="form-label" for="fCompruebaIngresos">¿Puedes comprobar ingresos?</label>
               <select class="form-input" id="fCompruebaIngresos">
                 <option value="">Selecciona</option>
                 <option value="SI">Sí</option>
@@ -1260,12 +1449,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="form-section-head">
             <div class="form-section-head-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
             <div>
-              <div class="form-section-title">Agenda tu visita</div>
-              <div class="form-section-sub">Completa tus datos y recibe tu precotización al instante.</div>
+              <h3 class="form-section-title">Agenda tu visita a la agencia</h3>
+              <div class="form-section-sub">Solo 5 datos. Recibes tu precotizacion al instante.</div>
             </div>
           </div>
 
-          <div class="form-empty-state" id="formGlobalError">
+          <div class="form-empty-state" id="formGlobalError" role="alert" aria-live="assertive">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <div>
               <div class="form-empty-state-text" id="formGlobalErrorText">Completa los campos requeridos para agendar</div>
@@ -1273,38 +1462,82 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
           </div>
 
+          <!-- PROGRESS BAR -->
+          <div class="form-progress" id="formProgress">
+            <div class="form-progress-step active" data-step="1">
+              <div class="form-step-num">1</div>
+              <div class="form-step-label">Tus datos</div>
+            </div>
+            <div class="form-progress-step" data-step="2">
+              <div class="form-step-num">2</div>
+              <div class="form-step-label">Vehiculo</div>
+            </div>
+            <div class="form-progress-step" data-step="3">
+              <div class="form-step-num">3</div>
+              <div class="form-step-label">Tu cita</div>
+            </div>
+          </div>
+
+          <!-- STEP 1: DATOS PERSONALES -->
+          <div class="form-step active" id="formStep1">
           <div class="form-grid">
             <div class="form-group full">
-              <label class="form-label">Nombre(s) <span class="req">*</span></label>
-              <input class="form-input" id="fName" type="text" placeholder="JUAN CARLOS" oninput="sanitizeOnInput(this); validateField(this)" autocomplete="given-name">
-              <div class="form-error-msg" id="fName-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Ingresa tu nombre</div>
+              <label class="form-label" for="fName">Nombre(s) <span class="req">*</span></label>
+              <input class="form-input" id="fName" type="text" placeholder="JUAN CARLOS" oninput="sanitizeOnInput(this); validateField(this)" autocomplete="given-name" required aria-required="true" aria-describedby="fName-error">
+              <div class="form-error-msg" id="fName-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Necesitamos tu nombre para la precotizacion</div>
             </div>
             <div class="form-group">
-              <label class="form-label">Apellido paterno <span class="req">*</span></label>
-              <input class="form-input" id="fLastName1" type="text" placeholder="PEREZ" oninput="sanitizeOnInput(this); validateField(this)" autocomplete="family-name">
-              <div class="form-error-msg" id="fLastName1-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Ingresa tu apellido paterno</div>
+              <label class="form-label" for="fLastName1">Apellido paterno <span class="req">*</span></label>
+              <input class="form-input" id="fLastName1" type="text" placeholder="LOPEZ" oninput="sanitizeOnInput(this); validateField(this)" autocomplete="family-name" required aria-required="true" aria-describedby="fLastName1-error">
+              <div class="form-error-msg" id="fLastName1-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Ingresa tu apellido paterno</div>
             </div>
             <div class="form-group">
-              <label class="form-label">Apellido materno <span class="req">*</span></label>
-              <input class="form-input" id="fLastName2" type="text" placeholder="GARCIA" oninput="sanitizeOnInput(this); validateField(this)" autocomplete="additional-name">
-              <div class="form-error-msg" id="fLastName2-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Ingresa tu apellido materno</div>
+              <label class="form-label" for="fLastName2">Apellido materno <span class="req">*</span></label>
+              <input class="form-input" id="fLastName2" type="text" placeholder="GARCIA" oninput="sanitizeOnInput(this); validateField(this)" autocomplete="additional-name" required aria-required="true" aria-describedby="fLastName2-error">
+              <div class="form-error-msg" id="fLastName2-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Ingresa tu apellido materno</div>
             </div>
             <div class="form-group">
-              <label class="form-label">Celular / WhatsApp <span class="req">*</span></label>
+              <label class="form-label" for="fPhone">WhatsApp (10 digitos) <span class="req">*</span></label>
               <div class="phone-wrap">
                 <div class="phone-prefix">MX +52</div>
-                <input class="form-input" id="fPhone" type="tel" placeholder="3312345678" maxlength="10" pattern="[0-9]{10}" oninput="formatPhone(this); validateField(this)" onkeypress="return /[0-9]/.test(event.key)" autocomplete="tel-national" inputmode="numeric" style="flex:1;">
+                <input class="form-input" id="fPhone" type="tel" placeholder="33 1234 5678" maxlength="10" pattern="[0-9]{10}" oninput="formatPhone(this); validateField(this)" onkeypress="return /[0-9]/.test(event.key)" autocomplete="tel-national" inputmode="numeric" required aria-required="true" aria-describedby="fPhone-error" style="flex:1;">
               </div>
-              <div class="help-text">10 dígitos sin espacios</div>
-              <div class="form-error-msg" id="fPhone-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Ingresa un celular válido de 10 dígitos</div>
+              <div class="help-text">10 digitos sin espacios</div>
+              <div class="form-error-msg" id="fPhone-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Necesitamos 10 digitos para contactarte por WhatsApp</div>
             </div>
             <div class="form-group">
-              <label class="form-label">Correo electrónico <span class="req">*</span></label>
-              <input class="form-input" id="fEmail" type="email" placeholder="TU@EMAIL.COM" oninput="validateField(this)" autocomplete="email">
-              <div class="form-error-msg" id="fEmail-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Ingresa un correo válido</div>
+              <label class="form-label" for="fEmail">Correo electronico <span class="req">*</span></label>
+              <input class="form-input" id="fEmail" type="email" placeholder="TU@EMAIL.COM" oninput="validateField(this)" autocomplete="email" required aria-required="true" aria-describedby="fEmail-error">
+              <div class="form-error-msg" id="fEmail-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Revisa tu correo — te enviaremos la precotizacion ahi</div>
             </div>
-            <div class="form-group form-group-full">
-              <label class="form-label">Fecha y hora de la cita <span class="req">*</span></label>
+          </div>
+          <div class="form-step-nav">
+            <button type="button" class="btn-step-next" onclick="goToFormStep(2)">Siguiente <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></button>
+          </div>
+          </div>
+
+          <!-- STEP 2: VEHICULO / FINANCIAMIENTO -->
+          <div class="form-step" id="formStep2">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label class="form-label" for="fTradeIn">¿Quieres dejar tu auto actual como enganche? (opcional)</label>
+              <select class="form-input" id="fTradeIn">
+                <option value="">No, compra directa</option>
+                <option value="si">Sí, quiero que lo evalúen</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-step-nav">
+            <button type="button" class="btn-step-prev" onclick="goToFormStep(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg> Anterior</button>
+            <button type="button" class="btn-step-next" onclick="goToFormStep(3)">Siguiente <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></button>
+          </div>
+          </div>
+
+          <!-- STEP 3: CITA -->
+          <div class="form-step" id="formStep3">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label class="form-label" for="fDateTime">Fecha y hora de la cita <span class="req">*</span></label>
               <input type="hidden" id="fDateTime" value="">
               <input type="hidden" id="hFechaCita" value="">
               <input type="hidden" id="hHoraCita" value="">
@@ -1324,33 +1557,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="cita-summary" id="citaSummary"></div>
               </div>
               <div class="help-text">Mínimo 24 horas de anticipación. Lunes a sábado, 9:00 a 18:30.</div>
-              <div class="form-error-msg" id="fDateTime-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span id="fDateTime-error-text">Selecciona una fecha y hora para tu cita</span></div>
-            </div>
-            <div class="form-group form-group-full">
-              <label class="form-label">¿Tienes auto a cuenta? (opcional)</label>
-              <select class="form-input" id="fTradeIn">
-                <option value="">No, compra directa</option>
-                <option value="si">Sí, quiero que lo evalúen</option>
-              </select>
+              <div class="form-error-msg" id="fDateTime-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span id="fDateTime-error-text">Elige cuando quieres visitarnos</span></div>
             </div>
           </div>
 
-          <label style="display:flex; align-items:flex-start; gap:8px; margin:16px 0 8px; font-size:13px; color:var(--ink-400, #94a3b8); line-height:1.4; cursor:pointer;">
-            <input type="checkbox" id="fPrivacy" required checked style="margin-top:3px; min-width:18px; min-height:18px; accent-color:var(--color-accent, #FBC645);">
-            <span>He leído y acepto el <a href="https://grupoplasencia.com/aviso_de_privacidad/" target="_blank" rel="noopener" style="color:var(--color-cyan, #17B7E0); text-decoration:underline;">Aviso de Privacidad</a> de Grupo Plasencia Automotriz.</span>
+          <label for="fPrivacy" style="display:flex; align-items:flex-start; gap:8px; margin:16px 0 8px; font-size:13px; color:var(--ink-600, #475569); line-height:1.4; cursor:pointer;">
+            <input type="checkbox" id="fPrivacy" required style="margin-top:3px; min-width:18px; min-height:18px; accent-color:var(--color-accent, #FBC645);">
+            <span>He leido y acepto el <a href="https://grupoplasencia.com/aviso_de_privacidad/" target="_blank" rel="noopener" style="color:var(--color-cyan, #17B7E0); text-decoration:underline;">Aviso de Privacidad</a> de Grupo Plasencia Automotriz.</span>
           </label>
-          <div class="form-error-msg" id="fPrivacy-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Debes aceptar el aviso de privacidad para continuar.</div>
+          <div class="form-error-msg" id="fPrivacy-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Acepta el aviso de privacidad para que podamos agendarte</div>
 
-          <label style="display:flex; align-items:flex-start; gap:8px; margin:4px 0 16px; font-size:13px; color:var(--ink-400, #94a3b8); line-height:1.4; cursor:pointer;">
-            <input type="checkbox" id="fMarketing" checked style="margin-top:3px; min-width:18px; min-height:18px; accent-color:var(--color-accent, #FBC645);">
+          <label for="fMarketing" style="display:flex; align-items:flex-start; gap:8px; margin:4px 0 16px; font-size:13px; color:var(--ink-600, #475569); line-height:1.4; cursor:pointer;">
+            <input type="checkbox" id="fMarketing" style="margin-top:3px; min-width:18px; min-height:18px; accent-color:var(--color-accent, #FBC645);">
             <span>Acepto que mis datos sean utilizados con fines promocionales y de contacto comercial.</span>
           </label>
 
+          <div class="form-step-nav">
+            <button type="button" class="btn-step-prev" onclick="goToFormStep(2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg> Anterior</button>
+          </div>
+
           <button class="btn-conversion" onclick="submitForm()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            Agendar visita y recibir precotización
+            Agendar mi cita
           </button>
-          <p class="form-privacy">Tus datos se tratan conforme a la LFPDPPP y se usan exclusivamente para coordinar tu visita a la agencia.</p>
+          <p class="form-privacy">Tus datos solo se usan para tu cita. Protegidos conforme a ley (LFPDPPP).</p>
+          </div><!-- /formStep3 -->
         </div>
       </div>
 
@@ -1359,14 +1590,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="confirmation-icon-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
-        <div class="confirmation-title">Cita agendada</div>
-        <p class="confirmation-subtitle">Guarda tu folio y descarga tu precotización. Te esperamos el día de tu cita.</p>
+        <div class="confirmation-title">Listo, tu cita esta agendada</div>
+        <p class="confirmation-subtitle" id="confirmSubtitle">Guarda tu folio y descarga tu precotizacion.</p>
+
+        <!-- QUE SIGUE -->
+        <div class="next-steps">
+          <div class="next-step-item">
+            <div class="next-step-num">1</div>
+            <div class="next-step-text">Descarga tu precotizacion y guardala como referencia.</div>
+          </div>
+          <div class="next-step-item">
+            <div class="next-step-num">2</div>
+            <div class="next-step-text">Tu asesor te contactara por WhatsApp para confirmar tu cita.</div>
+          </div>
+          <div class="next-step-item">
+            <div class="next-step-num">3</div>
+            <div class="next-step-text">Llega a la agencia con tu folio. Tu asesor ya tiene tus datos.</div>
+          </div>
+        </div>
         <div class="confirmation-folio" id="confirmFolio">GP-SEM-000000</div>
 
         <div class="confirmation-details" id="confirmDetails"></div>
 
         <div style="margin:20px 0;border-radius:var(--radius-lg);overflow:hidden;border:1.5px solid var(--ink-200);">
-          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.6418057207534!2d-103.4083277!3d20.643452099999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ac5c80179401%3A0x8ed321a0e1445e25!2sSeminuevos%20Plasencia!5e0!3m2!1ses!2smx!4v1774907986396!5m2!1ses!2smx" width="100%" height="220" style="border:0;display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.6418057207534!2d-103.4083277!3d20.643452099999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ac5c80179401%3A0x8ed321a0e1445e25!2sSeminuevos%20Plasencia!5e0!3m2!1ses!2smx!4v1774907986396!5m2!1ses!2smx" width="100%" height="220" style="border:0;display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicacion de Seminuevos Plasencia en Google Maps"></iframe>
           <div style="padding:14px 16px;background:#fff;text-align:left;">
             <div style="font-size:14px;font-weight:800;color:var(--ink-900);font-family:var(--font-display);">Seminuevos Plasencia</div>
             <div style="font-size:12px;color:var(--ink-500);margin-top:3px;">Av. López Mateos Sur, Guadalajara, Jalisco</div>
@@ -1376,7 +1623,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <button onclick="generateQuotePDF()" class="btn-pdf">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Descargar precotización (PDF)
+          Descargar mi precotizacion
         </button>
         <button onclick="addToCalendar()" class="btn-cal">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -1384,9 +1631,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </button>
         <a id="waAsesor" href="#" target="_blank" rel="noopener" class="btn-wa-asesor" aria-label="Contactar por WhatsApp">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4l-2.4-1.1c-.3-.1-.7 0-.9.2l-.9 1.1c-1.5-.8-2.7-2-3.5-3.5l1.1-.9c.3-.2.4-.6.2-.9L9.6 6.5c-.2-.4-.6-.5-1-.4l-2.2.7c-.4.1-.7.5-.6.9.6 4.6 4.3 8.3 8.9 8.9.4.1.8-.1.9-.6l.7-2.2c.1-.4-.1-.8-.5-1z"/></svg>
-          Contactar al equipo de ventas por WhatsApp
+          Escribir a mi asesor por WhatsApp
         </a>
-        <p style="font-size:12px;color:var(--ink-400);margin-top:18px;">Guarda tu folio. Preséntalo al llegar a la agencia.</p>
+        <p style="font-size:12px;color:var(--ink-600);margin-top:18px;">Muestra este folio cuando llegues a la agencia. Tu asesor ya tiene tus datos.</p>
       </div>
     </div>
   </div>
@@ -1425,7 +1672,7 @@ function sendToWebhook(data) {
 const ASESOR_ASIGNADO = {
   nombre: 'VENDEDOR DIGITAL',
   canal: 'Canal de atencion digital',
-  telefono: '+52 33 0000 0000' // TODO: telefono real del canal
+  telefono: '+52 33 3344 4400' // Canal Seminuevos Plasencia
 };
 
 // ── VEHICLE DATA (15 seminuevos) ──
@@ -1477,7 +1724,7 @@ function renderCards(filter) {
   grid.innerHTML = filtered.map(v => {
     const monthly = calcMonthly(v.price, 20, 36);
     return `
-    <div class="v-card" onclick="openModal(${v.id})">
+    <div class="v-card" onclick="openModal(${v.id})" tabindex="0" role="button" aria-label="${displayName(v)} ${v.year} - ${fmt(v.price)}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openModal(${v.id})}">
       <div class="v-card-img-wrap">
         <img class="v-card-img" src="${v.img}" alt="${v.name}" loading="lazy">
         ${v.badge ? `<div class="v-card-badge ${badgeClass(v.badge)}">${v.badge}</div>` : ''}
@@ -1496,10 +1743,51 @@ function renderCards(filter) {
   }).join('');
 }
 
+// ── FORM STEP NAVIGATION (Progressive Disclosure) ──
+let currentFormStep = 1;
+function goToFormStep(step) {
+  // Validate current step before advancing
+  if (step > currentFormStep) {
+    if (currentFormStep === 1) {
+      const step1Fields = ['fName','fLastName1','fLastName2','fPhone','fEmail'];
+      let allValid = true;
+      step1Fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const v = el.value.trim();
+        let valid = v.length > 0;
+        if (id === 'fPhone') valid = /^[0-9]{10}$/.test(v);
+        else if (id === 'fEmail') valid = v.includes('@') && v.length >= 5;
+        if (!valid) { showFieldError(id); el.classList.add('error'); el.classList.remove('valid'); allValid = false; }
+        else { hideFieldError(id); el.classList.remove('error'); el.classList.add('valid'); }
+      });
+      if (!allValid) return;
+    }
+  }
+  // Update steps
+  currentFormStep = step;
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('formStep' + step);
+  if (target) target.classList.add('active');
+  // Update progress bar
+  document.querySelectorAll('.form-progress-step').forEach(s => {
+    const sNum = parseInt(s.dataset.step);
+    s.classList.remove('active','completed');
+    if (sNum === step) s.classList.add('active');
+    else if (sNum < step) s.classList.add('completed');
+  });
+  // Scroll form into view
+  const formHead = document.querySelector('.form-section-head');
+  if (formHead) formHead.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 function filterCars(type, el) {
   currentFilter = type;
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.filter-chip').forEach(c => {
+    c.classList.remove('active');
+    c.setAttribute('aria-pressed', 'false');
+  });
   el.classList.add('active');
+  el.setAttribute('aria-pressed', 'true');
   renderCards(type);
 }
 
@@ -1535,6 +1823,9 @@ function updateCalc() {
   const downAmount = Math.round(effectivePrice * downPct / 100);
 
   document.getElementById('downLabel').textContent = `${downPct}%`;
+  const slider = document.getElementById('downSlider');
+  slider.setAttribute('aria-valuenow', downPct);
+  slider.setAttribute('aria-valuetext', downPct + '% de enganche');
 
   const engancheEl = document.getElementById('engancheAmount');
   if (engancheEl) engancheEl.textContent = fmt(downAmount);
@@ -1821,6 +2112,7 @@ function openModal(id) {
   if (!currentCar) return;
 
   document.getElementById('modalImg').src = currentCar.img;
+  document.getElementById('modalImg').alt = displayName(currentCar) + ' ' + (currentCar.year || '') + ' ' + (currentCar.version || '');
   document.getElementById('modalName').textContent = `${currentCar.name} ${currentCar.year}`;
   document.getElementById('modalPrice').textContent = fmt(currentCar.price);
   document.getElementById('modalBadge').textContent = currentCar.badge;
@@ -1870,11 +2162,11 @@ function openModal(id) {
 
   // reset form
   ['fName','fLastName1','fLastName2','fPhone','fEmail'].forEach(id => document.getElementById(id).value = '');
-  // reset checkboxes to checked
+  // reset checkboxes to unchecked (consentimiento activo LFPDPPP)
   const privBox = document.getElementById('fPrivacy');
-  if (privBox) privBox.checked = true;
+  if (privBox) privBox.checked = false;
   const mktBox = document.getElementById('fMarketing');
-  if (mktBox) mktBox.checked = true;
+  if (mktBox) mktBox.checked = false;
   clearValidation();
 
   document.getElementById('detailState').style.display = 'block';
@@ -1882,6 +2174,7 @@ function openModal(id) {
 
   document.getElementById('vehicleModal').classList.add('open');
   document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
 }
 
 function closeModal() {
@@ -1890,6 +2183,8 @@ function closeModal() {
   document.documentElement.style.overflow = '';
   // Reset estado interno para que el proximo vehiculo abra limpio
   if (typeof resetSubmitState === 'function') resetSubmitState();
+  // Reset form steps to step 1
+  if (typeof goToFormStep === 'function') goToFormStep(1);
   const confirmEl = document.getElementById('confirmState');
   if (confirmEl) confirmEl.classList.remove('show');
   const detailEl = document.getElementById('detailState');
@@ -1954,6 +2249,13 @@ function showFieldError(id) {
   const errorEl = document.getElementById(id + '-error');
   if (el) el.classList.add('error');
   if (errorEl) errorEl.classList.add('show');
+}
+
+function hideFieldError(id) {
+  const el = document.getElementById(id);
+  const errorEl = document.getElementById(id + '-error');
+  if (el) el.classList.remove('error');
+  if (errorEl) errorEl.classList.remove('show');
 }
 
 function clearValidation() {
