@@ -227,7 +227,7 @@ body {
 }
 @media(min-width:768px){ .filters-section { top: 72px; } }
 .filters-wrap { display: flex; align-items: center; gap: 16px; }
-.filters-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; flex: 1; }
+.filters-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; flex: 1; -webkit-overflow-scrolling: touch; }
 .filter-chip {
   display: inline-flex; align-items: center; gap: 6px;
   background: #fff; border: 1.5px solid var(--ink-200);
@@ -353,6 +353,8 @@ body {
   -webkit-backdrop-filter: blur(10px);
   justify-content: center; align-items: flex-start;
   padding: 16px; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 .modal-overlay.open { display: flex; }
 .modal-content {
@@ -880,11 +882,14 @@ body { font-size: 15px; }
 
 /* Modal fullscreen en mobile */
 @media (max-width: 640px) {
-  .modal-overlay { padding: 0; align-items: stretch; }
+  .modal-overlay { padding: 0; align-items: stretch; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
   .modal-content {
     margin: 0; max-width: 100%;
     border-radius: 0;
     min-height: 100vh;
+    min-height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .modal-gallery { aspect-ratio: 4/3; }
   .modal-body { padding: 22px 18px 28px; }
@@ -958,10 +963,12 @@ body { font-size: 15px; }
 }
 .cal-nav {
   display: flex; align-items: center; justify-content: center;
-  width: 32px; height: 32px; border-radius: 50%;
+  width: 44px; height: 44px; border-radius: 50%;
   border: 1px solid var(--ink-200, #E2E8F0);
   background: #fff; cursor: pointer; color: var(--ink-600);
   transition: all var(--duration-fast, 160ms) var(--ease);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 .cal-nav:hover { border-color: var(--color-accent, #FBC645); color: var(--color-accent, #FBC645); }
 .cal-nav:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
@@ -980,7 +987,9 @@ body { font-size: 15px; }
   font-size: 13px; font-weight: 600; color: var(--ink-700, #2D3748);
   border-radius: 8px; cursor: pointer; border: none; background: transparent;
   transition: all var(--duration-fast, 160ms) var(--ease);
-  min-height: 36px;
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 .cal-day:hover:not(.cal-day--disabled):not(.cal-day--selected) {
   background: rgba(251,198,69,0.12); color: var(--color-accent-hover, #E5B232);
@@ -1014,7 +1023,7 @@ body { font-size: 15px; }
   display: flex; flex-wrap: wrap; gap: 6px;
 }
 .time-slot {
-  padding: 8px 14px;
+  padding: 10px 16px;
   font-size: 13px; font-weight: 600;
   color: var(--ink-600, #475569);
   background: #fff;
@@ -1023,6 +1032,10 @@ body { font-size: 15px; }
   cursor: pointer;
   transition: all var(--duration-fast, 160ms) var(--ease);
   font-family: var(--font-body, 'Inter');
+  min-height: 44px;
+  display: inline-flex; align-items: center; justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 .time-slot:hover:not(.time-slot--selected) {
   border-color: var(--color-accent, #FBC645);
@@ -1217,6 +1230,46 @@ select.form-input.valid { background-position: right 40px center; }
     scroll-behavior: auto !important;
   }
   html { scroll-behavior: auto; }
+}
+
+/* ── STICKY MOBILE CTA BAR ── */
+.sticky-mobile-cta {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 150;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  border-top: 1px solid var(--ink-200);
+  padding: 10px 16px;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+}
+@media (max-width: 640px) {
+  .sticky-mobile-cta { display: flex; gap: 10px; align-items: center; }
+  /* Offset body bottom so content is not hidden behind sticky bar */
+  body { padding-bottom: 76px; }
+  /* Hide sticky bar when modal is open (body is fixed) */
+  body[style*="position: fixed"] .sticky-mobile-cta { display: none; }
+}
+.sticky-mobile-cta-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 16px;
+  border: none; border-radius: var(--radius-md);
+  font-family: var(--font-display); font-size: 14px; font-weight: 800;
+  cursor: pointer; text-decoration: none;
+  min-height: 48px; touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  transition: all var(--duration-fast) var(--ease);
+}
+.sticky-mobile-cta-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+.sticky-mobile-cta-btn--primary {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+  color: var(--color-primary);
+  box-shadow: 0 6px 16px -4px rgba(251,198,69,0.45);
+}
+.sticky-mobile-cta-btn--wa {
+  background: #25D366; color: #fff;
+  box-shadow: 0 6px 16px -4px rgba(37,211,102,0.45);
 }
 </style>
 </head>
@@ -2245,14 +2298,25 @@ function openModal(id) {
   document.getElementById('confirmState').classList.remove('show');
 
   document.getElementById('vehicleModal').classList.add('open');
+  // Body scroll lock — iOS-safe: position fixed + save scroll position
+  document.body.dataset.scrollY = window.scrollY;
   document.body.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
+  document.body.style.top = `-${window.scrollY}px`;
   document.documentElement.style.overflow = 'hidden';
 }
 
 function closeModal() {
   document.getElementById('vehicleModal').classList.remove('open');
+  // Restore body scroll — iOS-safe: restore position and scroll
+  var savedScrollY = document.body.dataset.scrollY || '0';
   document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.width = '';
+  document.body.style.top = '';
   document.documentElement.style.overflow = '';
+  window.scrollTo(0, parseInt(savedScrollY, 10));
   // Reset estado interno para que el proximo vehiculo abra limpio
   if (typeof resetSubmitState === 'function') resetSubmitState();
   // Reset form steps to step 1
@@ -2707,6 +2771,18 @@ function addToCalendar() {
 
 // renderCards('all') se llama desde el fetch de catalogo-piloto.json al cargar
 </script>
+
+<!-- Sticky Mobile CTA Bar -->
+<div class="sticky-mobile-cta" id="stickyMobileCta">
+  <a href="#inventario" class="sticky-mobile-cta-btn sticky-mobile-cta-btn--primary" onclick="document.querySelector('.inventory-section').scrollIntoView({behavior:'smooth'});return false;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Ver inventario
+  </a>
+  <a href="https://wa.me/523333444400?text=Hola%2C%20me%20interesa%20un%20seminuevo" class="sticky-mobile-cta-btn sticky-mobile-cta-btn--wa" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.96 9.96 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+    WhatsApp
+  </a>
+</div>
 
 </body>
 </html>
