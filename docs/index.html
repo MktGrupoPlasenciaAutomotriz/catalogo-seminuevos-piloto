@@ -1725,6 +1725,8 @@ let currentCar = null;
 let selectedTerm = 36;
 let currentFilter = 'all';
 let searchQuery = '';
+const ITEMS_PER_PAGE = 12;
+let visibleCount = ITEMS_PER_PAGE;
 
 function fmt(n) { return '$' + n.toLocaleString('es-MX'); }
 
@@ -1740,6 +1742,7 @@ const CAM_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 // ── RENDER CARDS ──
 function onSearch(val) {
   searchQuery = val;
+  visibleCount = ITEMS_PER_PAGE;
   renderCards(currentFilter);
 }
 
@@ -1758,7 +1761,8 @@ function renderCards(filter) {
     );
   }
 
-  document.getElementById('carCount').textContent = filtered.length;
+  const showing = Math.min(visibleCount, filtered.length);
+  document.getElementById('carCount').textContent = filtered.length > showing ? showing + ' de ' + filtered.length : filtered.length;
 
   if (filtered.length === 0) {
     const noResultMsg = searchQuery
@@ -1772,7 +1776,10 @@ function renderCards(filter) {
     return;
   }
 
-  grid.innerHTML = filtered.map(v => {
+  const toShow = filtered.slice(0, visibleCount);
+  const remaining = filtered.length - toShow.length;
+
+  grid.innerHTML = toShow.map(v => {
     const monthly = calcMonthly(v.price, 20, 36);
     return `
     <div class="v-card" onclick="openModal(${v.id})" tabindex="0" role="button" aria-label="${v.name} ${v.year} - ${fmt(v.price)}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openModal(${v.id})}">
@@ -1792,6 +1799,19 @@ function renderCards(filter) {
       </div>
     </div>`;
   }).join('');
+
+  if (remaining > 0) {
+    grid.innerHTML += `<div style="grid-column:1/-1;text-align:center;padding:24px;">
+      <button onclick="loadMore()" style="padding:14px 32px;background:var(--color-accent,#FBC645);color:#1A1A1A;border:none;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:15px;cursor:pointer;min-height:48px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:transform 0.15s,box-shadow 0.15s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+        Ver más vehículos (${remaining} restantes)
+      </button>
+    </div>`;
+  }
+}
+
+function loadMore() {
+  visibleCount += ITEMS_PER_PAGE;
+  renderCards(currentFilter);
 }
 
 // ── FORM STEP NAVIGATION (Progressive Disclosure) ──
@@ -1833,6 +1853,7 @@ function goToFormStep(step) {
 }
 function filterCars(type, el) {
   currentFilter = type;
+  visibleCount = ITEMS_PER_PAGE;
   document.querySelectorAll('.filter-chip').forEach(c => {
     c.classList.remove('active');
     c.setAttribute('aria-pressed', 'false');
