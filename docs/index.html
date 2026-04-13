@@ -11,8 +11,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Seminuevos Plasencia | Encuentra tu auto ideal</title>
-<meta property="og:title" content="Seminuevos Plasencia — Autos certificados con garantia 6 meses">
-<meta property="og:description" content="79 vehiculos desde $158K. Bonos de hasta $15,000. Financiamiento desde 25% de enganche. Agenda tu cita gratis.">
+<meta property="og:title" content="Seminuevos Plasencia — Autos certificados con garantía 6 meses">
+<meta property="og:description" content="79 vehículos desde $158K. Bonos de hasta $15,000. Financiamiento desde 25% de enganche. Agenda tu cita gratis.">
 <meta property="og:image" content="https://mktgrupoplasenciaautomotriz.github.io/catalogo-seminuevos-piloto/og-seminuevos.jpg">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mktgrupoplasenciaautomotriz.github.io/catalogo-seminuevos-piloto/">
@@ -248,6 +248,30 @@ body {
   padding: 8px 14px; background: var(--ink-100); border-radius: var(--radius-full);
 }
 .filters-count strong { color: var(--ink-800); }
+
+/* ── SEARCH BAR ── */
+.search-bar-wrap { margin-bottom: 14px; }
+.search-bar {
+  position: relative; width: 100%; max-width: 480px;
+}
+.search-bar input {
+  width: 100%; padding: 11px 16px 11px 42px;
+  font-family: var(--font-body); font-size: 14px; font-weight: 500;
+  color: var(--ink-800); background: #fff;
+  border: 1.5px solid var(--ink-200); border-radius: var(--radius-full);
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease), box-shadow var(--duration-fast) var(--ease);
+}
+.search-bar input::placeholder { color: var(--ink-400); font-weight: 400; }
+.search-bar input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(251,198,69,0.18);
+}
+.search-bar-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; color: var(--ink-400); pointer-events: none;
+}
+.search-bar input:focus ~ .search-bar-icon { color: var(--color-accent); }
 
 /* ── VEHICLE GRID ── */
 .inventory-section { padding: 48px 0 64px; }
@@ -1224,8 +1248,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="container">
     <div class="hero-content">
       <div class="hero-tagline"><span class="dot"></span> Oferta abril — Bonos hasta $15,000</div>
-      <h1>Tu proximo auto<br><span class="gradient">esta aqui</span></h1>
-      <p class="hero-sub">Bonos de hasta $15,000 en vehiculos seleccionados. 19+ marcas, todos certificados con garantia 6 meses. Financiamiento desde 25% de enganche.</p>
+      <h1>Tu próximo auto<br><span class="gradient">está aquí</span></h1>
+      <p class="hero-sub">Bonos de hasta $15,000 en vehículos seleccionados. 19+ marcas, todos certificados con garantía 6 meses. Financiamiento desde 25% de enganche.</p>
       <div class="hero-stats">
         <div class="hero-stat">
           <div class="hero-stat-num">19+</div>
@@ -1237,7 +1261,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="hero-stat">
           <div class="hero-stat-num">$158K</div>
-          <div class="hero-stat-label">El mas accesible</div>
+          <div class="hero-stat-label">El más accesible</div>
         </div>
       </div>
       <button class="hero-cta" onclick="document.querySelector('.inventory-section').scrollIntoView({behavior:'smooth'})">
@@ -1252,9 +1276,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="trust-bar">
   <div class="container">
     <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> 150 puntos de inspeccion</div>
-    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 6 meses de garantia mecanica</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 6 meses de garantía mecánica</div>
     <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> 7 dias para devolver, sin letra chica</div>
-    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Credito desde 12 meses</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Crédito desde 12 meses</div>
     <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Factura original verificada</div>
   </div>
 </div>
@@ -1262,11 +1286,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ════ FILTERS ════ -->
 <section class="filters-section">
   <div class="container">
+    <div class="search-bar-wrap">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Buscar por marca, modelo o año..." oninput="onSearch(this.value)" autocomplete="off">
+        <svg class="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+    </div>
     <div class="filters-wrap">
       <div class="filters-row" id="filterRow">
         <button class="filter-chip active" onclick="filterCars('all', this)" aria-pressed="true">Todos</button>
         <button class="filter-chip" onclick="filterCars('suv', this)" aria-pressed="false">SUV</button>
-        <button class="filter-chip" onclick="filterCars('sedan', this)" aria-pressed="false">Sedan</button>
+        <button class="filter-chip" onclick="filterCars('sedan', this)" aria-pressed="false">Sedán</button>
         <button class="filter-chip" onclick="filterCars('pickup', this)" aria-pressed="false">Pick-up</button>
         <button class="filter-chip" onclick="filterCars('hatchback', this)" aria-pressed="false">Hatchback</button>
       </div>
@@ -1280,7 +1310,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="container">
     <div class="section-head">
       <span class="section-eyebrow">Inventario certificado</span>
-      <h2 class="section-title">Catalogo del mes</h2>
+      <h2 class="section-title">Catálogo del mes</h2>
     </div>
     <div class="inventory-grid" id="inventoryGrid">
       <!-- JS rendered -->
@@ -1302,7 +1332,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <p><strong>Seminuevos Plasencia</strong> &middot; Un legado de excelencia automotriz<br>Av. López Mateos Sur No. 2600, Col. La Calma, Zapopan, Jalisco<br>Lun a Vie 9:00 a 18:00 &middot; Sáb 9:00 a 14:00 &middot; Tel. (33) 3344 4400</p>
     <div style="margin-top:14px;"><a href="https://grupoplasencia.com/aviso_de_privacidad/" target="_blank" rel="noopener" style="color: rgba(255,255,255,0.5); text-decoration: underline; font-size: 12px;">Aviso de Privacidad</a></div>
-    <p style="margin-top:14px;font-size:11px;opacity:0.65;">Precios, equipamiento e imagenes de referencia. Sujetos a disponibilidad. Promociones vigentes del 1 al 30 de abril de 2026.</p>
+    <p style="margin-top:14px;font-size:11px;opacity:0.65;">Precios, equipamiento e imágenes de referencia. Sujetos a disponibilidad. Promociones vigentes del 1 al 30 de abril de 2026.</p>
     <p style="margin-top:8px;font-size:11px;opacity:0.65;">&copy; 2026 Grupo Plasencia Automotriz. Todos los derechos reservados.</p>
   </div>
 </footer>
@@ -1393,7 +1423,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="qualify-head">
             <div class="qualify-head-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></div>
             <div>
-              <h3 class="qualify-title">Personaliza tu cotizacion</h3>
+              <h3 class="qualify-title">Personaliza tu cotización</h3>
               <div class="qualify-sub">Para ofrecerte el mejor esquema fiscal y financiero</div>
             </div>
           </div>
@@ -1402,8 +1432,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="form-group full">
               <div class="label-with-tip">
                 Tipo de persona
-                <span class="tip" tabindex="0" aria-label="Informacion sobre tipo de persona">?
-                  <span class="tip-content">Personas fisicas con actividad empresarial y morales pueden acreditar el IVA y deducir el vehiculo si lo destinan a su actividad. Nos sirve para ofrecerte el mejor esquema (factura, leasing, credito empresarial).</span>
+                <span class="tip" tabindex="0" aria-label="Información sobre tipo de persona">?
+                  <span class="tip-content">Personas físicas con actividad empresarial y morales pueden acreditar el IVA y deducir el vehículo si lo destinan a su actividad. Nos sirve para ofrecerte el mejor esquema (factura, leasing, crédito empresarial).</span>
                 </span>
               </div>
               <select class="form-input" id="fTipoPersona" onchange="onTipoPersonaChange()" aria-describedby="fTipoPersona-error">
@@ -1429,7 +1459,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <option value="SI">Si, necesito financiamiento</option>
                 <option value="NO (CONTADO)">No, pago de contado</option>
               </select>
-              <div class="form-error-msg" id="fBuscaFinanciamiento-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Selecciona como piensas pagar</div>
+              <div class="form-error-msg" id="fBuscaFinanciamiento-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Selecciona cómo piensas pagar</div>
             </div>
 
             <div class="form-group" id="ingresosWrap" style="display:none;">
@@ -1450,7 +1480,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="form-section-head-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
             <div>
               <h3 class="form-section-title">Agenda tu visita a la agencia</h3>
-              <div class="form-section-sub">Solo 5 datos. Recibes tu precotizacion al instante.</div>
+              <div class="form-section-sub">Solo 5 datos. Recibes tu precotización al instante.</div>
             </div>
           </div>
 
@@ -1470,7 +1500,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
             <div class="form-progress-step" data-step="2">
               <div class="form-step-num">2</div>
-              <div class="form-step-label">Vehiculo</div>
+              <div class="form-step-label">Vehículo</div>
             </div>
             <div class="form-progress-step" data-step="3">
               <div class="form-step-num">3</div>
@@ -1484,7 +1514,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="form-group full">
               <label class="form-label" for="fName">Nombre(s) <span class="req">*</span></label>
               <input class="form-input" id="fName" type="text" placeholder="JUAN CARLOS" oninput="sanitizeOnInput(this); validateField(this)" autocomplete="given-name" required aria-required="true" aria-describedby="fName-error">
-              <div class="form-error-msg" id="fName-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Necesitamos tu nombre para la precotizacion</div>
+              <div class="form-error-msg" id="fName-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Necesitamos tu nombre para la precotización</div>
             </div>
             <div class="form-group">
               <label class="form-label" for="fLastName1">Apellido paterno <span class="req">*</span></label>
@@ -1506,9 +1536,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <div class="form-error-msg" id="fPhone-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Necesitamos 10 digitos para contactarte por WhatsApp</div>
             </div>
             <div class="form-group">
-              <label class="form-label" for="fEmail">Correo electronico <span class="req">*</span></label>
+              <label class="form-label" for="fEmail">Correo electrónico <span class="req">*</span></label>
               <input class="form-input" id="fEmail" type="email" placeholder="TU@EMAIL.COM" oninput="validateField(this)" autocomplete="email" required aria-required="true" aria-describedby="fEmail-error">
-              <div class="form-error-msg" id="fEmail-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Revisa tu correo — te enviaremos la precotizacion ahi</div>
+              <div class="form-error-msg" id="fEmail-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Revisa tu correo — te enviaremos la precotización ahí</div>
             </div>
           </div>
           <div class="form-step-nav">
@@ -1563,7 +1593,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
           <label for="fPrivacy" style="display:flex; align-items:flex-start; gap:8px; margin:16px 0 8px; font-size:13px; color:var(--ink-600, #475569); line-height:1.4; cursor:pointer;">
             <input type="checkbox" id="fPrivacy" required style="margin-top:3px; min-width:18px; min-height:18px; accent-color:var(--color-accent, #FBC645);">
-            <span>He leido y acepto el <a href="https://grupoplasencia.com/aviso_de_privacidad/" target="_blank" rel="noopener" style="color:var(--color-cyan, #17B7E0); text-decoration:underline;">Aviso de Privacidad</a> de Grupo Plasencia Automotriz.</span>
+            <span>He leído y acepto el <a href="https://grupoplasencia.com/aviso_de_privacidad/" target="_blank" rel="noopener" style="color:var(--color-cyan, #17B7E0); text-decoration:underline;">Aviso de Privacidad</a> de Grupo Plasencia Automotriz.</span>
           </label>
           <div class="form-error-msg" id="fPrivacy-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Acepta el aviso de privacidad para que podamos agendarte</div>
 
@@ -1591,13 +1621,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
         <div class="confirmation-title">Listo, tu cita esta agendada</div>
-        <p class="confirmation-subtitle" id="confirmSubtitle">Guarda tu folio y descarga tu precotizacion.</p>
+        <p class="confirmation-subtitle" id="confirmSubtitle">Guarda tu folio y descarga tu precotización.</p>
 
         <!-- QUE SIGUE -->
         <div class="next-steps">
           <div class="next-step-item">
             <div class="next-step-num">1</div>
-            <div class="next-step-text">Descarga tu precotizacion y guardala como referencia.</div>
+            <div class="next-step-text">Descarga tu precotización y guárdala como referencia.</div>
           </div>
           <div class="next-step-item">
             <div class="next-step-num">2</div>
@@ -1613,7 +1643,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="confirmation-details" id="confirmDetails"></div>
 
         <div style="margin:20px 0;border-radius:var(--radius-lg);overflow:hidden;border:1.5px solid var(--ink-200);">
-          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.6418057207534!2d-103.4083277!3d20.643452099999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ac5c80179401%3A0x8ed321a0e1445e25!2sSeminuevos%20Plasencia!5e0!3m2!1ses!2smx!4v1774907986396!5m2!1ses!2smx" width="100%" height="220" style="border:0;display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicacion de Seminuevos Plasencia en Google Maps"></iframe>
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.6418057207534!2d-103.4083277!3d20.643452099999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ac5c80179401%3A0x8ed321a0e1445e25!2sSeminuevos%20Plasencia!5e0!3m2!1ses!2smx!4v1774907986396!5m2!1ses!2smx" width="100%" height="220" style="border:0;display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación de Seminuevos Plasencia en Google Maps"></iframe>
           <div style="padding:14px 16px;background:#fff;text-align:left;">
             <div style="font-size:14px;font-weight:800;color:var(--ink-900);font-family:var(--font-display);">Seminuevos Plasencia</div>
             <div style="font-size:12px;color:var(--ink-500);margin-top:3px;">Av. López Mateos Sur, Guadalajara, Jalisco</div>
@@ -1623,7 +1653,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <button onclick="generateQuotePDF()" class="btn-pdf">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Descargar mi precotizacion
+          Descargar mi precotización
         </button>
         <button onclick="addToCalendar()" class="btn-cal">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -1687,13 +1717,14 @@ fetch('catalogo-piloto.json')
   })
   .catch(err => {
     console.error('Error cargando catalogo:', err);
-    document.querySelector('.v-grid').innerHTML = '<p style="text-align:center;color:#999;padding:40px;">Error cargando inventario. Intenta recargar la pagina.</p>';
+    document.querySelector('.v-grid').innerHTML = '<p style="text-align:center;color:#999;padding:40px;">Error cargando inventario. Intenta recargar la página.</p>';
   });
 
 
 let currentCar = null;
 let selectedTerm = 36;
 let currentFilter = 'all';
+let searchQuery = '';
 
 function fmt(n) { return '$' + n.toLocaleString('es-MX'); }
 
@@ -1707,16 +1738,36 @@ const PIN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 const CAM_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>';
 
 // ── RENDER CARDS ──
+function onSearch(val) {
+  searchQuery = val;
+  renderCards(currentFilter);
+}
+
 function renderCards(filter) {
   const grid = document.getElementById('inventoryGrid');
-  const filtered = filter === 'all' ? vehicles : vehicles.filter(v => v.type === filter);
+  let filtered = filter === 'all' ? vehicles : vehicles.filter(v => v.type === filter);
+
+  // Filtro de búsqueda
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(v =>
+      (v.name || '').toLowerCase().includes(q) ||
+      (v.version || '').toLowerCase().includes(q) ||
+      String(v.year).includes(q) ||
+      (v.color || '').toLowerCase().includes(q)
+    );
+  }
+
   document.getElementById('carCount').textContent = filtered.length;
 
   if (filtered.length === 0) {
+    const noResultMsg = searchQuery
+      ? `Sin resultados para "<strong>${searchQuery.replace(/</g,'&lt;')}</strong>"`
+      : 'Sin resultados';
     grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:64px 20px;color:var(--ink-500);">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-bottom:12px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--ink-700);">Sin resultados</div>
-      <div style="font-size:13px;margin-top:4px;">Prueba con otra categoria</div>
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--ink-700);">${noResultMsg}</div>
+      <div style="font-size:13px;margin-top:4px;">Prueba con otra categoría o término de búsqueda</div>
     </div>`;
     return;
   }
@@ -1724,7 +1775,7 @@ function renderCards(filter) {
   grid.innerHTML = filtered.map(v => {
     const monthly = calcMonthly(v.price, 20, 36);
     return `
-    <div class="v-card" onclick="openModal(${v.id})" tabindex="0" role="button" aria-label="${displayName(v)} ${v.year} - ${fmt(v.price)}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openModal(${v.id})}">
+    <div class="v-card" onclick="openModal(${v.id})" tabindex="0" role="button" aria-label="${v.name} ${v.year} - ${fmt(v.price)}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openModal(${v.id})}">
       <div class="v-card-img-wrap">
         <img class="v-card-img" src="${v.img}" alt="${v.name}" loading="lazy">
         ${v.badge ? `<div class="v-card-badge ${badgeClass(v.badge)}">${v.badge}</div>` : ''}
@@ -2111,7 +2162,7 @@ function openModal(id) {
   if (!currentCar) return;
 
   document.getElementById('modalImg').src = currentCar.img;
-  document.getElementById('modalImg').alt = displayName(currentCar) + ' ' + (currentCar.year || '') + ' ' + (currentCar.version || '');
+  document.getElementById('modalImg').alt = currentCar.name + ' ' + (currentCar.year || '') + ' ' + (currentCar.version || '');
   document.getElementById('modalName').textContent = `${currentCar.name} ${currentCar.year}`;
   document.getElementById('modalPrice').textContent = fmt(currentCar.price);
   document.getElementById('modalBadge').textContent = currentCar.badge;
