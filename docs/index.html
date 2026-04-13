@@ -249,24 +249,31 @@ body {
 }
 .filters-count strong { color: var(--ink-800); }
 
-/* ── SEARCH BAR ── */
-.search-bar-wrap { margin-bottom: 14px; }
-.search-bar {
-  position: relative; width: 100%; max-width: 480px;
+/* ── FILTER BAR (dropdowns) ── */
+.filter-bar { padding: 16px 0; }
+.filter-bar-inner { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filter-search { position: relative; flex: 1; min-width: 200px; }
+.filter-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ink-400, #94A3B8); pointer-events: none; }
+.filter-search input { width: 100%; padding: 10px 12px 10px 36px; border: 1px solid var(--ink-200, #E2E8F0); border-radius: 9999px; font-size: 14px; font-family: var(--font-body); background: #fff; transition: border-color 0.15s; color: var(--ink-800); }
+.filter-search input::placeholder { color: var(--ink-400); font-weight: 400; }
+.filter-search input:focus { outline: none; border-color: var(--color-accent, #FBC645); box-shadow: 0 0 0 3px rgba(251,198,69,0.15); }
+.filter-select { padding: 10px 32px 10px 14px; border: 1px solid var(--ink-200, #E2E8F0); border-radius: 9999px; font-size: 13px; font-family: var(--font-body); background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center; -webkit-appearance: none; appearance: none; cursor: pointer; color: var(--ink-600, #475569); transition: border-color 0.15s; }
+.filter-select:focus { outline: none; border-color: var(--color-accent, #FBC645); }
+.filter-clear { padding: 10px 16px; border: 1px solid var(--ink-200, #E2E8F0); border-radius: 9999px; font-size: 12px; font-weight: 600; font-family: var(--font-body); background: #fff; color: var(--ink-500, #718096); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.filter-clear:hover { background: var(--ink-50, #F7FAFC); border-color: var(--ink-300); color: var(--ink-700); }
+.filter-active-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.filter-active-pills:empty { display: none; }
+.filter-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: var(--color-accent, #FBC645); color: #1A1A1A; border-radius: 9999px; font-size: 11px; font-weight: 600; }
+.filter-pill button { background: none; border: none; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; color: rgba(0,0,0,0.5); }
+.filter-pill button:hover { color: #1A1A1A; }
+.filter-count { margin-top: 8px; font-size: 12px; color: var(--ink-500, #718096); }
+@media(max-width:640px) {
+  .filter-bar-inner { flex-direction: column; }
+  .filter-search { min-width: 100%; }
+  .filter-dropdown-wrap { width: calc(50% - 4px); }
+  .filter-select { width: 100%; }
 }
-.search-bar input {
-  width: 100%; padding: 11px 16px 11px 42px;
-  font-family: var(--font-body); font-size: 14px; font-weight: 500;
-  color: var(--ink-800); background: #fff;
-  border: 1.5px solid var(--ink-200); border-radius: var(--radius-full);
-  outline: none;
-  transition: border-color var(--duration-fast) var(--ease), box-shadow var(--duration-fast) var(--ease);
-}
-.search-bar input::placeholder { color: var(--ink-400); font-weight: 400; }
-.search-bar input:focus {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(251,198,69,0.18);
-}
+/* legacy compat - keep search-bar-icon ref if needed */
 .search-bar-icon {
   position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
   width: 18px; height: 18px; color: var(--ink-400); pointer-events: none;
@@ -863,15 +870,14 @@ body { font-size: 15px; }
 .phone-prefix { min-height: 48px; font-size: 15px; }
 
 /* Touch targets >= 44x44 */
-.filter-chip, .calc-term-btn, .btn-conversion, .btn-pdf, .btn-cal, .btn-wa-asesor, .header-tel-link, .modal-close {
+.filter-select, .filter-clear, .calc-term-btn, .btn-conversion, .btn-pdf, .btn-cal, .btn-wa-asesor, .header-tel-link, .modal-close {
   min-height: 44px;
 }
 /* Eliminar delay de 300ms y double-tap zoom en mobile */
-.v-card, .filter-chip, .calc-term-btn, .calc-slider, .btn-conversion, .btn-pdf, .btn-cal, .btn-wa-asesor, .modal-close, .header-tel-link, .form-input, .form-select, button, a {
+.v-card, .filter-select, .filter-clear, .calc-term-btn, .calc-slider, .btn-conversion, .btn-pdf, .btn-cal, .btn-wa-asesor, .modal-close, .header-tel-link, .form-input, .form-select, button, a {
   touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
-.filter-chip { padding: 11px 18px; }
 .calc-term-btn { padding: 14px 4px; min-height: 48px; }
 .modal-close { width: 44px; height: 44px; }
 
@@ -1339,49 +1345,60 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ════ FILTERS ════ -->
 <section class="filters-section">
   <div class="container">
-    <div class="search-bar-wrap">
-      <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Buscar por marca, modelo o año..." oninput="onSearch(this.value)" autocomplete="off">
-        <svg class="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <div class="filter-bar">
+      <div class="filter-bar-inner">
+        <div class="filter-search">
+          <svg class="filter-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Buscar marca, modelo o año..." oninput="onSearch(this.value)" id="searchInput">
+        </div>
+        <div class="filter-dropdown-wrap">
+          <select onchange="filterByType(this.value)" id="filterType" class="filter-select">
+            <option value="all">Tipo</option>
+            <option value="suv">SUV</option>
+            <option value="sedan">Sedan</option>
+            <option value="pickup">Pick-up</option>
+            <option value="hatchback">Hatchback</option>
+          </select>
+        </div>
+        <div class="filter-dropdown-wrap">
+          <select onchange="filterByBrandSelect(this.value)" id="filterBrand" class="filter-select">
+            <option value="all">Marca</option>
+            <option value="Hyundai">Hyundai</option>
+            <option value="Ford">Ford</option>
+            <option value="Nissan">Nissan</option>
+            <option value="Mazda">Mazda</option>
+            <option value="Chevrolet">Chevrolet</option>
+            <option value="Jeep">Jeep</option>
+            <option value="Toyota">Toyota</option>
+            <option value="Volkswagen">VW</option>
+            <option value="_other">Otras</option>
+          </select>
+        </div>
+        <div class="filter-dropdown-wrap">
+          <select onchange="filterByPriceSelect(this.value)" id="filterPrice" class="filter-select">
+            <option value="all">Precio</option>
+            <option value="0-200">Hasta $200K</option>
+            <option value="200-350">$200K - $350K</option>
+            <option value="350-500">$350K - $500K</option>
+            <option value="500-750">$500K - $750K</option>
+            <option value="750+">$750K+</option>
+          </select>
+        </div>
+        <div class="filter-dropdown-wrap">
+          <select onchange="filterByLocSelect(this.value)" id="filterLoc" class="filter-select">
+            <option value="all">Ubicacion</option>
+            <option value="Lopez Mateos">Lopez Mateos</option>
+            <option value="Mazda Plasencia">Mazda Plasencia</option>
+          </select>
+        </div>
+        <button onclick="clearAllFilters()" class="filter-clear" id="filterClearBtn" style="display:none;">✕ Limpiar</button>
       </div>
+      <div class="filter-active-pills" id="activePills"></div>
+      <div class="filter-count"><strong id="carCount">0</strong> vehiculos</div>
     </div>
-    <div class="filters-wrap">
-      <div class="filters-row" id="filterRow">
-        <button class="filter-chip active" onclick="filterCars('all', this)" aria-pressed="true">Todos</button>
-        <button class="filter-chip" onclick="filterCars('suv', this)" aria-pressed="false">SUV</button>
-        <button class="filter-chip" onclick="filterCars('sedan', this)" aria-pressed="false">Sedán</button>
-        <button class="filter-chip" onclick="filterCars('pickup', this)" aria-pressed="false">Pick-up</button>
-        <button class="filter-chip" onclick="filterCars('hatchback', this)" aria-pressed="false">Hatchback</button>
-        <span style="width:1px;height:24px;background:var(--ink-200,#CBD5E0);margin:0 4px;"></span>
-        <button class="filter-chip" onclick="filterByLoc('all', this)" aria-pressed="false" data-loc="all" style="background:var(--color-primary-light,#2D3748);color:#F7FAFC;border-color:var(--color-primary-light,#2D3748);">Todo el lote</button>
-        <button class="filter-chip" onclick="filterByLoc('Lopez Mateos', this)" aria-pressed="false" data-loc="Lopez Mateos">López Mateos <span style="font-size:10px;opacity:0.7;">(68)</span></button>
-        <button class="filter-chip" onclick="filterByLoc('Mazda Plasencia', this)" aria-pressed="false" data-loc="Mazda Plasencia">Mazda Plasencia <span style="font-size:10px;opacity:0.7;">(22)</span></button>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;" id="brandFilters">
-        <button class="filter-chip active" onclick="filterByBrand('all', this)" data-brand="all" aria-pressed="true" style="font-size:11px;padding:6px 14px;">Todas las marcas</button>
-        <button class="filter-chip" onclick="filterByBrand('Hyundai', this)" data-brand="Hyundai" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Hyundai</button>
-        <button class="filter-chip" onclick="filterByBrand('Ford', this)" data-brand="Ford" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Ford</button>
-        <button class="filter-chip" onclick="filterByBrand('Nissan', this)" data-brand="Nissan" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Nissan</button>
-        <button class="filter-chip" onclick="filterByBrand('Mazda', this)" data-brand="Mazda" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Mazda</button>
-        <button class="filter-chip" onclick="filterByBrand('Chevrolet', this)" data-brand="Chevrolet" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Chevrolet</button>
-        <button class="filter-chip" onclick="filterByBrand('Jeep', this)" data-brand="Jeep" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Jeep</button>
-        <button class="filter-chip" onclick="filterByBrand('Toyota', this)" data-brand="Toyota" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Toyota</button>
-        <button class="filter-chip" onclick="filterByBrand('Volkswagen', this)" data-brand="Volkswagen" aria-pressed="false" style="font-size:11px;padding:6px 14px;">VW</button>
-        <button class="filter-chip" onclick="filterByBrand('_other', this)" data-brand="_other" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Otras</button>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;" id="priceFilters">
-        <button class="filter-chip active" onclick="filterByPrice('all', this)" data-price="all" aria-pressed="true" style="font-size:11px;padding:6px 14px;">Cualquier precio</button>
-        <button class="filter-chip" onclick="filterByPrice('0-200', this)" data-price="0-200" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Hasta $200K</button>
-        <button class="filter-chip" onclick="filterByPrice('200-350', this)" data-price="200-350" aria-pressed="false" style="font-size:11px;padding:6px 14px;">$200K - $350K</button>
-        <button class="filter-chip" onclick="filterByPrice('350-500', this)" data-price="350-500" aria-pressed="false" style="font-size:11px;padding:6px 14px;">$350K - $500K</button>
-        <button class="filter-chip" onclick="filterByPrice('500-750', this)" data-price="500-750" aria-pressed="false" style="font-size:11px;padding:6px 14px;">$500K - $750K</button>
-        <button class="filter-chip" onclick="filterByPrice('750+', this)" data-price="750+" aria-pressed="false" style="font-size:11px;padding:6px 14px;">$750K+</button>
-      </div>
-      <div style="font-size:11px;color:var(--ink-400,#94A3B8);margin-top:6px;padding:0 4px;line-height:1.4;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        Ambas ubicaciones están en el mismo complejo: <strong>Av. López Mateos Sur 2600, Jardines del Sol, Zapopan</strong>. Un solo lote, todas las marcas disponibles. <a href="#" onclick="event.preventDefault();document.getElementById('mapModal').style.display='flex'" style="color:var(--color-accent,#FBC645);text-decoration:underline;font-weight:600;">Ver en mapa →</a>
-      </div>
-      <div class="filters-count"><strong id="carCount">15</strong> vehículos</div>
+    <div style="font-size:11px;color:var(--ink-400,#94A3B8);margin-top:2px;padding:0 4px;line-height:1.4;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Ambas ubicaciones están en el mismo complejo: <strong>Av. López Mateos Sur 2600, Jardines del Sol, Zapopan</strong>. Un solo lote, todas las marcas disponibles. <a href="#" onclick="event.preventDefault();document.getElementById('mapModal').style.display='flex'" style="color:var(--color-accent,#FBC645);text-decoration:underline;font-weight:600;">Ver en mapa →</a>
     </div>
   </div>
 </section>
@@ -1826,48 +1843,39 @@ const PIN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 const CAM_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>';
 
 // ── RENDER CARDS ──
-function filterByLoc(loc, el) {
-  currentLocFilter = loc;
+function filterByType(val) { currentFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); }
+function filterByBrandSelect(val) { currentBrandFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); }
+function filterByPriceSelect(val) { currentPriceFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); }
+function filterByLocSelect(val) { currentLocFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); }
+function onSearch(val) { searchQuery = val; visibleCount = ITEMS_PER_PAGE; renderCards(currentFilter); updateFilterUI(); }
+
+function clearAllFilters() {
+  currentFilter = 'all'; currentBrandFilter = 'all'; currentPriceFilter = 'all'; currentLocFilter = 'all'; searchQuery = '';
   visibleCount = ITEMS_PER_PAGE;
-  document.querySelectorAll('.filter-chip[data-loc]').forEach(c => {
-    c.classList.remove('active');
-    c.style.background = ''; c.style.color = ''; c.style.borderColor = '';
-  });
-  el.classList.add('active');
-  el.style.background = 'var(--color-primary-light,#2D3748)';
-  el.style.color = '#F7FAFC';
-  el.style.borderColor = 'var(--color-primary-light,#2D3748)';
-  renderCards(currentFilter);
+  document.getElementById('filterType').value = 'all';
+  document.getElementById('filterBrand').value = 'all';
+  document.getElementById('filterPrice').value = 'all';
+  document.getElementById('filterLoc').value = 'all';
+  document.getElementById('searchInput').value = '';
+  updateFilters();
 }
 
-function filterByPrice(range, el) {
-  currentPriceFilter = range;
-  visibleCount = ITEMS_PER_PAGE;
-  document.querySelectorAll('#priceFilters .filter-chip').forEach(c => {
-    c.classList.remove('active');
-    c.setAttribute('aria-pressed','false');
-  });
-  el.classList.add('active');
-  el.setAttribute('aria-pressed','true');
+function updateFilters() {
   renderCards(currentFilter);
+  updateFilterUI();
 }
 
-function filterByBrand(brand, el) {
-  currentBrandFilter = brand;
-  visibleCount = ITEMS_PER_PAGE;
-  document.querySelectorAll('#brandFilters .filter-chip').forEach(c => {
-    c.classList.remove('active');
-    c.setAttribute('aria-pressed','false');
-  });
-  el.classList.add('active');
-  el.setAttribute('aria-pressed','true');
-  renderCards(currentFilter);
-}
-
-function onSearch(val) {
-  searchQuery = val;
-  visibleCount = ITEMS_PER_PAGE;
-  renderCards(currentFilter);
+function updateFilterUI() {
+  var hasFilters = currentFilter !== 'all' || currentBrandFilter !== 'all' || currentPriceFilter !== 'all' || currentLocFilter !== 'all' || searchQuery;
+  document.getElementById('filterClearBtn').style.display = hasFilters ? '' : 'none';
+  var pills = document.getElementById('activePills');
+  var html = '';
+  if (currentFilter !== 'all') html += '<span class="filter-pill">' + document.getElementById('filterType').selectedOptions[0].text + ' <button onclick="filterByType(\'all\');document.getElementById(\'filterType\').value=\'all\'">x</button></span>';
+  if (currentBrandFilter !== 'all') html += '<span class="filter-pill">' + document.getElementById('filterBrand').selectedOptions[0].text + ' <button onclick="filterByBrandSelect(\'all\');document.getElementById(\'filterBrand\').value=\'all\'">x</button></span>';
+  if (currentPriceFilter !== 'all') html += '<span class="filter-pill">' + document.getElementById('filterPrice').selectedOptions[0].text + ' <button onclick="filterByPriceSelect(\'all\');document.getElementById(\'filterPrice\').value=\'all\'">x</button></span>';
+  if (currentLocFilter !== 'all') html += '<span class="filter-pill">' + document.getElementById('filterLoc').selectedOptions[0].text + ' <button onclick="filterByLocSelect(\'all\');document.getElementById(\'filterLoc\').value=\'all\'">x</button></span>';
+  if (searchQuery) html += '<span class="filter-pill">&quot;' + searchQuery + '&quot; <button onclick="document.getElementById(\'searchInput\').value=\'\';onSearch(\'\')">x</button></span>';
+  pills.innerHTML = html;
 }
 
 function renderCards(filter) {
@@ -2004,17 +2012,7 @@ function goToFormStep(step) {
   const formHead = document.querySelector('.form-section-head');
   if (formHead) formHead.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-function filterCars(type, el) {
-  currentFilter = type;
-  visibleCount = ITEMS_PER_PAGE;
-  document.querySelectorAll('.filter-chip').forEach(c => {
-    c.classList.remove('active');
-    c.setAttribute('aria-pressed', 'false');
-  });
-  el.classList.add('active');
-  el.setAttribute('aria-pressed', 'true');
-  renderCards(type);
-}
+/* filterCars replaced by filterByType dropdown */
 
 // ── CALCULATOR ──
 // TODO confirmar tasa real seminuevos con Chucho
