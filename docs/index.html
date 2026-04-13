@@ -1830,7 +1830,6 @@ function updateCalc() {
   const engancheEl = document.getElementById('engancheAmount');
   if (engancheEl) engancheEl.textContent = fmt(downAmount);
 
-  const slider = document.getElementById('downSlider');
   const pct = ((downPct - 20) / 50) * 100;
   slider.style.background = `linear-gradient(to right, var(--color-accent) 0%, var(--color-accent) ${pct}%, var(--ink-200) ${pct}%)`;
 
