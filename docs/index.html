@@ -1359,7 +1359,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
       <div style="font-size:11px;color:var(--ink-400,#94A3B8);margin-top:6px;padding:0 4px;line-height:1.4;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        Ambas ubicaciones están en el mismo complejo: <strong>Av. López Mateos Sur 2600, Jardines del Sol, Zapopan</strong>. Un solo lote, todas las marcas disponibles.
+        Ambas ubicaciones están en el mismo complejo: <strong>Av. López Mateos Sur 2600, Jardines del Sol, Zapopan</strong>. Un solo lote, todas las marcas disponibles. <a href="#" onclick="event.preventDefault();document.getElementById('mapModal').style.display='flex'" style="color:var(--color-accent,#FBC645);text-decoration:underline;font-weight:600;">Ver en mapa →</a>
       </div>
       <div class="filters-count"><strong id="carCount">15</strong> vehículos</div>
     </div>
@@ -2810,6 +2810,26 @@ function addToCalendar() {
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.96 9.96 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
     WhatsApp
   </a>
+</div>
+
+<!-- ════ MAP MODAL ════ -->
+<div id="mapModal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:640px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #E2E8F0;">
+      <div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:16px;color:#1A1A1A;">Seminuevos Plasencia</div>
+        <div style="font-size:12px;color:#718096;margin-top:2px;">Av. López Mateos Sur 2600, Jardines del Sol, Zapopan</div>
+      </div>
+      <button onclick="document.getElementById('mapModal').style.display='none'" style="background:none;border:none;font-size:24px;cursor:pointer;color:#718096;padding:4px 8px;line-height:1;" aria-label="Cerrar mapa">&times;</button>
+    </div>
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.6418057207534!2d-103.4083277!3d20.643452099999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ac5c80179401%3A0x8ed321a0e1445e25!2sSeminuevos%20Plasencia!5e0!3m2!1ses!2smx!4v1774907986396!5m2!1ses!2smx" width="100%" height="360" style="border:0;display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación de Seminuevos Plasencia"></iframe>
+    <div style="padding:12px 20px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #E2E8F0;">
+      <a href="https://maps.google.com/?q=Seminuevos+Plasencia+Lopez+Mateos+Zapopan" target="_blank" rel="noopener" style="padding:10px 20px;background:var(--color-accent,#FBC645);color:#1A1A1A;border:none;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Abrir en Google Maps
+      </a>
+    </div>
+  </div>
 </div>
 
 </body>
