@@ -1948,6 +1948,7 @@ function renderCards(filter) {
           <div class="v-card-price">${fmt(v.price)}</div>
           <div class="v-card-monthly"><span>Desde</span> ${fmt(monthly)}/mes</div>
         </div>
+        <div style="margin-top:10px;"><button style="width:100%;padding:10px;background:var(--color-accent,#FBC645);color:#1A1A1A;border:none;border-radius:8px;font-family:var(--font-display);font-weight:700;font-size:13px;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='';this.style.boxShadow=''">Agendar cita para este auto</button></div>
       </div>
     </div>`;
   }).join('');
