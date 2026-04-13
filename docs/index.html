@@ -1357,6 +1357,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <button class="filter-chip" onclick="filterByLoc('Lopez Mateos', this)" aria-pressed="false" data-loc="Lopez Mateos">López Mateos <span style="font-size:10px;opacity:0.7;">(68)</span></button>
         <button class="filter-chip" onclick="filterByLoc('Mazda Plasencia', this)" aria-pressed="false" data-loc="Mazda Plasencia">Mazda Plasencia <span style="font-size:10px;opacity:0.7;">(22)</span></button>
       </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;" id="brandFilters">
+        <button class="filter-chip active" onclick="filterByBrand('all', this)" data-brand="all" aria-pressed="true" style="font-size:11px;padding:6px 14px;">Todas las marcas</button>
+        <button class="filter-chip" onclick="filterByBrand('Hyundai', this)" data-brand="Hyundai" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Hyundai</button>
+        <button class="filter-chip" onclick="filterByBrand('Ford', this)" data-brand="Ford" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Ford</button>
+        <button class="filter-chip" onclick="filterByBrand('Nissan', this)" data-brand="Nissan" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Nissan</button>
+        <button class="filter-chip" onclick="filterByBrand('Mazda', this)" data-brand="Mazda" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Mazda</button>
+        <button class="filter-chip" onclick="filterByBrand('Chevrolet', this)" data-brand="Chevrolet" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Chevrolet</button>
+        <button class="filter-chip" onclick="filterByBrand('Jeep', this)" data-brand="Jeep" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Jeep</button>
+        <button class="filter-chip" onclick="filterByBrand('Toyota', this)" data-brand="Toyota" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Toyota</button>
+        <button class="filter-chip" onclick="filterByBrand('Volkswagen', this)" data-brand="Volkswagen" aria-pressed="false" style="font-size:11px;padding:6px 14px;">VW</button>
+        <button class="filter-chip" onclick="filterByBrand('_other', this)" data-brand="_other" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Otras</button>
+      </div>
       <div style="font-size:11px;color:var(--ink-400,#94A3B8);margin-top:6px;padding:0 4px;line-height:1.4;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
         Ambas ubicaciones están en el mismo complejo: <strong>Av. López Mateos Sur 2600, Jardines del Sol, Zapopan</strong>. Un solo lote, todas las marcas disponibles. <a href="#" onclick="event.preventDefault();document.getElementById('mapModal').style.display='flex'" style="color:var(--color-accent,#FBC645);text-decoration:underline;font-weight:600;">Ver en mapa →</a>
@@ -1787,7 +1799,9 @@ let currentCar = null;
 let selectedTerm = 36;
 let currentFilter = 'all';
 let currentLocFilter = 'all';
+let currentBrandFilter = 'all';
 let searchQuery = '';
+const TOP_BRANDS = ['Hyundai','Ford','Nissan','Mazda','Chevrolet','Jeep','Toyota','Volkswagen'];
 const ITEMS_PER_PAGE = 12;
 let visibleCount = ITEMS_PER_PAGE;
 
@@ -1817,6 +1831,18 @@ function filterByLoc(loc, el) {
   renderCards(currentFilter);
 }
 
+function filterByBrand(brand, el) {
+  currentBrandFilter = brand;
+  visibleCount = ITEMS_PER_PAGE;
+  document.querySelectorAll('#brandFilters .filter-chip').forEach(c => {
+    c.classList.remove('active');
+    c.setAttribute('aria-pressed','false');
+  });
+  el.classList.add('active');
+  el.setAttribute('aria-pressed','true');
+  renderCards(currentFilter);
+}
+
 function onSearch(val) {
   searchQuery = val;
   visibleCount = ITEMS_PER_PAGE;
@@ -1830,6 +1856,15 @@ function renderCards(filter) {
   // Filtro de ubicación
   if (currentLocFilter !== 'all') {
     filtered = filtered.filter(v => v.loc === currentLocFilter);
+  }
+
+  // Filtro de marca
+  if (currentBrandFilter !== 'all') {
+    if (currentBrandFilter === '_other') {
+      filtered = filtered.filter(v => !TOP_BRANDS.includes(v.brand));
+    } else {
+      filtered = filtered.filter(v => v.brand === currentBrandFilter);
+    }
   }
 
   // Filtro de búsqueda
@@ -1872,6 +1907,10 @@ function renderCards(filter) {
         <div class="v-card-photos">${CAM_SVG} ${v.photos}</div>
       </div>
       <div class="v-card-body">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+          <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 6px;border-radius:4px;background:var(--ink-100,#EDF2F7);color:var(--ink-600,#475569);">${v.brand||''}</span>
+          <span style="font-size:9px;color:var(--ink-400,#94A3B8);">${v.loc||''}</span>
+        </div>
         <div class="v-card-title">${v.name} ${v.year}</div>
         <div class="v-card-specs">${v.version} &middot; ${v.km.toLocaleString()} km &middot; ${v.trans}</div>
         <div class="v-card-price-row">

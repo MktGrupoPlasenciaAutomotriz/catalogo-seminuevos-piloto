@@ -152,6 +152,7 @@ def transform(fields):
         "badge": badge,
         "photos": int(fields.get("TOTAL_IMAGENES", 0) or 0),
         "loc": get_loc(fields),
+        "brand": fields.get("MARCA", "") or "",
     }
 
 def main():
