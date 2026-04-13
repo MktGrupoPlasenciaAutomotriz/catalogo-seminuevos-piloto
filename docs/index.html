@@ -1369,6 +1369,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <button class="filter-chip" onclick="filterByBrand('Volkswagen', this)" data-brand="Volkswagen" aria-pressed="false" style="font-size:11px;padding:6px 14px;">VW</button>
         <button class="filter-chip" onclick="filterByBrand('_other', this)" data-brand="_other" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Otras</button>
       </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;" id="priceFilters">
+        <button class="filter-chip active" onclick="filterByPrice('all', this)" data-price="all" aria-pressed="true" style="font-size:11px;padding:6px 14px;">Cualquier precio</button>
+        <button class="filter-chip" onclick="filterByPrice('0-200', this)" data-price="0-200" aria-pressed="false" style="font-size:11px;padding:6px 14px;">Hasta $200K</button>
+        <button class="filter-chip" onclick="filterByPrice('200-350', this)" data-price="200-350" aria-pressed="false" style="font-size:11px;padding:6px 14px;">$200K - $350K</button>
+        <button class="filter-chip" onclick="filterByPrice('350-500', this)" data-price="350-500" aria-pressed="false" style="font-size:11px;padding:6px 14px;">$350K - $500K</button>
+        <button class="filter-chip" onclick="filterByPrice('500-750', this)" data-price="500-750" aria-pressed="false" style="font-size:11px;padding:6px 14px;">$500K - $750K</button>
+        <button class="filter-chip" onclick="filterByPrice('750+', this)" data-price="750+" aria-pressed="false" style="font-size:11px;padding:6px 14px;">$750K+</button>
+      </div>
       <div style="font-size:11px;color:var(--ink-400,#94A3B8);margin-top:6px;padding:0 4px;line-height:1.4;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
         Ambas ubicaciones están en el mismo complejo: <strong>Av. López Mateos Sur 2600, Jardines del Sol, Zapopan</strong>. Un solo lote, todas las marcas disponibles. <a href="#" onclick="event.preventDefault();document.getElementById('mapModal').style.display='flex'" style="color:var(--color-accent,#FBC645);text-decoration:underline;font-weight:600;">Ver en mapa →</a>
@@ -1800,6 +1808,7 @@ let selectedTerm = 36;
 let currentFilter = 'all';
 let currentLocFilter = 'all';
 let currentBrandFilter = 'all';
+let currentPriceFilter = 'all';
 let searchQuery = '';
 const TOP_BRANDS = ['Hyundai','Ford','Nissan','Mazda','Chevrolet','Jeep','Toyota','Volkswagen'];
 const ITEMS_PER_PAGE = 12;
@@ -1828,6 +1837,18 @@ function filterByLoc(loc, el) {
   el.style.background = 'var(--color-primary-light,#2D3748)';
   el.style.color = '#F7FAFC';
   el.style.borderColor = 'var(--color-primary-light,#2D3748)';
+  renderCards(currentFilter);
+}
+
+function filterByPrice(range, el) {
+  currentPriceFilter = range;
+  visibleCount = ITEMS_PER_PAGE;
+  document.querySelectorAll('#priceFilters .filter-chip').forEach(c => {
+    c.classList.remove('active');
+    c.setAttribute('aria-pressed','false');
+  });
+  el.classList.add('active');
+  el.setAttribute('aria-pressed','true');
   renderCards(currentFilter);
 }
 
@@ -1865,6 +1886,16 @@ function renderCards(filter) {
     } else {
       filtered = filtered.filter(v => v.brand === currentBrandFilter);
     }
+  }
+
+  // Filtro de precio
+  if (currentPriceFilter !== 'all') {
+    const p = currentPriceFilter;
+    if (p === '0-200') filtered = filtered.filter(v => v.price <= 200000);
+    else if (p === '200-350') filtered = filtered.filter(v => v.price > 200000 && v.price <= 350000);
+    else if (p === '350-500') filtered = filtered.filter(v => v.price > 350000 && v.price <= 500000);
+    else if (p === '500-750') filtered = filtered.filter(v => v.price > 500000 && v.price <= 750000);
+    else if (p === '750+') filtered = filtered.filter(v => v.price > 750000);
   }
 
   // Filtro de búsqueda
