@@ -85,11 +85,17 @@ def get_engine(fields):
 def get_img(fields):
     imgs = fields.get("IMAGENES_URLS")
     if imgs and isinstance(imgs, str):
-        # Airtable returns multilineText as string with newlines
         first = imgs.strip().split("\n")[0].strip()
         if first: return first
     thumb = fields.get("THUMBNAIL", "")
     return thumb or ""
+
+def get_all_imgs(fields):
+    """Return list of all image URLs for gallery."""
+    imgs = fields.get("IMAGENES_URLS")
+    if imgs and isinstance(imgs, str):
+        return [u.strip() for u in imgs.strip().split("\n") if u.strip()]
+    return []
 
 def get_loc(fields):
     aid = fields.get("AGENCIA_ID")
@@ -153,6 +159,7 @@ def transform(fields):
         "photos": int(fields.get("TOTAL_IMAGENES", 0) or 0),
         "loc": get_loc(fields),
         "brand": fields.get("MARCA", "") or "",
+        "gallery": get_all_imgs(fields),
     }
 
 def main():
