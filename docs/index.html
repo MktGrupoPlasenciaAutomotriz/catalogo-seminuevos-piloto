@@ -1442,8 +1442,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
     <div class="modal-gallery" id="modalGallery">
-      <img id="modalImg" src="" alt="">
-      <div id="modalPhotoCount" style="text-align:center;padding:6px 0;font-size:11px;color:var(--ink-400,#A0AEC0);background:rgba(0,0,0,0.55);position:absolute;bottom:0;left:0;right:0;display:none;"></div>
+      <img id="modalImg" src="" alt="" style="cursor:pointer;" onclick="galleryNav(1)">
+      <button id="galleryPrev" onclick="event.stopPropagation();galleryNav(-1)" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:#fff;font-size:20px;cursor:pointer;display:none;backdrop-filter:blur(4px);line-height:1;">&lsaquo;</button>
+      <button id="galleryNext" onclick="event.stopPropagation();galleryNav(1)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:#fff;font-size:20px;cursor:pointer;display:none;backdrop-filter:blur(4px);line-height:1;">&rsaquo;</button>
+      <div id="modalPhotoCount" style="text-align:center;padding:6px 0;font-size:11px;color:#fff;background:rgba(0,0,0,0.5);position:absolute;bottom:0;left:0;right:0;display:none;backdrop-filter:blur(4px);"></div>
       <div class="modal-gallery-badge" id="modalBadge"></div>
       <div class="modal-gallery-loc" id="modalGalleryLoc">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -1826,6 +1828,15 @@ fetch('catalogo-piloto.json')
 
 
 let currentCar = null;
+let galleryIdx = 0;
+let galleryImgs = [];
+
+function galleryNav(dir) {
+  if (galleryImgs.length <= 1) return;
+  galleryIdx = (galleryIdx + dir + galleryImgs.length) % galleryImgs.length;
+  document.getElementById('modalImg').src = galleryImgs[galleryIdx];
+  document.getElementById('modalPhotoCount').textContent = (galleryIdx + 1) + ' de ' + galleryImgs.length + ' fotos';
+}
 let selectedTerm = 36;
 let currentFilter = 'all';
 let currentLocFilter = 'all';
@@ -2338,14 +2349,23 @@ function openModal(id) {
   currentCar = vehicles.find(v => v.id === id);
   if (!currentCar) return;
 
-  document.getElementById('modalImg').src = currentCar.img;
+  // Gallery setup
+  galleryIdx = 0;
+  galleryImgs = (currentCar.gallery && currentCar.gallery.length > 0) ? currentCar.gallery : [currentCar.img];
+  document.getElementById('modalImg').src = galleryImgs[0];
   document.getElementById('modalImg').alt = currentCar.name + ' ' + (currentCar.year || '') + ' ' + (currentCar.version || '');
   var photoCountEl = document.getElementById('modalPhotoCount');
-  if (currentCar.photos && currentCar.photos > 1) {
-    photoCountEl.innerHTML = '\uD83D\uDCF8 1 de ' + currentCar.photos + ' fotos disponibles \u2014 agenda tu cita para verlas todas';
+  var prevBtn = document.getElementById('galleryPrev');
+  var nextBtn = document.getElementById('galleryNext');
+  if (galleryImgs.length > 1) {
+    photoCountEl.textContent = '1 de ' + galleryImgs.length + ' fotos';
     photoCountEl.style.display = 'block';
+    prevBtn.style.display = 'block';
+    nextBtn.style.display = 'block';
   } else {
     photoCountEl.style.display = 'none';
+    prevBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
   }
   document.getElementById('modalName').textContent = `${currentCar.name} ${currentCar.year}`;
   document.getElementById('modalPrice').textContent = fmt(currentCar.price);
