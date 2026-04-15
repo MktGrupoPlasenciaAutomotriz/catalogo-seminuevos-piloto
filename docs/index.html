@@ -1778,6 +1778,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ════ JAVASCRIPT ════ -->
 <script>
 const WEBHOOK_URL = 'https://hooks.zapier.com/hooks/catch/27114778/u7dvk6y/';
+var searchDebounce = null;
 
 function sendToWebhook(data) {
   if (!WEBHOOK_URL) return;
@@ -1868,11 +1869,19 @@ const PIN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 const CAM_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>';
 
 // ── RENDER CARDS ──
-function filterByType(val) { currentFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); }
-function filterByBrandSelect(val) { currentBrandFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); }
-function filterByPriceSelect(val) { currentPriceFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); }
-function filterByLocSelect(val) { currentLocFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); }
-function onSearch(val) { searchQuery = val; visibleCount = ITEMS_PER_PAGE; renderCards(currentFilter); updateFilterUI(); }
+function filterByType(val) { currentFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_type', filter_value: val }); }
+function filterByBrandSelect(val) { currentBrandFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_brand', filter_value: val }); }
+function filterByPriceSelect(val) { currentPriceFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_price', filter_value: val }); }
+function filterByLocSelect(val) { currentLocFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_location', filter_value: val }); }
+function onSearch(val) {
+  searchQuery = val; visibleCount = ITEMS_PER_PAGE; renderCards(currentFilter); updateFilterUI();
+  clearTimeout(searchDebounce);
+  if (val && val.length >= 2) {
+    searchDebounce = setTimeout(function() {
+      dataLayer.push({ event: 'search', search_term: val, results_count: document.querySelectorAll('.v-card').length });
+    }, 1000);
+  }
+}
 
 function clearAllFilters() {
   currentFilter = 'all'; currentBrandFilter = 'all'; currentPriceFilter = 'all'; currentLocFilter = 'all'; searchQuery = '';
@@ -1883,6 +1892,7 @@ function clearAllFilters() {
   document.getElementById('filterLoc').value = 'all';
   document.getElementById('searchInput').value = '';
   updateFilters();
+  dataLayer.push({ event: 'filter_clear' });
 }
 
 function updateFilters() {
@@ -2025,6 +2035,9 @@ function goToFormStep(step) {
     }
   }
   // Update steps
+  if (step === 2 && currentCar) {
+    dataLayer.push({ event: 'form_start', item_name: currentCar.name + ' ' + currentCar.year, item_price: currentCar.price });
+  }
   currentFormStep = step;
   document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
   const target = document.getElementById('formStep' + step);
@@ -2360,6 +2373,7 @@ function openModal(id) {
   if (typeof resetSubmitState === 'function') resetSubmitState();
   currentCar = vehicles.find(v => v.id === id);
   if (!currentCar) return;
+  dataLayer.push({ event: 'view_item', item_name: currentCar.name + ' ' + currentCar.year, item_price: currentCar.price, item_brand: currentCar.brand || '' });
 
   // Gallery setup
   galleryIdx = 0;
@@ -2670,6 +2684,7 @@ function submitForm() {
   };
 
   sendToWebhook(payload);
+  dataLayer.push({ event: 'generate_lead', item_name: currentCar.name + ' ' + currentCar.year, item_price: currentCar.price, lead_value: currentCar.price });
 
   lastAppointment = {
     ...payload,
