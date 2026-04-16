@@ -1465,6 +1465,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="modal-vehicle-version" id="modalLocation"></div>
           </div>
           <div class="modal-vehicle-price" id="modalPrice"></div>
+            <div class="modal-vehicle-price-disclaimer" style="font-size:11px;color:var(--ink-500,#64748B);margin-top:4px;font-weight:500;line-height:1.35;">Precio de lista, incluye IVA. Sujeto a cambios sin previo aviso.</div>
         </div>
 
         <div class="modal-specs" id="modalSpecs"></div>
@@ -2001,6 +2002,7 @@ function renderCards(filter) {
           <div class="v-card-price" title="Precio de lista, incluye IVA. Sujeto a cambios sin previo aviso.">${fmt(v.price)}</div>
           <div class="v-card-monthly"><span>Desde</span> ${fmt(monthly)}/mes</div>
         </div>
+        <div class="v-card-price-disclaimer" style="font-size:10px;color:var(--ink-400,#94A3B8);margin-top:4px;line-height:1.3;">Precio de lista, incluye IVA. Sujeto a cambios sin previo aviso.</div>
         <div style="margin-top:10px;display:flex;gap:6px;">
           ${v.badge ? `<button onclick="event.stopPropagation();this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'" style="flex:1;padding:10px;background:transparent;color:var(--color-accent,#FBC645);border:1.5px solid var(--color-accent,#FBC645);border-radius:8px;font-family:var(--font-display);font-weight:700;font-size:11px;cursor:pointer;transition:all 0.15s;">Ver promoción</button><div style="display:none;position:absolute;left:12px;right:12px;bottom:52px;background:#1A1A1A;color:#F7FAFC;padding:12px 14px;border-radius:10px;font-size:12px;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,0.3);z-index:5;"><strong style="color:var(--color-accent,#FBC645);">${v.badge}</strong><br>Tasa referencial estimada 14.9%. Enganche desde 25%.<br><span style="font-size:10px;color:#A0AEC0;">Vigencia abril 2026. Sujeto a disponibilidad.</span></div>` : ''}
           <button onclick="event.stopPropagation();openModal(${v.id})" style="flex:1;padding:10px;background:var(--color-accent,#FBC645);color:#1A1A1A;border:none;border-radius:8px;font-family:var(--font-display);font-weight:700;font-size:11px;cursor:pointer;transition:transform 0.15s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">Agendar cita</button>
