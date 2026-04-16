@@ -2859,6 +2859,14 @@ function generateQuotePDF() {
   const downAmount = Math.round(a.precio * a.enganche_pct / 100);
   twoColRow('Enganche', `${a.enganche_pct}% · $${downAmount.toLocaleString('es-MX')}`, 'Plazo', `${a.plazo_meses} meses`);
   twoColRow('Tasa referencial anual', `${(cfg.tasaAnual * 100).toFixed(1)}%`, 'Financiamiento', a.busca_financiamiento || '—');
+  if (a.comprueba_ingresos && a.comprueba_ingresos !== 'N/A' && a.comprueba_ingresos !== '') {
+    twoColRow('Comprueba ingresos', a.comprueba_ingresos, '', '');
+    if ((a.comprueba_ingresos||'').toUpperCase() === 'NO') {
+      y += 1; doc.setFontSize(8); doc.setTextColor(16, 93, 78); doc.setFont('helvetica', 'normal');
+      doc.text('Nota: No comprobar ingresos no impide la compra. Puede implicar enganche desde 25% o esquema alternativo que tu asesor te detallara.', margin, y, { maxWidth: pageW - (margin*2) });
+      doc.setFontSize(10); doc.setTextColor(0,0,0); y += 6;
+    }
+  }
 
   // Mensualidad — bloque hero negro con cyan/gold
   y += 1;
