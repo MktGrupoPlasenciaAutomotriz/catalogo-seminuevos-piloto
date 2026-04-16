@@ -1813,7 +1813,7 @@ function sendToWebhook(data) {
 const ASESOR_ASIGNADO = {
   nombre: 'VENDEDOR DIGITAL',
   canal: 'Canal de atencion digital',
-  telefono: '+52 33 3344 4400' // Canal Seminuevos Plasencia
+  telefono: '+52 33 4163 8050' // Canal Seminuevos Plasencia (WhatsApp Business)
 };
 
 // ── CAPTURE URL PARAMS (fbclid, gclid, UTMs) ──
@@ -2700,8 +2700,8 @@ function submitForm() {
   document.getElementById('detailState').style.display = 'none';
   document.getElementById('confirmFolio').textContent = folio;
   const waPhone = ASESOR_ASIGNADO.telefono.replace(/[^0-9]/g, '');
-  const waMsg = `Hola, acabo de agendar una cita en Seminuevos Plasencia. Folio: ${folio}. Vehiculo: ${currentCar.name} ${currentCar.year}.`;
-  document.getElementById('waAsesor').href = `https://wa.me/${waPhone}?text=${encodeURIComponent(waMsg)}`;
+  const waMsg = `Hola, soy ${nombre} ${ap1}. Acabo de agendar mi cita en Seminuevos Plasencia para el ${dateLabel} a las ${timeLabel}. Vengo por ${currentCar.name} ${currentCar.year} (${currentCar.version}). Mi folio es ${folio}.`;
+  document.getElementById('waAsesor').href = `https://api.whatsapp.com/send/?phone=${waPhone}&text=${encodeURIComponent(waMsg)}&type=phone_number&app_absent=0`;
   document.getElementById('confirmDetails').innerHTML = `
     <p><span>Vehículo</span> <strong>${currentCar.name} ${currentCar.year}</strong></p>
     <p><span>Versión</span> <strong>${currentCar.version}</strong></p>
