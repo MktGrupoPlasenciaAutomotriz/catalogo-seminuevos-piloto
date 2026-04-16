@@ -1575,12 +1575,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             <div class="form-group" id="ingresosWrap" style="display:none;">
               <label class="form-label" for="fCompruebaIngresos">¿Puedes comprobar ingresos?</label>
-              <select class="form-input" id="fCompruebaIngresos">
+              <select class="form-input" id="fCompruebaIngresos" onchange="toggleIngresosFeedback(this)">
                 <option value="">Selecciona</option>
                 <option value="SI">Sí</option>
                 <option value="NO">No</option>
               </select>
-              <div class="help-text">No es requisito, solo nos ayuda a calificar mejor tu crédito.</div>
+              <div class="help-text">Si no puedes comprobarlos, no te preocupa: no es restricción para la compra. Solo puede implicar un enganche mayor (desde 25%).</div>
             </div>
           </div>
         </div>
@@ -2937,6 +2937,23 @@ function addToCalendar() {
 }
 
 // renderCards('all') se llama desde el fetch de catalogo-piloto.json al cargar
+
+// Feedback amistoso cuando el usuario indica que no puede comprobar ingresos
+function toggleIngresosFeedback(sel) {
+  var existing = document.getElementById('ingresosFeedback');
+  if (sel.value === 'NO') {
+    if (!existing) {
+      var feedback = document.createElement('div');
+      feedback.id = 'ingresosFeedback';
+      feedback.style.cssText = 'margin-top:8px;padding:10px 12px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:8px;font-size:12px;color:var(--color-success-dark,#065F46);line-height:1.45;';
+      feedback.innerHTML = '<strong>Tranquilo, no es restricción para comprar.</strong> Tu asesor te mostrará opciones con un enganche mayor (desde 25%) o esquemas alternativos. Lo vemos juntos en la cita.';
+      sel.parentNode.appendChild(feedback);
+    }
+  } else if (existing) {
+    existing.remove();
+  }
+}
+
 </script>
 
 
