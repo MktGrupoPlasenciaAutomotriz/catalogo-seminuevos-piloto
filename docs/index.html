@@ -1434,7 +1434,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <p><strong>Seminuevos Plasencia</strong> &middot; Un legado de excelencia automotriz<br>Av. López Mateos Sur No. 2600, Col. La Calma, Zapopan, Jalisco<br>Lun a Vie 9:00 a 18:00 &middot; Sáb 9:00 a 14:00 &middot; Tel. (33) 3344 4400</p>
     <div style="margin-top:14px;"><a href="https://grupoplasencia.com/aviso_de_privacidad/" target="_blank" rel="noopener" style="color: rgba(255,255,255,0.5); text-decoration: underline; font-size: 12px;">Aviso de Privacidad</a></div>
-    <p style="margin-top:14px;font-size:11px;opacity:0.65;">Vigencia del 1 al 30 de abril de 2026 o hasta agotar existencias. Precios de lista en pesos mexicanos, incluyen IVA y estan sujetos a cambios sin previo aviso. Los intereses del financiamiento causan IVA adicional; la mensualidad mostrada es estimada y puede variar al momento de la contratacion segun tasa autorizada, enganche y esquema elegido. Promociones y bonos aplican unicamente en vehiculos seminuevos seleccionados. Imagenes ilustrativas. Consulta modelos participantes, terminos y condiciones con tu asesor de ventas. Credito sujeto a aprobacion bancaria.</p>
+    <p style="margin-top:14px;font-size:11px;opacity:0.65;">Vigencia del 1 al 30 de abril de 2026 o hasta agotar existencias. Precios de lista en pesos mexicanos, incluyen IVA y están sujetos a cambios sin previo aviso. Los intereses del financiamiento causan IVA adicional; la mensualidad mostrada es estimada y puede variar al momento de la contratación según tasa autorizada, enganche y esquema elegido. Promociones y bonos aplican únicamente en vehículos seminuevos seleccionados. Imágenes ilustrativas. Consulta modelos participantes, términos y condiciones con tu asesor de ventas. Crédito sujeto a aprobación bancaria.</p>
     <p style="margin-top:8px;font-size:11px;opacity:0.65;">&copy; 2026 Grupo Plasencia Automotriz. Todos los derechos reservados.</p>
   </div>
 </footer>
@@ -1520,7 +1520,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="calc-result-label">Tu mensualidad estimada</div>
             <div class="calc-result-amount" id="monthlyAmount">$0</div>
             <div class="calc-result-sub">Tasa referencial estimada: <strong>14.9%</strong></div>
-            <div style="font-size:10px;color:rgba(255,255,255,0.42);margin-top:6px;line-height:1.35;font-style:italic;position:relative;">Mensualidad estimada. El importe real puede variar al contratar segun tasa autorizada, enganche, plazo y esquema elegido. El interes causa IVA.</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.42);margin-top:6px;line-height:1.35;font-style:italic;position:relative;">Mensualidad estimada. El importe real puede variar al contratar según tasa autorizada, enganche, plazo y esquema elegido. El interés causa IVA.</div>
             <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-top:6px;line-height:1.4;position:relative;">* Cálculo con fines informativos y tasa referencial estimada. No constituye una autorización de crédito ni una oferta vinculante. La tasa real, monto y plazo dependen de la institución financiera, el perfil del solicitante y el vehículo seleccionado. Consulta condiciones con tu asesor de ventas.</div>
           </div>
 
@@ -1775,6 +1775,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           Escribir a mi asesor por WhatsApp
         </a>
         <p style="font-size:12px;color:var(--ink-600);margin-top:18px;">Muestra este folio cuando llegues a la agencia. Tu asesor ya tiene tus datos.</p>
+        <p style="font-size:11px;color:var(--ink-500);margin-top:16px;line-height:1.5;max-width:500px;margin-left:auto;margin-right:auto;padding:10px 14px;background:var(--ink-50);border:1px solid var(--ink-200);border-radius:8px;">La precotización descargable es un documento de carácter informativo. No constituye una cotización oficial ni una oferta vinculante. La cotización formal, condiciones finales de financiamiento y precio de contratación serán proporcionados por tu asesor de ventas durante la visita a la agencia. Consulta modelos participantes, términos y condiciones con tu asesor. Crédito sujeto a aprobación bancaria.</p>
       </div>
     </div>
   </div>
@@ -2766,7 +2767,7 @@ function generateQuotePDF() {
   doc.text(`Emitido: ${today}`, pageW - margin, 21, { align: 'right' });
   const vigenciaDate = new Date();
   vigenciaDate.setDate(vigenciaDate.getDate() + cfg.vigenciaDias);
-  doc.text(`Vigencia: ${cfg.vigenciaDias} días (al ${vigenciaDate.toLocaleDateString('es-MX')})`, pageW - margin, 25, { align: 'right' });
+  doc.text(`Emitida: ${new Date().toLocaleDateString('es-MX')}`, pageW - margin, 25, { align: 'right' });
 
   // Cursor
   let y = headerH + 9;
@@ -2905,7 +2906,7 @@ function generateQuotePDF() {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6.5);
   doc.setTextColor(...cfg.mutedColor);
-  const legal = 'Precio sujeto a disponibilidad. Vehículo seminuevo certificado. Garantía mecánica 6 meses. Cotización preliminar sujeta a aprobación crediticia. Vigencia 7 días.';
+  const legal = 'Documento de carácter informativo. No constituye una cotización oficial ni una oferta vinculante. Precios de lista en MXN, incluyen IVA y están sujetos a cambios sin previo aviso. Los intereses del financiamiento causan IVA adicional; la mensualidad es estimada y puede variar al contratar según tasa autorizada, enganche y esquema elegido. La cotización formal y condiciones finales serán proporcionadas por tu asesor de ventas durante la visita a la agencia. Vehículo seminuevo certificado. Garantía mecánica 6 meses. Crédito sujeto a aprobación bancaria.';
   const legalLines = doc.splitTextToSize(legal, contentW);
   const legalHeight = legalLines.length * 3; // approx 3mm per line at 6.5pt
   // Ensure legal text does not collide with brand line at pageH - 8
