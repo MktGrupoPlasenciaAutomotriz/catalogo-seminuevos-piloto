@@ -1966,23 +1966,36 @@ function renderCards(filter) {
   document.getElementById('carCount').textContent = filtered.length > showing ? showing + ' de ' + filtered.length : filtered.length;
 
   if (filtered.length === 0) {
-    const noResultMsg = searchQuery
-      ? `Sin resultados para "<strong>${searchQuery.replace(/</g,'&lt;')}</strong>"`
-      : 'Sin resultados';
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:64px 20px;color:var(--ink-500);">
-      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-bottom:12px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--ink-700);">${noResultMsg}</div>
-      <div style="font-size:13px;margin-top:4px;">Prueba con otra categoría o término de búsqueda</div>
-    </div>`;
+    const suggestions = getSuggestions(3);
+    const msgText = searchQuery ? 'para "' + searchQuery.replace(/</g,'&lt;') + '"' : 'con esos filtros';
+    grid.innerHTML =
+      '<div style="grid-column:1/-1;text-align:center;padding:40px 20px 20px;">' +
+        '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;margin-bottom:10px;color:var(--ink-500);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
+        '<div style="font-weight:800;font-size:18px;color:var(--ink-900);margin-bottom:8px;font-family:var(--font-display);">No encontramos autos ' + msgText + '</div>' +
+        '<div style="font-size:14px;color:var(--ink-500);margin-bottom:18px;">Pero te sugerimos estos — los más atractivos del inventario:</div>' +
+        '<button onclick="clearAllFilters()" style="padding:10px 20px;background:transparent;border:1.5px solid var(--ink-300);border-radius:9999px;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink-700);font-family:var(--font-body);">↺ Ver todo el inventario</button>' +
+      '</div>' +
+      suggestions.map(buildVCardHTML).join('');
     return;
   }
 
   const toShow = filtered.slice(0, visibleCount);
   const remaining = filtered.length - toShow.length;
 
-  grid.innerHTML = toShow.map(v => {
-    const monthly = calcMonthly(v.price, 20, 36);
-    return `
+  grid.innerHTML = toShow.map(buildVCardHTML).join('');
+  if (remaining > 0) {
+    grid.innerHTML += `<div style="grid-column:1/-1;text-align:center;padding:24px;">
+      <button onclick="loadMore()" style="padding:14px 32px;background:var(--color-accent,#FBC645);color:#1A1A1A;border:none;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:15px;cursor:pointer;min-height:48px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:transform 0.15s,box-shadow 0.15s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+        Ver más vehículos (${remaining} restantes)
+      </button>
+    </div>`;
+  }
+}
+
+// Card template unificado
+function buildVCardHTML(v) {
+  const monthly = calcMonthly(v.price, 20, 36);
+  return `
     <div class="v-card" onclick="openModal(${v.id})" tabindex="0" role="button" aria-label="${v.name} ${v.year} - ${fmt(v.price)}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openModal(${v.id})}">
       <div class="v-card-img-wrap">
         <img class="v-card-img" src="${v.img}" alt="${v.name}" loading="lazy">
@@ -2008,15 +2021,35 @@ function renderCards(filter) {
         </div>
       </div>
     </div>`;
-  }).join('');
+}
 
-  if (remaining > 0) {
-    grid.innerHTML += `<div style="grid-column:1/-1;text-align:center;padding:24px;">
-      <button onclick="loadMore()" style="padding:14px 32px;background:var(--color-accent,#FBC645);color:#1A1A1A;border:none;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:15px;cursor:pointer;min-height:48px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:transform 0.15s,box-shadow 0.15s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
-        Ver más vehículos (${remaining} restantes)
-      </button>
-    </div>`;
+function getSuggestions(n) {
+  function bonoAmt(v) {
+    const m = (v.badge || '').match(/\$\s*([\d,]+)/);
+    return m ? parseInt(m[1].replace(/,/g,''), 10) : 0;
   }
+  return vehicles.slice().sort(function(a, b){
+    const d = bonoAmt(b) - bonoAmt(a);
+    if (d !== 0) return d;
+    const y = (b.year || 0) - (a.year || 0);
+    if (y !== 0) return y;
+    return (b.price || 0) - (a.price || 0);
+  }).slice(0, n || 3);
+}
+
+function clearAllFilters() {
+  searchQuery = '';
+  currentFilter = 'all';
+  currentBrandFilter = 'all';
+  currentPriceFilter = 'all';
+  currentLocFilter = 'all';
+  const si = document.getElementById('searchInput'); if (si) si.value = '';
+  ['filterType','filterBrand','filterPrice','filterLoc'].forEach(function(id){
+    const el = document.getElementById(id); if (el) el.value = 'all';
+  });
+  visibleCount = ITEMS_PER_PAGE;
+  renderCards('all');
+  if (typeof updateFilterUI === 'function') updateFilterUI();
 }
 
 function loadMore() {
