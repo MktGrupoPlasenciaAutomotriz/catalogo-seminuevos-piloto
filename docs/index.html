@@ -2507,7 +2507,8 @@ function openModal(id) {
   document.getElementById('detailState').style.display = 'block';
   document.getElementById('confirmState').classList.remove('show');
 
-  document.getElementById('vehicleModal').classList.add('open');
+  const modal = document.getElementById('vehicleModal');
+  modal.classList.add('open');
   // Body scroll lock — iOS-safe: position fixed + save scroll position
   document.body.dataset.scrollY = window.scrollY;
   document.body.style.overflow = 'hidden';
@@ -2515,6 +2516,12 @@ function openModal(id) {
   document.body.style.width = '100%';
   document.body.style.top = `-${window.scrollY}px`;
   document.documentElement.style.overflow = 'hidden';
+  // Scroll al TOP: usuario ve primero auto + calculadora, no datos personales
+  requestAnimationFrame(() => {
+    modal.scrollTop = 0;
+    const content = modal.querySelector('.modal-content');
+    if (content) content.scrollTop = 0;
+  });
 }
 
 function closeModal() {
