@@ -876,6 +876,7 @@ select.form-input {
   margin-top: 6px; display: none; align-items: center; gap: 5px;
 }
 .form-error-msg.show { display: flex; }
+.form-error-msg svg { width:14px; height:14px; flex-shrink:0; }
 .form-error-msg svg { width: 13px; height: 13px; flex-shrink: 0; }
 .form-input.valid { border-color: var(--color-success); }
 
@@ -2907,6 +2908,29 @@ function resetSubmitState() {
   const b = document.querySelector('.btn-conversion');
   if (b) { b.disabled = false; b.style.opacity = ''; b.style.cursor = ''; }
 }
+
+// Scroll al primer campo con error (UX: user-centric — sube al problema)
+function scrollToFirstError() {
+  // Prioridad: campo input con error > error-msg visible > banner global
+  const firstInvalidInput = document.querySelector('.form-step.active .form-input.error, .form-step.active select.error');
+  const firstErrorMsg = document.querySelector('.form-step.active .form-error-msg.show');
+  const target = firstInvalidInput || firstErrorMsg;
+  if (!target) return;
+  // Scroll del modal-content (scroll interno del modal)
+  const modal = document.getElementById('vehicleModal');
+  const content = modal ? modal.querySelector('.modal-content') : null;
+  const scroller = content || modal || document.scrollingElement;
+  if (scroller && scroller.scrollBy) {
+    const rect = target.getBoundingClientRect();
+    const offset = rect.top - 120; // margen arriba para contexto
+    scroller.scrollBy({ top: offset, behavior: 'smooth' });
+  }
+  // Focus si es input/select (en mobile abre teclado solo si input, evitamos)
+  if (firstInvalidInput && window.innerWidth > 768) {
+    firstInvalidInput.focus({ preventScroll: true });
+  }
+}
+
 function submitForm() {
   if (submitting) return;
   clearValidation();
