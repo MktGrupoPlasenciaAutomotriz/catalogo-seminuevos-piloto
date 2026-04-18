@@ -2761,6 +2761,9 @@ function openModal(id) {
   document.getElementById('confirmState').classList.remove('show');
 
   const modal = document.getElementById('vehicleModal');
+  const content = modal.querySelector('.modal-content');
+  const resetModalScroll = () => { modal.scrollTop = 0; if (content) content.scrollTop = 0; };
+  resetModalScroll();
   modal.classList.add('open');
   // Body scroll lock — iOS-safe: position fixed + save scroll position
   document.body.dataset.scrollY = window.scrollY;
@@ -2769,12 +2772,10 @@ function openModal(id) {
   document.body.style.width = '100%';
   document.body.style.top = `-${window.scrollY}px`;
   document.documentElement.style.overflow = 'hidden';
-  // Scroll al TOP: usuario ve primero auto + calculadora, no datos personales
-  requestAnimationFrame(() => {
-    modal.scrollTop = 0;
-    const content = modal.querySelector('.modal-content');
-    if (content) content.scrollTop = 0;
-  });
+  // Triple safety net — iOS puede cachear scroll
+  requestAnimationFrame(resetModalScroll);
+  setTimeout(resetModalScroll, 50);
+  setTimeout(resetModalScroll, 200);
 }
 
 function closeModal() {
