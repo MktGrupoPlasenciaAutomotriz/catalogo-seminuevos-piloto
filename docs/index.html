@@ -1168,6 +1168,11 @@ body { font-size: 15px; }
   letter-spacing: 0.3px; white-space: nowrap;
 }
 .form-progress-step.active .form-step-label { color: var(--ink-900); }
+.step-summary { display:none; align-items:center; justify-content:space-between; gap:12px; padding:10px 14px; margin:0 0 16px; background:linear-gradient(135deg,#1A1A1A,#2A2A2A); color:#F7FAFC; border-radius:12px; position:sticky; top:0; z-index:5; }
+.step-summary.show { display:flex; }
+.step-summary-main { flex:1; min-width:0; }
+.step-summary-title { font-family:var(--font-display); font-weight:700; font-size:13px; color:#F7FAFC; line-height:1.2; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.step-summary-meta { font-size:11px; color:#CBD5E1; margin-top:2px; font-weight:500; }
 .form-progress-step.completed .form-step-label { color: var(--color-success-dark); }
 @media(max-width:559px){ .form-step-label { display: none; } }
 
@@ -1618,6 +1623,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="form-progress-step" data-step="3">
               <div class="form-step-num">3</div>
               <div class="form-step-label">Tu cita</div>
+            </div>
+          </div>
+
+          <!-- Sticky summary visible en step 2 y 3 -->
+          <div class="step-summary" id="stepSummary">
+            <div class="step-summary-main">
+              <div class="step-summary-title" id="stepSummaryTitle">—</div>
+              <div class="step-summary-meta" id="stepSummaryMeta">—</div>
             </div>
           </div>
 
@@ -2084,6 +2097,7 @@ function goToFormStep(step) {
   if (step === 2 && currentCar) {
     dataLayer.push({ event: 'form_start', item_name: currentCar.name + ' ' + currentCar.year, item_price: currentCar.price });
   }
+  updateStepSummary(step);
   currentFormStep = step;
   document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
   const target = document.getElementById('formStep' + step);
@@ -2549,6 +2563,17 @@ function sanitizeOnInput(el) {
 function formatPhone(el) { el.value = el.value.replace(/[^0-9]/g, '').slice(0, 10); }
 
 // ── VALIDATION ──
+function updateStepSummary(step) {
+  const bar = document.getElementById('stepSummary'); if (!bar) return;
+  if (step === 1 || !currentCar) { bar.classList.remove('show'); return; }
+  const t = document.getElementById('stepSummaryTitle');
+  const m = document.getElementById('stepSummaryMeta');
+  if (t) t.textContent = (currentCar.name || '') + ' ' + (currentCar.year || '') + (currentCar.version ? ' · ' + currentCar.version : '');
+  const monthly = typeof calcMonthly === 'function' ? calcMonthly(currentCar.price, 20, 36) : 0;
+  if (m) m.textContent = fmt(currentCar.price) + (monthly ? '  ·  Desde ' + fmt(monthly) + '/mes' : '');
+  bar.classList.add('show');
+}
+
 function validateField(el) {
   const errorEl = document.getElementById(el.id + '-error');
   let isValid = false;
