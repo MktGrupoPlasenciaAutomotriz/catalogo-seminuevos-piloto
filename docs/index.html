@@ -2073,7 +2073,7 @@ function goToFormStep(step) {
         const v = el.value.trim();
         let valid = v.length > 0;
         if (id === 'fPhone') valid = /^[0-9]{10}$/.test(v);
-        else if (id === 'fEmail') valid = v.includes('@') && v.length >= 5;
+        else if (id === 'fEmail') valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
         if (!valid) { showFieldError(id); el.classList.add('error'); el.classList.remove('valid'); allValid = false; }
         else { hideFieldError(id); el.classList.remove('error'); el.classList.add('valid'); }
       });
@@ -2557,7 +2557,7 @@ function validateField(el) {
   } else if (el.id === 'fEmail') {
     const v = el.value.trim().toUpperCase();
     el.value = v;
-    isValid = v.includes('@') && v.length >= 5;
+    isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   } else {
     isValid = el.value.trim().length > 0;
   }
@@ -2565,6 +2565,10 @@ function validateField(el) {
     el.classList.remove('error');
     el.classList.add('valid');
     if (errorEl) errorEl.classList.remove('show');
+    if (!document.querySelector('.form-error-msg.show') && !document.querySelector('.form-input.error')) {
+      const ge = document.getElementById('formGlobalError');
+      if (ge) ge.classList.remove('show');
+    }
   } else {
     el.classList.remove('valid');
   }
@@ -2636,7 +2640,7 @@ function submitForm() {
     let valid = false;
     const v = el.value.trim();
     if (id === 'fPhone') valid = /^[0-9]{10}$/.test(v);
-    else if (id === 'fEmail') valid = v.includes('@') && v.length >= 5;
+    else if (id === 'fEmail') valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
     else if (id === 'fDateTime') valid = validateDateTime();
     else valid = v.length > 0;
     if (!valid) {
