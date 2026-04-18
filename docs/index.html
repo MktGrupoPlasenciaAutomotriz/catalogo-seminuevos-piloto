@@ -2329,7 +2329,7 @@ function goToFormStep(step) {
         if (!valid) { showFieldError(id); el.classList.add('error'); el.classList.remove('valid'); allValid = false; }
         else { hideFieldError(id); el.classList.remove('error'); el.classList.add('valid'); }
       });
-      if (!allValid) return;
+      if (!allValid) { if (typeof scrollToFirstError === 'function') scrollToFirstError(); return; }
     }
   }
   // Update steps
