@@ -202,15 +202,18 @@ body {
 
 .hero-stats {
   display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 16px; max-width: 640px; margin: 0 auto;
+  gap: 12px; max-width: 560px; margin: 32px 0 28px;
 }
+@media (max-width: 768px) { .hero-stats { max-width: 100%; margin: 28px auto; } }
+@media (max-width: 480px) { .hero-stats { grid-template-columns: 1fr; } }
 .hero-stat {
-  text-align: center;
-  padding: 18px 12px;
+  text-align: left;
+  padding: 14px 18px;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: var(--radius-lg);
   backdrop-filter: blur(12px);
+  min-width: 0;
 }
 .hero-stat-num {
   font-family: var(--font-display);
