@@ -269,6 +269,15 @@ body {
 /* ── FILTER BAR (dropdowns) ── */
 .filter-bar { padding: 16px 0; }
 .filter-bar-inner { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* Type icon chips */
+.type-chips { display:flex; gap:8px; overflow-x:auto; padding:8px 0 12px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.type-chips::-webkit-scrollbar { display:none; }
+.type-chip { display:inline-flex; align-items:center; gap:8px; padding:10px 16px; background:#fff; border:1.5px solid var(--ink-200); border-radius:999px; font-family:var(--font-body); font-size:13px; font-weight:700; color:var(--ink-700); cursor:pointer; flex-shrink:0; transition:all 0.15s ease; white-space:nowrap; }
+.type-chip:hover { border-color:var(--color-accent); color:var(--ink-900); transform:translateY(-1px); }
+.type-chip.active { background:var(--color-accent); color:var(--ink-900); border-color:var(--color-accent); box-shadow:0 4px 10px rgba(251,198,69,0.35); }
+.type-chip svg { width:18px; height:18px; flex-shrink:0; }
+#filterType { display:none; }
 .filter-search { position: relative; flex: 1; min-width: 200px; }
 .filter-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ink-400, #94A3B8); pointer-events: none; }
 .filter-search input { width: 100%; padding: 10px 12px 10px 36px; border: 1px solid var(--ink-200, #E2E8F0); border-radius: 9999px; font-size: 14px; font-family: var(--font-body); background: #fff; transition: border-color 0.15s; color: var(--ink-800); }
@@ -1369,13 +1378,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ════ FILTERS ════ -->
 <section class="filters-section">
   <div class="container">
+    <!-- Type icon chips -->
+    <div class="type-chips" role="group" aria-label="Filtrar por tipo de vehiculo">
+      <button type="button" class="type-chip active" data-type="all" onclick="filterByTypeChip('all')" aria-pressed="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Todos</span>
+      </button>
+      <button type="button" class="type-chip" data-type="suv" onclick="filterByTypeChip('suv')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 13l2-4 3-3h8l3 3 2 4v5h-2a2 2 0 0 0-4 0H9a2 2 0 0 0-4 0H3v-5z"/><circle cx="7" cy="18" r="1.5" fill="currentColor"/><circle cx="17" cy="18" r="1.5" fill="currentColor"/></svg>
+        <span>SUV</span>
+      </button>
+      <button type="button" class="type-chip" data-type="sedan" onclick="filterByTypeChip('sedan')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 16l2-3 5-3h4l5 3 2 3v3h-2a2 2 0 0 0-4 0H9a2 2 0 0 0-4 0H3v-3z"/><circle cx="7" cy="19" r="1.3" fill="currentColor"/><circle cx="17" cy="19" r="1.3" fill="currentColor"/></svg>
+        <span>Sedán</span>
+      </button>
+      <button type="button" class="type-chip" data-type="pickup" onclick="filterByTypeChip('pickup')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M2 14l2-4h4l1 3h5v6H9a2 2 0 0 0-4 0H3v-5zm13-1h7l-1 6h-2a2 2 0 0 0-4 0v-6z"/><circle cx="7" cy="19" r="1.3" fill="currentColor"/><circle cx="17" cy="19" r="1.3" fill="currentColor"/></svg>
+        <span>Pick-up</span>
+      </button>
+      <button type="button" class="type-chip" data-type="hatchback" onclick="filterByTypeChip('hatchback')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 15l4-3 5-4h2l5 7v3h-2a2 2 0 0 0-4 0H9a2 2 0 0 0-4 0H3v-3z"/><circle cx="7" cy="18" r="1.3" fill="currentColor"/><circle cx="17" cy="18" r="1.3" fill="currentColor"/></svg>
+        <span>Hatchback</span>
+      </button>
+    </div>
     <div class="filter-bar">
       <div class="filter-bar-inner">
         <div class="filter-search">
           <svg class="filter-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input type="text" placeholder="Buscar marca, modelo o año..." oninput="onSearch(this.value)" id="searchInput">
         </div>
-        <div class="filter-dropdown-wrap">
+        <div class="filter-dropdown-wrap" style="display:none;">
           <select onchange="filterByType(this.value)" id="filterType" class="filter-select">
             <option value="all">Tipo</option>
             <option value="suv">SUV</option>
@@ -1892,6 +1924,11 @@ const CAM_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 
 // ── RENDER CARDS ──
 function filterByType(val) { currentFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_type', filter_value: val }); }
+function filterByTypeChip(val) {
+  filterByType(val);
+  document.querySelectorAll('.type-chip').forEach(function(c){ var on = c.dataset.type === val; c.classList.toggle('active', on); c.setAttribute('aria-pressed', on?'true':'false'); });
+  var dd = document.getElementById('filterType'); if (dd) dd.value = val;
+}
 function filterByBrandSelect(val) { currentBrandFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_brand', filter_value: val }); }
 function filterByPriceSelect(val) { currentPriceFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_price', filter_value: val }); }
 function filterByLocSelect(val) { currentLocFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_location', filter_value: val }); }
@@ -2059,6 +2096,7 @@ function clearAllFilters() {
   ['filterType','filterBrand','filterPrice','filterLoc'].forEach(function(id){
     const el = document.getElementById(id); if (el) el.value = 'all';
   });
+  document.querySelectorAll('.type-chip').forEach(function(c){ c.classList.toggle('active', c.dataset.type === 'all'); c.setAttribute('aria-pressed', c.dataset.type === 'all' ? 'true' : 'false'); });
   visibleCount = ITEMS_PER_PAGE;
   renderCards('all');
   if (typeof updateFilterUI === 'function') updateFilterUI();
