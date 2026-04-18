@@ -1536,62 +1536,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
         </div>
 
-        <!-- QUALIFY: TIPO PERSONA + FINANCIAMIENTO -->
-        <div class="qualify-section">
-          <div class="qualify-head">
-            <div class="qualify-head-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></div>
-            <div>
-              <h3 class="qualify-title">Personaliza tu cotización</h3>
-              <div class="qualify-sub">Para ofrecerte el mejor esquema fiscal y financiero</div>
-            </div>
-          </div>
-
-          <div class="form-grid">
-            <div class="form-group full">
-              <div class="label-with-tip">
-                Tipo de persona
-                <span class="tip" tabindex="0" aria-label="Información sobre tipo de persona">?
-                  <span class="tip-content">Personas físicas con actividad empresarial y morales pueden acreditar el IVA y deducir el vehículo si lo destinan a su actividad. Nos sirve para ofrecerte el mejor esquema (factura, leasing, crédito empresarial).</span>
-                </span>
-              </div>
-              <select class="form-input" id="fTipoPersona" onchange="onTipoPersonaChange()" aria-describedby="fTipoPersona-error">
-                <option value="" disabled selected>Selecciona <span class="label-opt">Opcional</span></option>
-                <option value="PERSONA FISICA">Persona física</option>
-                <option value="PERSONA FISICA CON ACTIVIDAD EMPRESARIAL">Persona física con actividad empresarial</option>
-                <option value="PERSONA MORAL">Persona moral</option>
-              </select>
-              <div class="iva-banner" id="ivaBanner" style="display:none;">
-                <div class="iva-banner-icon">💰</div>
-                <div class="iva-banner-text">
-                  <strong>Beneficio fiscal disponible</strong>
-                  <span>Como persona con actividad empresarial o moral, puedes acreditar el IVA y deducir tu vehículo. Te preparamos el mejor esquema en tu cita.</span>
-                </div>
-              </div>
-              <div class="form-error-msg" id="fTipoPersona-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Selecciona el tipo de persona</div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="fBuscaFinanciamiento">¿Necesitas financiamiento? <span class="label-req">Obligatorio</span></label>
-              <select class="form-input" id="fBuscaFinanciamiento" onchange="toggleIngresos()" required aria-required="true" aria-describedby="fBuscaFinanciamiento-error">
-                <option value="" disabled selected>Selecciona</option>
-                <option value="SI">Si, necesito financiamiento</option>
-                <option value="NO (CONTADO)">No, pago de contado</option>
-              </select>
-              <div class="form-error-msg" id="fBuscaFinanciamiento-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Selecciona cómo piensas pagar</div>
-            </div>
-
-            <div class="form-group" id="ingresosWrap" style="display:none;">
-              <label class="form-label" for="fCompruebaIngresos">¿Puedes comprobar ingresos?</label>
-              <select class="form-input" id="fCompruebaIngresos" onchange="toggleIngresosFeedback(this)">
-                <option value="">Selecciona</option>
-                <option value="SI">Sí</option>
-                <option value="NO">No</option>
-              </select>
-              <div class="help-text">Si no puedes comprobarlos, no te preocupes: no es restricción para la compra. Solo puede implicar un enganche mayor (desde 25%).</div>
-            </div>
-          </div>
-        </div>
-
         <!-- FORM -->
         <div class="form-section">
           <div class="form-section-head">
@@ -1675,6 +1619,45 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <!-- STEP 2: VEHICULO / FINANCIAMIENTO -->
           <div class="form-step" id="formStep2">
           <div class="form-grid">
+            <div class="form-group full">
+              <label class="form-label" for="fTipoPersona">Tipo de persona <span class="label-opt">Opcional</span></label>
+              <select class="form-input" id="fTipoPersona" onchange="onTipoPersonaChange()" aria-describedby="fTipoPersona-error">
+                <option value="">Selecciona</option>
+                <option value="PERSONA FISICA">Persona física</option>
+                <option value="PERSONA FISICA CON ACTIVIDAD EMPRESARIAL">Persona física con actividad empresarial</option>
+                <option value="PERSONA MORAL">Persona moral</option>
+              </select>
+              <div class="iva-banner" id="ivaBanner" style="display:none;">
+                <div class="iva-banner-icon">💰</div>
+                <div class="iva-banner-text">
+                  <strong>Beneficio fiscal disponible</strong>
+                  <span>Como persona con actividad empresarial o moral, puedes acreditar el IVA y deducir tu vehículo. Te preparamos el mejor esquema en tu cita.</span>
+                </div>
+              </div>
+              <div class="form-error-msg" id="fTipoPersona-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Selecciona tu tipo de persona</div>
+            </div>
+
+            <div class="form-group full">
+              <label class="form-label" for="fBuscaFinanciamiento">¿Necesitas financiamiento? <span class="label-req">Obligatorio</span></label>
+              <select class="form-input" id="fBuscaFinanciamiento" onchange="toggleIngresos()" required aria-required="true" aria-describedby="fBuscaFinanciamiento-error">
+                <option value="">Selecciona</option>
+                <option value="SI">Sí, necesito financiamiento</option>
+                <option value="NO (CONTADO)">No, pago de contado</option>
+              </select>
+              <div class="form-error-msg" id="fBuscaFinanciamiento-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Indica si buscas financiamiento o contado</div>
+            </div>
+
+            <div class="form-group full" id="ingresosWrap" style="display:none;">
+              <label class="form-label" for="fCompruebaIngresos">¿Puedes comprobar ingresos? <span class="label-req">Obligatorio</span></label>
+              <select class="form-input" id="fCompruebaIngresos" onchange="toggleIngresosFeedback(this)" aria-describedby="fCompruebaIngresos-error">
+                <option value="">Selecciona</option>
+                <option value="SI">Sí</option>
+                <option value="NO">No</option>
+              </select>
+              <div class="help-text">Si no puedes comprobarlos, no te preocupes: no es restricción para la compra. Solo puede implicar un enganche mayor (desde 25%).</div>
+              <div class="form-error-msg" id="fCompruebaIngresos-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Indica si puedes comprobar ingresos</div>
+            </div>
+
             <div class="form-group full">
               <label class="form-label" for="fTradeIn">¿Quieres dejar tu auto actual como enganche? <span class="label-opt">Opcional</span></label>
               <select class="form-input" id="fTradeIn">
