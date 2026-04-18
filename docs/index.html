@@ -276,7 +276,7 @@ body {
 .type-chip { display:inline-flex; align-items:center; gap:8px; padding:10px 16px; background:#fff; border:1.5px solid var(--ink-200); border-radius:999px; font-family:var(--font-body); font-size:13px; font-weight:700; color:var(--ink-700); cursor:pointer; flex-shrink:0; transition:all 0.15s ease; white-space:nowrap; }
 .type-chip:hover { border-color:var(--color-accent); color:var(--ink-900); transform:translateY(-1px); }
 .type-chip.active { background:var(--color-accent); color:var(--ink-900); border-color:var(--color-accent); box-shadow:0 4px 10px rgba(251,198,69,0.35); }
-.type-chip svg { width:24px; height:16px; flex-shrink:0; } .type-chip svg[viewBox='0 0 24 24'] { height:18px; width:18px; }
+.type-chip svg { width:20px; height:20px; flex-shrink:0; }
 #filterType { display:none; }
 
 
@@ -299,6 +299,39 @@ body {
   .steps-head { margin-bottom:32px; }
   .step-card { padding:22px 20px; }
   .step-num { font-size:32px; }
+}
+
+
+
+/* Google Reviews */
+.reviews-section { background:#0F0F0F; padding:72px 0; border-top:1px solid rgba(255,255,255,0.06); }
+.reviews-head { text-align:center; max-width:720px; margin:0 auto 40px; }
+.reviews-kicker { font-size:11px; font-weight:800; letter-spacing:0.18em; text-transform:uppercase; color:var(--color-accent); margin-bottom:10px; }
+.reviews-title { font-family:var(--font-display); font-weight:900; font-size:clamp(32px,5vw,52px); line-height:1; color:#F7FAFC; letter-spacing:-0.03em; margin:0 0 10px; display:inline-flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center; }
+.reviews-title-stars { display:inline-flex; gap:2px; color:#FBBC05; }
+.reviews-title-stars svg { width:28px; height:28px; }
+.reviews-sub { font-size:14px; line-height:1.6; color:rgba(247,250,252,0.72); margin:0; }
+.reviews-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; max-width:1100px; margin:0 auto; }
+.review-card { background:#1A1A1A; border:1px solid rgba(251,198,69,0.15); border-radius:16px; padding:22px 22px; transition:transform 0.2s, box-shadow 0.2s; }
+.review-card:hover { transform:translateY(-3px); box-shadow:0 14px 30px -12px rgba(251,198,69,0.28); }
+.review-head { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.review-avatar { width:42px; height:42px; border-radius:50%; background:var(--color-accent); color:#1A1A1A; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:14px; flex-shrink:0; letter-spacing:0.02em; }
+.review-meta { flex:1; min-width:0; }
+.review-name { font-weight:700; font-size:14px; color:#F7FAFC; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.review-date { font-size:11px; color:rgba(247,250,252,0.72); margin-top:2px; }
+.review-stars { display:flex; gap:1px; color:#FBBC05; flex-shrink:0; }
+.review-stars svg { width:14px; height:14px; }
+.review-text { font-size:14px; line-height:1.6; color:rgba(247,250,252,0.72); margin:0; font-style:italic; }
+.reviews-footer { text-align:center; margin-top:36px; }
+.reviews-cta { display:inline-flex; align-items:center; gap:10px; padding:12px 22px; background:#1A1A1A; color:#F7FAFC; border:1.5px solid rgba(251,198,69,0.3); border-radius:999px; font-family:var(--font-body); font-weight:700; font-size:13px; text-decoration:none; transition:all 0.2s; }
+.reviews-cta:hover { transform:translateY(-1px); box-shadow:0 8px 18px -6px rgba(251,198,69,0.28); }
+.reviews-cta-g { display:inline-flex; width:18px; height:18px; }
+.reviews-cta-g svg { width:100%; height:100%; }
+@media (max-width: 640px) {
+  .reviews-section { padding:48px 0; }
+  .reviews-title { font-size:36px; }
+  .reviews-title-stars svg { width:22px; height:22px; }
+  .review-card { padding:18px 18px; }
 }
 
 /* FAQ */
@@ -1442,6 +1475,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ════ TRUST BAR ════ -->
 <div class="trust-bar">
   <div class="container">
+    <div class="trust-item"><strong><svg class="trust-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg> 75 años de experiencia Plasencia</strong></div>
     <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Inspección de 150 puntos</div>
     <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> 1 año de garantía</div>
     <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg> Crédito desde 12 meses</div>
@@ -1455,23 +1489,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- Type icon chips -->
     <div class="type-chips" role="group" aria-label="Filtrar por tipo de vehiculo">
       <button type="button" class="type-chip active" data-type="all" onclick="filterByTypeChip('all')" aria-pressed="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
         <span>Todos</span>
       </button>
       <button type="button" class="type-chip" data-type="suv" onclick="filterByTypeChip('suv')">
-        <svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 10.5h21"/><path d="M1.8 10.5v-2.5L3.8 6 6 3h11l2.8 3 2.4 2v2"/><path d="M7 6h11"/><circle cx="6.5" cy="11.5" r="1.8" fill="currentColor" stroke="none"/><circle cx="17.5" cy="11.5" r="1.8" fill="currentColor" stroke="none"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3v-6l2-5h9l4 5h2a2 2 0 012 2v4h-2M16 17H9M14 6v5M5 11h14"/></svg>
         <span>SUV</span>
       </button>
       <button type="button" class="type-chip" data-type="sedan" onclick="filterByTypeChip('sedan')">
-        <svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 10.5h21"/><path d="M2.5 10.5v-1l1.5-2.2 3-0.3 2-2.5h6.5l3 2.8 3.5 0.3v2.9"/><path d="M9 4.5h6.5"/><circle cx="6.5" cy="11.5" r="1.7" fill="currentColor" stroke="none"/><circle cx="17.5" cy="11.5" r="1.7" fill="currentColor" stroke="none"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3v-6l2-5h9l4 5h1a2 2 0 012 2v4h-2M15 17H9M3 11h15M9 11V6"/></svg>
         <span>Sedán</span>
       </button>
       <button type="button" class="type-chip" data-type="pickup" onclick="filterByTypeChip('pickup')">
-        <svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 10.5h21"/><path d="M2 10.5v-2.8l2-1.2 2-0.5 1-3h6l2 3.5h9v4"/><path d="M7 5h5.5"/><circle cx="6" cy="11.5" r="1.7" fill="currentColor" stroke="none"/><circle cx="17.5" cy="11.5" r="1.7" fill="currentColor" stroke="none"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3V6a1 1 0 011-1h9v12M15 17h-6M15 17h6v-6h-8M13 11h5l3 5"/></svg>
         <span>Pick-up</span>
       </button>
       <button type="button" class="type-chip" data-type="hatchback" onclick="filterByTypeChip('hatchback')">
-        <svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 10.5h21"/><path d="M2.5 10.5v-1.5l1.8-2 3-0.8 1.5-2.2h7l2.5 5 3.7 0.5v1"/><path d="M8.8 4h6.8"/><circle cx="6.5" cy="11.5" r="1.7" fill="currentColor" stroke="none"/><circle cx="17.5" cy="11.5" r="1.7" fill="currentColor" stroke="none"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3v-6l2-4 3-3h5l3 4 3 2h1v7h-2M15 17H9M3 11h16"/></svg>
         <span>Hatchback</span>
       </button>
     </div>
@@ -1542,6 +1576,58 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div class="inventory-grid" id="inventoryGrid">
       <!-- JS rendered -->
+    </div>
+  </div>
+</section>
+
+<!-- ════ REVIEWS (Google) ════ -->
+<section class="reviews-section" aria-labelledby="reviewsTitle">
+  <div class="container">
+    <div class="reviews-head">
+      <div class="reviews-kicker">Lo que dicen nuestros clientes</div>
+      <h2 class="reviews-title" id="reviewsTitle">4.2 <span class="reviews-title-stars" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg></span> en Google</h2>
+      <p class="reviews-sub">6,795 reseñas en Google · Promedio de Mazda, Ford y Hyundai Plasencia (lotes que nutren Seminuevos)</p>
+    </div>
+    <div class="reviews-grid">
+      <article class="review-card">
+        <div class="review-head">
+          <div class="review-avatar" aria-hidden="true">RR</div>
+          <div class="review-meta">
+            <div class="review-name">Ricardo Rodríguez</div>
+            <div class="review-date">hace 3 meses</div>
+          </div>
+          <div class="review-stars" aria-label="5 estrellas"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg></div>
+        </div>
+        <p class="review-text">"Excelente atención, excelentes modelos. Mi asesor fue Edgar Cruz."</p>
+      </article>
+      <article class="review-card">
+        <div class="review-head">
+          <div class="review-avatar" aria-hidden="true">LM</div>
+          <div class="review-meta">
+            <div class="review-name">Luis Miguel M</div>
+            <div class="review-date">Local Guide</div>
+          </div>
+          <div class="review-stars" aria-label="5 estrellas"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg></div>
+        </div>
+        <p class="review-text">"Bonita agencia con agradable ambiente. El asesor que me atendió muy bien. Atento, dispuesto para apoyarme."</p>
+      </article>
+      <article class="review-card">
+        <div class="review-head">
+          <div class="review-avatar" aria-hidden="true">AR</div>
+          <div class="review-meta">
+            <div class="review-name">Abner Rodríguez</div>
+            <div class="review-date">Local Guide</div>
+          </div>
+          <div class="review-stars" aria-label="5 estrellas"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg></div>
+        </div>
+        <p class="review-text">"Gran atención, sobre todo a la cajera del turno de la tarde. Excelente servicio."</p>
+      </article>
+    </div>
+    <div class="reviews-footer">
+      <a href="https://www.google.com/maps/place/Grupo+Plasencia+S.A.+de+C.V." target="_blank" rel="noopener" class="reviews-cta">
+        <span class="reviews-cta-g" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg></span>
+        Ver todas las reseñas en Google
+      </a>
     </div>
   </div>
 </section>
