@@ -1111,10 +1111,26 @@ body { font-size: 15px; }
 .cal-day--disabled {
   color: var(--ink-300, #CBD5E0); cursor: default; opacity: 0.5;
 }
+/* Hoy deshabilitado: clickeable para disparar warning, no seleccionable */
+.cal-day--today.cal-day--disabled { cursor: not-allowed; opacity: 0.6; }
+.cal-day--today.cal-day--disabled:hover { background: rgba(245,158,11,0.08); }
 .cal-day--sunday.cal-day--disabled { color: var(--ink-300); text-decoration: line-through; }
 .cal-day--today:not(.cal-day--selected) {
   border: 1.5px solid var(--color-cyan, #17B7E0);
 }
+
+/* ── CALENDAR WARNING BANNER (no agendamos mismo dia) ── */
+.cal-warning {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 10px 14px; margin: 0 0 12px;
+  background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 8px;
+  color: #92400E; font-size: 12.5px; font-weight: 600; line-height: 1.4;
+}
+.cal-warning svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; color: #D97706; }
+.cal-warning.hidden { display: none; }
+.cal-warning.shake { animation: warnShake 0.45s ease-in-out; border-color: #F59E0B; background: #FDE68A; }
+@keyframes warnShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 50%{transform:translateX(4px)} 75%{transform:translateX(-2px)} }
+@media (max-width: 640px) { .cal-warning { font-size: 12px; padding: 9px 12px; } }
 .cal-day--selected {
   background: var(--color-accent, #FBC645) !important;
   color: var(--color-primary, #0F0F0F) !important;
@@ -1931,6 +1947,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <input type="hidden" id="hFechaCita" value="">
               <input type="hidden" id="hHoraCita" value="">
               <div class="cita-picker" id="citaPicker">
+                <div class="cal-warning" id="calWarning" role="status" aria-live="polite">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span>No agendamos citas el mismo día. Selecciona una fecha de mañana en adelante (mínimo 24 h).</span>
+                </div>
                 <div class="cal-wrap">
                   <div class="cal-header">
                     <button type="button" class="cal-nav" id="calPrev" onclick="calNav(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
@@ -2481,6 +2501,7 @@ function setupDateInput() {
   calViewMonth = min.getMonth();
   calSelectedDate = null;
   calSelectedTime = null;
+  showSameDayWarning(true);
   renderCalendar();
   document.getElementById('timeSlotsWrap').style.display = 'none';
   document.getElementById('citaSummary').classList.remove('show');
@@ -2542,12 +2563,30 @@ function renderCalendar() {
     const dateStr = `${calViewYear}-${pad(calViewMonth+1)}-${pad(d)}`;
     if (selectable) {
       html += `<button type="button" class="${cls}" onclick="selectCalDay('${dateStr}')">${d}</button>`;
+    } else if (isToday) {
+      html += `<button type="button" class="${cls}" onclick="showSameDayWarning()">${d}</button>`;
     } else {
       html += `<div class="${cls}">${d}</div>`;
     }
   }
 
   grid.innerHTML = html;
+}
+
+let _calWarnTimer = null;
+function showSameDayWarning(initial) {
+  const w = document.getElementById('calWarning'); if (!w) return;
+  w.classList.remove('hidden');
+  if (initial) return;
+  w.classList.remove('shake');
+  void w.offsetWidth;
+  w.classList.add('shake');
+  if (_calWarnTimer) clearTimeout(_calWarnTimer);
+  _calWarnTimer = setTimeout(function(){ w.classList.remove('shake'); }, 500);
+}
+function hideSameDayWarning() {
+  const w = document.getElementById('calWarning'); if (!w) return;
+  w.classList.add('hidden');
 }
 
 function calNav(dir) {
@@ -2562,6 +2601,7 @@ function selectCalDay(dateStr) {
   calSelectedDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
   calSelectedDate.setHours(0,0,0,0);
   calSelectedTime = null;
+  hideSameDayWarning();
   renderCalendar();
   renderTimeSlots();
   updateCitaSummary();
