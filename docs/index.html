@@ -1119,6 +1119,21 @@ body { font-size: 15px; }
   border: 1.5px solid var(--color-cyan, #17B7E0);
 }
 
+/* ── CITA SUCURSAL INFO (claridad user-centric: donde sera la cita) ── */
+.cita-sucursal-info {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; margin: 0 0 10px;
+  background: var(--ink-50, #F8FAFC); border: 1px solid var(--ink-200, #E2E8F0);
+  border-left: 3px solid var(--color-accent, #FBC645); border-radius: 8px;
+}
+.cita-sucursal-icon { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; color: var(--color-accent, #FBC645); }
+.cita-sucursal-text { flex: 1; min-width: 0; }
+.cita-sucursal-label { font-size: 10px; font-weight: 700; color: var(--ink-500, #64748b); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+.cita-sucursal-name { font-size: 14px; font-weight: 800; color: var(--ink-900, #0F0F0F); font-family: var(--font-display, inherit); line-height: 1.2; }
+.cita-sucursal-addr { font-size: 12px; color: var(--ink-600, #475569); margin-top: 3px; line-height: 1.35; }
+.cita-sucursal-note { font-size: 11px; color: var(--ink-500, #64748b); margin-top: 5px; line-height: 1.35; font-style: italic; }
+@media (max-width: 640px) { .cita-sucursal-name { font-size: 13.5px; } .cita-sucursal-addr { font-size: 11.5px; } .cita-sucursal-note { font-size: 10.5px; } }
+
 /* ── CALENDAR WARNING BANNER (no agendamos mismo dia) ── */
 .cal-warning {
   display: flex; align-items: flex-start; gap: 8px;
@@ -1952,6 +1967,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <input type="hidden" id="hFechaCita" value="">
               <input type="hidden" id="hHoraCita" value="">
               <div class="cita-picker" id="citaPicker">
+                <div class="cita-sucursal-info" id="citaSucursalInfo" role="status" aria-live="polite">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="cita-sucursal-icon"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <div class="cita-sucursal-text">
+                    <div class="cita-sucursal-label">Tu cita será en</div>
+                    <div class="cita-sucursal-name" id="citaSucursalName">—</div>
+                    <div class="cita-sucursal-addr" id="citaSucursalAddr">—</div>
+                    <div class="cita-sucursal-note">Este seminuevo solo está en esta sucursal. La cita se agenda aquí.</div>
+                  </div>
+                </div>
                 <div class="cal-warning" id="calWarning" role="status" aria-live="polite">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                   <span>No agendamos citas el mismo día. Selecciona una fecha de mañana en adelante (mínimo 24 h).</span>
@@ -2507,6 +2531,7 @@ function setupDateInput() {
   calSelectedDate = null;
   calSelectedTime = null;
   showSameDayWarning(true);
+  updateCitaSucursalInfo();
   renderCalendar();
   document.getElementById('timeSlotsWrap').style.display = 'none';
   document.getElementById('citaSummary').classList.remove('show');
@@ -2514,6 +2539,17 @@ function setupDateInput() {
   document.getElementById('fDateTime').value = '';
   document.getElementById('hFechaCita').value = '';
   document.getElementById('hHoraCita').value = '';
+}
+
+// Popula el bloque "Tu cita sera en ..." en step 3, segun la sucursal del auto actual.
+// La sucursal del auto es fija (no hay selector); el objetivo es comunicar claridad.
+function updateCitaSucursalInfo() {
+  if (typeof currentCar === 'undefined' || !currentCar) return;
+  const cfg = getSucursalMap(currentCar.loc);
+  const nameEl = document.getElementById('citaSucursalName');
+  const addrEl = document.getElementById('citaSucursalAddr');
+  if (nameEl) nameEl.textContent = cfg.name;
+  if (addrEl) addrEl.textContent = cfg.addr;
 }
 
 function renderCalendar() {
@@ -2678,7 +2714,8 @@ function updateCitaSummary() {
     const [hh, mm] = calSelectedTime.split(':').map(Number);
     const ampm = hh >= 12 ? 'PM' : 'AM';
     const h12 = hh % 12 === 0 ? 12 : hh % 12;
-    el.textContent = `Tu cita: ${dayName} ${day} de ${monthName}, ${h12}:${pad(mm)} ${ampm}`;
+    const sucName = currentCar ? getSucursalMap(currentCar.loc).name : '';
+    el.textContent = `Tu cita: ${dayName} ${day} de ${monthName}, ${h12}:${pad(mm)} ${ampm}` + (sucName ? ` · ${sucName}` : '');
     el.classList.add('show');
   } else {
     el.classList.remove('show');
