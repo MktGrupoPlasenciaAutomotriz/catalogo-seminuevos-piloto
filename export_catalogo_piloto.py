@@ -110,26 +110,22 @@ def get_loc(fields):
         3885: "Mazda Santa Anita",
     }.get(aid, "Lopez Mateos")
 
-# --- Bonos de la oferta comercial Abril 2026 (Ford Plasencia) ---
-# Fuente: artes de Meta Ads entregados por Jose Reyes
-# Regla: autos del lote Ford (agencia 3852) tienen bono segun precio
-# Hyundai (agencia 4199) no tiene bonos
-BONOS_FORD = {
-    # precio_range: bono
-    # $15,000 para: Expedition, Suburban, Gladiator, Expedition 2021
-    # $10,000 para: Maverick, Koleos, CX9, Bronco, Explorer
-    # $7,500 para: Silverado, Ranger
-    # $5,000 para: el resto
-}
+# --- Bonos de la oferta comercial Abril 2026 (Seminuevos Plasencia) ---
+# Fuente: artes de Meta Ads entregados por Jose Reyes (Gerente Ford+Semi).
+# Regla: TODOS los autos en agencias del piloto reciben bono segun precio.
+# Fase 1 (abril 2026): Lote Otero (3852 Seminuevos Plasencia Lopez Mateos + 4199 Mazda Plasencia).
+# Fase 2 (abril 2026): extension Mazda GDL metro (3886, 3736, 3888, 3737, 3885).
+# Confirmado por Chucho Porras (Dir Mkt): "aplica la misma oferta comercial" para las 5 Mazda nuevas.
+PILOTO_AGENCIAS_CON_BONO = {3852, 4199, 3886, 3736, 3888, 3737, 3885}
 
 def get_bono(fields):
-    """Asigna bono segun oferta comercial abril 2026."""
+    """Asigna bono segun oferta comercial abril 2026.
+    $15,000 premium (>=$750K), $10,000 (>=$450K), $7,500 (>=$350K), $5,000 resto.
+    Aplica a los 7 lotes del piloto (Lote Otero + 5 Mazda GDL metro)."""
     aid = fields.get("AGENCIA_ID")
-    if aid != 3852:  # Solo lote Ford/multimarca tiene bonos
+    if aid not in PILOTO_AGENCIAS_CON_BONO:
         return 0
     price = fields.get("PRECIO", 0) or 0
-    marca = (fields.get("MARCA", "") or "").lower()
-    modelo = (fields.get("MODELO", "") or "").lower()
     # Bonos altos para vehiculos premium
     if price >= 750000:
         return 15000
