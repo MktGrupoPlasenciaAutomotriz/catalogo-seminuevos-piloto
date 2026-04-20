@@ -98,10 +98,17 @@ def get_all_imgs(fields):
     return []
 
 def get_loc(fields):
+    """Nombre legible de la sucursal. Usado como key para el mapping de mapas en la landing."""
     aid = fields.get("AGENCIA_ID")
-    if aid == 4199:
-        return "Mazda Plasencia"
-    return "Lopez Mateos"
+    return {
+        3852: "Lopez Mateos",
+        4199: "Mazda Plasencia",
+        3886: "Mazda Galerias",
+        3736: "Mazda Americas",
+        3888: "Mazda Acueducto",
+        3737: "Mazda Gonzalez Gallo",
+        3885: "Mazda Santa Anita",
+    }.get(aid, "Lopez Mateos")
 
 # --- Bonos de la oferta comercial Abril 2026 (Ford Plasencia) ---
 # Fuente: artes de Meta Ads entregados por Jose Reyes

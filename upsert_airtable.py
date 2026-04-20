@@ -45,8 +45,17 @@ CAMPOS_EDITABLES = {"DESTACADO", "NOTAS_INTERNAS", "FECHA_BAJA"}
 BATCH_SIZE = 10
 DELAY = 0.25
 
-# Alcance del piloto MVP (lote unico Av. Lopez Mateos Sur 2600 / Mariano Otero, Jardines del Sol)
-PILOTO_OTERO_AGENCIAS = {3852, 4199}
+# Alcance del piloto MVP.
+# Fase 1 (lote Otero): Av. Lopez Mateos Sur 2600 / Mariano Otero, Jardines del Sol
+#   - 3852 Seminuevos Plasencia Lopez Mateos (multimarca)
+#   - 4199 Mazda Plasencia (Mariano Otero, contigua)
+# Fase 2 (extension Mazda GDL metro, solicitada por Flor Alcaraz - abril 2026):
+#   - 3886 Mazda Galerias (Zapopan)
+#   - 3736 Mazda Americas (Guadalajara)
+#   - 3888 Mazda Acueducto (Zapopan)
+#   - 3737 Mazda Gonzalez Gallo (Guadalajara)
+#   - 3885 Mazda Santa Anita (Tlajomulco)
+PILOTO_OTERO_AGENCIAS = {3852, 4199, 3886, 3736, 3888, 3737, 3885}
 
 
 def http_request(method, url, body=None, retries=2):
