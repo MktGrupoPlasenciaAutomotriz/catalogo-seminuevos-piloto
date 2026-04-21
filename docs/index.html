@@ -1875,12 +1875,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="form-group">
               <label class="form-label" for="fLastName1">Apellido paterno <span class="label-req">Obligatorio</span></label>
               <input class="form-input" id="fLastName1" type="text" placeholder="LOPEZ" oninput="sanitizeOnInput(this); validateField(this)" autocomplete="family-name" required aria-required="true" aria-describedby="fLastName1-error">
-              <div class="form-error-msg" id="fLastName1-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Ingresa tu apellido paterno</div>
+              <div class="form-error-msg" id="fLastName1-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Necesitamos tu apellido paterno</div>
             </div>
             <div class="form-group">
               <label class="form-label" for="fLastName2">Apellido materno <span class="label-req">Obligatorio</span></label>
               <input class="form-input" id="fLastName2" type="text" placeholder="GARCIA" oninput="sanitizeOnInput(this); validateField(this)" autocomplete="additional-name" required aria-required="true" aria-describedby="fLastName2-error">
-              <div class="form-error-msg" id="fLastName2-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Ingresa tu apellido materno</div>
+              <div class="form-error-msg" id="fLastName2-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Necesitamos tu apellido materno</div>
             </div>
             <div class="form-group">
               <label class="form-label" for="fPhone">WhatsApp (10 digitos) <span class="label-req">Obligatorio</span></label>
@@ -1889,12 +1889,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <input class="form-input" id="fPhone" type="tel" placeholder="33 1234 5678" maxlength="10" pattern="[0-9]{10}" oninput="formatPhone(this); validateField(this)" onkeypress="return /[0-9]/.test(event.key)" autocomplete="tel-national" inputmode="numeric" required aria-required="true" aria-describedby="fPhone-error" style="flex:1;">
               </div>
               <div class="help-text">10 digitos sin espacios</div>
-              <div class="form-error-msg" id="fPhone-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Necesitamos 10 digitos para contactarte por WhatsApp</div>
+              <div class="form-error-msg" id="fPhone-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Necesitamos 10 dígitos para contactarte por WhatsApp</div>
             </div>
             <div class="form-group">
               <label class="form-label" for="fEmail">Correo electrónico <span class="label-req">Obligatorio</span></label>
               <input class="form-input" id="fEmail" type="email" placeholder="TU@EMAIL.COM" oninput="validateField(this)" autocomplete="email" required aria-required="true" aria-describedby="fEmail-error">
-              <div class="form-error-msg" id="fEmail-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Revisa tu correo — te enviaremos la precotización ahí</div>
+              <div class="form-error-msg" id="fEmail-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Revisa tu correo: te enviaremos la precotización ahí</div>
             </div>
           </div>
           <div class="form-step-nav">
@@ -1930,7 +1930,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <option value="SI">Sí, necesito financiamiento</option>
                 <option value="NO (CONTADO)">No, pago de contado</option>
               </select>
-              <div class="form-error-msg" id="fBuscaFinanciamiento-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Indica si buscas financiamiento o contado</div>
+              <div class="form-error-msg" id="fBuscaFinanciamiento-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Indica si buscas financiamiento o pago de contado</div>
             </div>
 
             <div class="form-group full" id="ingresosWrap" style="display:none;">
@@ -2003,7 +2003,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <input type="checkbox" id="fPrivacy" required style="margin-top:3px; min-width:18px; min-height:18px; accent-color:var(--color-accent, #FBC645);">
             <span>He leído y acepto el <a href="https://grupoplasencia.com/aviso_de_privacidad/" target="_blank" rel="noopener" style="color:var(--color-cyan, #17B7E0); text-decoration:underline;">Aviso de Privacidad</a> de Grupo Plasencia Automotriz.</span>
           </label>
-          <div class="form-error-msg" id="fPrivacy-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Acepta el aviso de privacidad para que podamos agendarte</div>
+          <div class="form-error-msg" id="fPrivacy-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Acepta el aviso de privacidad para continuar</div>
 
           <label for="fMarketing" style="display:flex; align-items:flex-start; gap:8px; margin:4px 0 16px; font-size:13px; color:var(--ink-600, #475569); line-height:1.4; cursor:pointer;">
             <input type="checkbox" id="fMarketing" style="margin-top:3px; min-width:18px; min-height:18px; accent-color:var(--color-accent, #FBC645);">
@@ -2376,6 +2376,19 @@ function goToFormStep(step) {
         if (id === 'fPhone') valid = /^[0-9]{10}$/.test(v);
         else if (id === 'fEmail') valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
         if (!valid) { showFieldError(id); el.classList.add('error'); el.classList.remove('valid'); allValid = false; }
+        else { hideFieldError(id); el.classList.remove('error'); el.classList.add('valid'); }
+      });
+      if (!allValid) { if (typeof scrollToFirstError === 'function') scrollToFirstError(); return; }
+    }
+    if (currentFormStep === 2) {
+      const step2Fields = ['fBuscaFinanciamiento'];
+      if (document.getElementById('fBuscaFinanciamiento').value === 'SI') step2Fields.push('fCompruebaIngresos');
+      let allValid = true;
+      step2Fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const v = el.value.trim();
+        if (v.length === 0) { showFieldError(id); el.classList.add('error'); el.classList.remove('valid'); allValid = false; }
         else { hideFieldError(id); el.classList.remove('error'); el.classList.add('valid'); }
       });
       if (!allValid) { if (typeof scrollToFirstError === 'function') scrollToFirstError(); return; }
@@ -3073,7 +3086,7 @@ function scrollToFirstError() {
 function submitForm() {
   if (submitting) return;
   clearValidation();
-  const fields = ['fName','fLastName1','fLastName2','fPhone','fEmail','fDateTime','fTipoPersona','fBuscaFinanciamiento'];
+  const fields = ['fName','fLastName1','fLastName2','fPhone','fEmail','fDateTime','fBuscaFinanciamiento'];
   if (document.getElementById('fBuscaFinanciamiento').value === 'SI') fields.push('fCompruebaIngresos');
   let firstError = null;
   fields.forEach(id => {
