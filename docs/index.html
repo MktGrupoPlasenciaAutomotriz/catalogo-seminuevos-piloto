@@ -2119,14 +2119,27 @@ const ASESOR_ASIGNADO = {
   telefono: '3341638050' // Canal Seminuevos Plasencia (WhatsApp Business, sin prefijo — se lo pone la URL)
 };
 
-// ── CAPTURE URL PARAMS (fbclid, gclid, UTMs) ──
+// ── CAPTURE URL PARAMS (fbclid, gclid, gbraid, wbraid, UTMs) + Meta cookies ──
 (function() {
   var params = new URLSearchParams(window.location.search);
-  ['fbclid','gclid','utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(function(k) {
+  ['fbclid','gclid','gbraid','wbraid','utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(function(k) {
     var v = params.get(k);
     if (v) sessionStorage.setItem(k, v);
   });
+  // Si llega fbclid pero Meta Pixel aun no setea _fbc, construirlo manualmente
+  // Formato oficial Meta: fb.1.{timestamp_ms}.{fbclid}
+  var fbclid = params.get('fbclid');
+  if (fbclid && !document.cookie.match(/(^|;)\s*_fbc=/)) {
+    var fbc = 'fb.1.' + Date.now() + '.' + fbclid;
+    document.cookie = '_fbc=' + fbc + '; path=/; max-age=7776000; SameSite=Lax';
+  }
 })();
+
+// Helper para leer cookies Meta (_fbp, _fbc) en el momento del submit
+function getCookie(name) {
+  var m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()\[\]\\\/\+^])/g,'\\$1') + '=([^;]*)'));
+  return m ? decodeURIComponent(m[1]) : '';
+}
 
 // ── VEHICLE DATA (15 seminuevos) ──
 let vehicles = [];
@@ -3209,9 +3222,15 @@ function submitForm() {
     etapa: 'CITA AGENDADA',
     fbclid: sessionStorage.getItem('fbclid') || '',
     gclid: sessionStorage.getItem('gclid') || '',
+    gbraid: sessionStorage.getItem('gbraid') || '',
+    wbraid: sessionStorage.getItem('wbraid') || '',
     utm_source: sessionStorage.getItem('utm_source') || '',
     utm_medium: sessionStorage.getItem('utm_medium') || '',
-    utm_campaign: sessionStorage.getItem('utm_campaign') || ''
+    utm_campaign: sessionStorage.getItem('utm_campaign') || '',
+    utm_content: sessionStorage.getItem('utm_content') || '',
+    utm_term: sessionStorage.getItem('utm_term') || '',
+    fbp: getCookie('_fbp'),
+    fbc: getCookie('_fbc')
   };
 
   sendToWebhook(payload);
