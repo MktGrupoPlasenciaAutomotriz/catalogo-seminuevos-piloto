@@ -1835,7 +1835,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   <span>Enganche</span>
                   <span class="calc-label-value" id="downLabel">20%</span>
                 </div>
-                <input type="range" class="calc-slider" id="downSlider" min="20" max="70" value="20" step="5" oninput="updateCalc()" aria-label="Porcentaje de enganche" aria-valuemin="20" aria-valuemax="70" aria-valuenow="20" aria-valuetext="20% de enganche">
+                <input type="range" class="calc-slider" id="downSlider" min="20" max="70" value="20" step="5" oninput="updateCalc(); pushCalcInteraction('enganche');" aria-label="Porcentaje de enganche" aria-valuemin="20" aria-valuemax="70" aria-valuenow="20" aria-valuetext="20% de enganche">
                 <div class="calc-slider-ticks">
                   <span>20%</span><span>30%</span><span>40%</span><span>50%</span><span>60%</span><span>70%</span>
                 </div>
@@ -2475,12 +2475,14 @@ const FORM_STEP_HEADS = {
   5: { title: 'Elige fecha y hora',            sub: 'Selecciona el día que te acomode para visitar el auto.' }
 };
 function goToFormStep(step) {
+  const stepFrom = currentFormStep;
   // Validate current step before advancing
   if (step > currentFormStep) {
     // Step 1 (calc) → Step 2 : no validation required (any slider state valid)
     if (currentFormStep === 2) {
       const stepFields = ['fName','fLastName1','fLastName2','fPhone','fEmail'];
       let allValid = true;
+      let firstErrorField = null;
       stepFields.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -2488,23 +2490,32 @@ function goToFormStep(step) {
         let valid = v.length > 0;
         if (id === 'fPhone') valid = /^[0-9]{10}$/.test(v);
         else if (id === 'fEmail') valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-        if (!valid) { showFieldError(id); el.classList.add('error'); el.classList.remove('valid'); allValid = false; }
+        if (!valid) { showFieldError(id); el.classList.add('error'); el.classList.remove('valid'); allValid = false; if (!firstErrorField) firstErrorField = id; }
         else { hideFieldError(id); el.classList.remove('error'); el.classList.add('valid'); }
       });
-      if (!allValid) { if (typeof scrollToFirstError === 'function') scrollToFirstError(); return; }
+      if (!allValid) {
+        try { dataLayer.push({ event: 'form_step_error', step: stepFrom, step_name: (FORM_STEP_HEADS[stepFrom]||{}).title || '', first_error_field: firstErrorField, item_name: currentCar ? (currentCar.name + ' ' + currentCar.year) : '' }); } catch (e) {}
+        if (typeof scrollToFirstError === 'function') scrollToFirstError();
+        return;
+      }
     }
     if (currentFormStep === 3) {
       const stepFields = ['fBuscaFinanciamiento'];
       if (document.getElementById('fBuscaFinanciamiento').value === 'SI') stepFields.push('fCompruebaIngresos');
       let allValid = true;
+      let firstErrorField = null;
       stepFields.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         const v = el.value.trim();
-        if (v.length === 0) { showFieldError(id); el.classList.add('error'); el.classList.remove('valid'); allValid = false; }
+        if (v.length === 0) { showFieldError(id); el.classList.add('error'); el.classList.remove('valid'); allValid = false; if (!firstErrorField) firstErrorField = id; }
         else { hideFieldError(id); el.classList.remove('error'); el.classList.add('valid'); }
       });
-      if (!allValid) { if (typeof scrollToFirstError === 'function') scrollToFirstError(); return; }
+      if (!allValid) {
+        try { dataLayer.push({ event: 'form_step_error', step: stepFrom, step_name: (FORM_STEP_HEADS[stepFrom]||{}).title || '', first_error_field: firstErrorField, item_name: currentCar ? (currentCar.name + ' ' + currentCar.year) : '' }); } catch (e) {}
+        if (typeof scrollToFirstError === 'function') scrollToFirstError();
+        return;
+      }
     }
     // Step 4 (sede) → Step 5 : no hay campos que validar, solo confirmacion visual
   }
@@ -2521,6 +2532,26 @@ function goToFormStep(step) {
       term_months: term,
       monthly_estimate: monthly
     });
+    // Evento explicito del commitment device (Step 1 CTA click) para funnel analysis
+    try { dataLayer.push({ event: 'commitment_cta_click', item_name: currentCar.name + ' ' + currentCar.year, item_price: currentCar.price, monthly_estimate: monthly, down_pct: downPct, term_months: term }); } catch (e) {}
+  }
+  // form_step_complete: funnel granular (todos los forward-advances exitosos)
+  if (step > stepFrom && currentCar) {
+    try {
+      const downPctFSC = parseInt((document.getElementById('downSlider')||{}).value || 20);
+      const termFSC = (typeof selectedTerm !== 'undefined') ? selectedTerm : 36;
+      const monthlyFSC = (typeof calcMonthly === 'function') ? calcMonthly(currentCar.price, downPctFSC, termFSC) : 0;
+      dataLayer.push({
+        event: 'form_step_complete',
+        step_from: stepFrom,
+        step_to: step,
+        step_from_name: (FORM_STEP_HEADS[stepFrom]||{}).title || '',
+        step_to_name: (FORM_STEP_HEADS[step]||{}).title || '',
+        item_name: currentCar.name + ' ' + currentCar.year,
+        item_price: currentCar.price,
+        monthly_estimate: monthlyFSC
+      });
+    } catch (e) {}
   }
   // Al entrar a Step 4 (sede) poblar mapa + datos de sucursal
   if (step === 4 && typeof updateLocationStepMap === 'function') updateLocationStepMap();
@@ -2700,6 +2731,29 @@ function onTipoPersonaChange() {
   }
 }
 
+// Debounce shared para calc_interaction — el slider dispara oninput 10+ veces, queremos un evento por "intento"
+let _calcInteractionTimer = null;
+function pushCalcInteraction(type) {
+  if (!currentCar) return;
+  if (_calcInteractionTimer) clearTimeout(_calcInteractionTimer);
+  _calcInteractionTimer = setTimeout(function(){
+    try {
+      const downPct = parseInt((document.getElementById('downSlider')||{}).value || 20);
+      const term = (typeof selectedTerm !== 'undefined') ? selectedTerm : 36;
+      const monthly = (typeof calcMonthly === 'function') ? calcMonthly(currentCar.price, downPct, term) : 0;
+      dataLayer.push({
+        event: 'calc_interaction',
+        interaction_type: type,
+        down_pct: downPct,
+        term_months: term,
+        monthly_estimate: monthly,
+        item_name: currentCar.name + ' ' + currentCar.year,
+        item_price: currentCar.price
+      });
+    } catch (e) {}
+  }, 600);
+}
+
 function updateCalc() {
   if (!currentCar) return;
   const downPct = parseInt(document.getElementById('downSlider').value);
@@ -2737,6 +2791,7 @@ function setTerm(months, el) {
   selectedTerm = months;
   document.querySelectorAll('.calc-term-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+  pushCalcInteraction('plazo');
   updateCalc();
 }
 
@@ -2912,6 +2967,14 @@ function selectCalDay(dateStr) {
   renderCalendar();
   renderTimeSlots();
   updateCitaSummary();
+  try {
+    dataLayer.push({
+      event: 'calendar_day_selected',
+      selected_date: dateStr,
+      day_of_week: calSelectedDate.getDay(),
+      item_name: currentCar ? (currentCar.name + ' ' + currentCar.year) : ''
+    });
+  } catch (e) {}
   // Clear time-dependent values
   document.getElementById('fDateTime').value = '';
   document.getElementById('hFechaCita').value = dateStr;
@@ -2959,15 +3022,25 @@ function selectTimeSlot(timeStr) {
   updateCitaSummary();
 
   // Update hidden inputs
+  let fullIso = '';
   if (calSelectedDate) {
     const dateStr = `${calSelectedDate.getFullYear()}-${pad(calSelectedDate.getMonth()+1)}-${pad(calSelectedDate.getDate())}`;
     document.getElementById('hFechaCita').value = dateStr;
     document.getElementById('hHoraCita').value = timeStr;
-    document.getElementById('fDateTime').value = `${dateStr}T${timeStr}`;
+    fullIso = `${dateStr}T${timeStr}`;
+    document.getElementById('fDateTime').value = fullIso;
   }
   // Hide error
   const errEl = document.getElementById('fDateTime-error');
   if (errEl) errEl.classList.remove('show');
+  try {
+    dataLayer.push({
+      event: 'calendar_time_selected',
+      selected_time: timeStr,
+      selected_datetime: fullIso,
+      item_name: currentCar ? (currentCar.name + ' ' + currentCar.year) : ''
+    });
+  } catch (e) {}
 }
 
 function updateCitaSummary() {
@@ -3153,6 +3226,18 @@ function openModal(id) {
 }
 
 function closeModal() {
+  // modal_close_before_submit: funnel drop-off tracker — solo si el usuario avanzo mas alla del step 1 y no completo submit
+  try {
+    if (!window._submitCompleted && typeof currentFormStep !== 'undefined' && currentFormStep > 1 && currentCar) {
+      dataLayer.push({
+        event: 'modal_close_before_submit',
+        last_step_reached: currentFormStep,
+        last_step_name: (FORM_STEP_HEADS[currentFormStep]||{}).title || '',
+        item_name: currentCar.name + ' ' + currentCar.year,
+        item_price: currentCar.price
+      });
+    }
+  } catch (e) {}
   document.getElementById('vehicleModal').classList.remove('open');
   // Restore body scroll — iOS-safe: restore position and scroll
   var savedScrollY = document.body.dataset.scrollY || '0';
@@ -3347,6 +3432,7 @@ let submitting = false;
 // ── SUBMIT FORM ──
 function resetSubmitState() {
   submitting = false;
+  window._submitCompleted = false;
   const b = document.querySelector('.btn-conversion');
   if (b) { b.disabled = false; b.style.opacity = ''; b.style.cursor = ''; }
 }
@@ -3487,6 +3573,7 @@ function submitForm() {
 
   sendToWebhook(payload);
   dataLayer.push({ event: 'generate_lead', item_name: currentCar.name + ' ' + currentCar.year, item_price: currentCar.price, lead_value: currentCar.price });
+  window._submitCompleted = true;
 
   lastAppointment = {
     ...payload,
