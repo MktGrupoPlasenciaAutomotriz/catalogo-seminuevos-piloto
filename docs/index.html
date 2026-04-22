@@ -1769,66 +1769,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="trust-badge-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Factura verificada</div>
         </div>
 
-        <!-- CALCULATOR -->
-        <div class="calc-section">
-          <div class="calc-head">
-            <div class="calc-head-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="12" y1="10" x2="14" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="12" y1="14" x2="14" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="10" y2="18"/><line x1="12" y1="18" x2="14" y2="18"/></svg></div>
-            <div>
-              <h3 class="calc-title">Calcula tu mensualidad</h3>
-              <div class="calc-sub">Ajusta el enganche y el plazo a tu medida</div>
-            </div>
-          </div>
-
-          <div class="calc-row">
-            <div class="calc-label">
-              <span>Enganche</span>
-              <span class="calc-label-value" id="downLabel">20%</span>
-            </div>
-            <input type="range" class="calc-slider" id="downSlider" min="20" max="70" value="20" step="5" oninput="updateCalc()" aria-label="Porcentaje de enganche" aria-valuemin="20" aria-valuemax="70" aria-valuenow="20" aria-valuetext="20% de enganche">
-            <div class="calc-slider-ticks">
-              <span>20%</span><span>30%</span><span>40%</span><span>50%</span><span>60%</span><span>70%</span>
-            </div>
-            <div class="enganche-highlight" id="engancheBox">
-              <div class="enganche-label">Tu enganche</div>
-              <div class="enganche-amount" id="engancheAmount">$0</div>
-            </div>
-          </div>
-
-          <div class="calc-row">
-            <div class="calc-label"><span>Plazo</span></div>
-            <div class="calc-terms" id="termBtns">
-              <button class="calc-term-btn" onclick="setTerm(12,this)">12m</button>
-              <button class="calc-term-btn" onclick="setTerm(24,this)">24m</button>
-              <button class="calc-term-btn active" onclick="setTerm(36,this)">36m</button>
-              <button class="calc-term-btn" onclick="setTerm(48,this)">48m</button>
-              <button class="calc-term-btn" onclick="setTerm(60,this)">60m</button>
-            </div>
-          </div>
-
-          <div style="background:rgba(214,158,46,0.15);border:1px solid rgba(214,158,46,0.3);border-radius:8px;padding:8px 12px;margin-bottom:12px;text-align:center;position:relative;">
-            <div style="font-size:11px;font-weight:700;color:var(--color-warning,#D69E2E);text-transform:uppercase;letter-spacing:0.5px;">&#9888;&#65039; Tasa referencial estimada: 14.9% anual</div>
-            <div style="font-size:9px;color:var(--ink-500,#718096);margin-top:2px;">Con fines informativos. La tasa real depende de la instituci&oacute;n financiera y tu perfil crediticio.</div>
-          </div>
-          <div class="calc-result">
-            <div class="calc-result-label">Tu mensualidad estimada</div>
-            <div class="calc-result-amount" id="monthlyAmount">$0</div>
-            <div class="calc-result-sub">Tasa referencial estimada: <strong>14.9%</strong></div>
-            <div style="font-size:10px;color:rgba(255,255,255,0.42);margin-top:6px;line-height:1.35;font-style:italic;position:relative;">Mensualidad estimada. El importe real puede variar al contratar según tasa autorizada, enganche, plazo y esquema elegido. El interés causa IVA.</div>
-            <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-top:6px;line-height:1.4;position:relative;">* Cálculo con fines informativos y tasa referencial estimada. No constituye una autorización de crédito ni una oferta vinculante. La tasa real, monto y plazo dependen de la institución financiera, el perfil del solicitante y el vehículo seleccionado. Consulta condiciones con tu asesor de ventas.</div>
-          </div>
-
-          <div class="calc-offer-banner" id="offerBanner">
-            <strong>A mayor enganche, mejor precio.</strong> Con 40%+ de enganche obtienes descuento adicional.
-          </div>
-        </div>
-
         <!-- FORM -->
         <div class="form-section">
           <div class="form-section-head">
             <div class="form-section-head-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
             <div>
-              <h3 class="form-section-title">Agenda tu visita a la agencia</h3>
-              <div class="form-section-sub">Solo 5 datos. Recibes tu precotización al instante.</div>
+              <h3 class="form-section-title" id="formSectionTitle">Cotiza tu mensualidad</h3>
+              <div class="form-section-sub" id="formSectionSub">Ajusta el enganche y el plazo a tu medida.</div>
             </div>
           </div>
 
@@ -1844,15 +1791,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="form-progress" id="formProgress">
             <div class="form-progress-step active" data-step="1">
               <div class="form-step-num">1</div>
-              <div class="form-step-label">Tus datos</div>
+              <div class="form-step-label">Cotiza</div>
             </div>
             <div class="form-progress-step" data-step="2">
               <div class="form-step-num">2</div>
-              <div class="form-step-label">Vehículo</div>
+              <div class="form-step-label">Datos</div>
             </div>
             <div class="form-progress-step" data-step="3">
               <div class="form-step-num">3</div>
-              <div class="form-step-label">Tu cita</div>
+              <div class="form-step-label">Perfil</div>
+            </div>
+            <div class="form-progress-step" data-step="4">
+              <div class="form-step-num">4</div>
+              <div class="form-step-label">Cita</div>
             </div>
           </div>
 
@@ -1864,8 +1815,66 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
           </div>
 
-          <!-- STEP 1: DATOS PERSONALES -->
+          <!-- STEP 1: COTIZACION (calculadora como commitment trigger) -->
           <div class="form-step active" id="formStep1">
+            <div class="calc-section" style="margin:0 0 16px;">
+              <div class="calc-row">
+                <div class="calc-label">
+                  <span>Enganche</span>
+                  <span class="calc-label-value" id="downLabel">20%</span>
+                </div>
+                <input type="range" class="calc-slider" id="downSlider" min="20" max="70" value="20" step="5" oninput="updateCalc()" aria-label="Porcentaje de enganche" aria-valuemin="20" aria-valuemax="70" aria-valuenow="20" aria-valuetext="20% de enganche">
+                <div class="calc-slider-ticks">
+                  <span>20%</span><span>30%</span><span>40%</span><span>50%</span><span>60%</span><span>70%</span>
+                </div>
+                <div class="enganche-highlight" id="engancheBox">
+                  <div class="enganche-label">Tu enganche</div>
+                  <div class="enganche-amount" id="engancheAmount">$0</div>
+                </div>
+              </div>
+
+              <div class="calc-row">
+                <div class="calc-label"><span>Plazo</span></div>
+                <div class="calc-terms" id="termBtns">
+                  <button class="calc-term-btn" onclick="setTerm(12,this)">12m</button>
+                  <button class="calc-term-btn" onclick="setTerm(24,this)">24m</button>
+                  <button class="calc-term-btn active" onclick="setTerm(36,this)">36m</button>
+                  <button class="calc-term-btn" onclick="setTerm(48,this)">48m</button>
+                  <button class="calc-term-btn" onclick="setTerm(60,this)">60m</button>
+                </div>
+              </div>
+
+              <div style="background:rgba(214,158,46,0.15);border:1px solid rgba(214,158,46,0.3);border-radius:8px;padding:8px 12px;margin-bottom:12px;text-align:center;position:relative;">
+                <div style="font-size:11px;font-weight:700;color:var(--color-warning,#D69E2E);text-transform:uppercase;letter-spacing:0.5px;">&#9888;&#65039; Tasa referencial estimada: 14.9% anual</div>
+                <div style="font-size:9px;color:var(--ink-500,#718096);margin-top:2px;">Con fines informativos. La tasa real depende de la instituci&oacute;n financiera y tu perfil crediticio.</div>
+              </div>
+              <div class="calc-result">
+                <div class="calc-result-label">Tu mensualidad estimada</div>
+                <div class="calc-result-amount" id="monthlyAmount">$0</div>
+                <div class="calc-result-sub">Tasa referencial estimada: <strong>14.9%</strong></div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.42);margin-top:6px;line-height:1.35;font-style:italic;position:relative;">Mensualidad estimada. El importe real puede variar al contratar según tasa autorizada, enganche, plazo y esquema elegido. El interés causa IVA.</div>
+                <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-top:6px;line-height:1.4;position:relative;">* Cálculo con fines informativos y tasa referencial estimada. No constituye una autorización de crédito ni una oferta vinculante. La tasa real, monto y plazo dependen de la institución financiera, el perfil del solicitante y el vehículo seleccionado. Consulta condiciones con tu asesor de ventas.</div>
+              </div>
+
+              <div class="calc-offer-banner" id="offerBanner">
+                <strong>A mayor enganche, mejor precio.</strong> Con 40%+ de enganche obtienes descuento adicional.
+              </div>
+            </div>
+
+            <!-- Commitment CTA: ata la cotizacion a la siguiente accion (dar datos) -->
+            <div class="form-step-nav" style="margin-top:4px;">
+              <button type="button" class="btn-step-next" id="btnCommitCalc" onclick="goToFormStep(2)" style="width:100%; justify-content:center; font-size:15px; padding:14px 20px;">
+                Agendar cita con esta mensualidad
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+            <p style="text-align:center; font-size:12px; color:var(--ink-500,#64748B); margin:10px 0 0; line-height:1.5;">
+              Llevamos tu cotización a la cita · Respuesta por WhatsApp en minutos
+            </p>
+          </div>
+
+          <!-- STEP 2: DATOS PERSONALES -->
+          <div class="form-step" id="formStep2">
           <div class="form-grid">
             <div class="form-group full">
               <label class="form-label" for="fName">Nombre(s) <span class="label-req">Obligatorio</span></label>
@@ -1898,12 +1907,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
           </div>
           <div class="form-step-nav">
-            <button type="button" class="btn-step-next" onclick="goToFormStep(2)">Siguiente <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></button>
+            <button type="button" class="btn-step-prev" onclick="goToFormStep(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg> Volver a cotizar</button>
+            <button type="button" class="btn-step-next" onclick="goToFormStep(3)">Siguiente <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></button>
           </div>
           </div>
 
-          <!-- STEP 2: VEHICULO / FINANCIAMIENTO -->
-          <div class="form-step" id="formStep2">
+          <!-- STEP 3: PERFIL / FINANCIAMIENTO -->
+          <div class="form-step" id="formStep3">
           <div class="form-grid">
             <div class="form-group full">
               <label class="form-label" for="fTipoPersona">Tipo de persona <span class="label-opt">Opcional</span></label>
@@ -1953,13 +1963,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
           </div>
           <div class="form-step-nav">
-            <button type="button" class="btn-step-prev" onclick="goToFormStep(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg> Anterior</button>
-            <button type="button" class="btn-step-next" onclick="goToFormStep(3)">Siguiente <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></button>
+            <button type="button" class="btn-step-prev" onclick="goToFormStep(2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg> Anterior</button>
+            <button type="button" class="btn-step-next" onclick="goToFormStep(4)">Siguiente <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></button>
           </div>
           </div>
 
-          <!-- STEP 3: CITA -->
-          <div class="form-step" id="formStep3">
+          <!-- STEP 4: CITA -->
+          <div class="form-step" id="formStep4">
           <div class="form-grid">
             <div class="form-group full">
               <label class="form-label" for="fDateTime">Fecha y hora de la cita <span class="label-req">Obligatorio</span></label>
@@ -2011,7 +2021,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </label>
 
           <div class="form-step-nav">
-            <button type="button" class="btn-step-prev" onclick="goToFormStep(2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg> Anterior</button>
+            <button type="button" class="btn-step-prev" onclick="goToFormStep(3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg> Anterior</button>
           </div>
 
           <button class="btn-conversion" onclick="submitForm()">
@@ -2019,7 +2029,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             Agendar mi cita
           </button>
           <p class="form-privacy">Tus datos solo se usan para tu cita. Protegidos conforme a ley (LFPDPPP).</p>
-          </div><!-- /formStep3 -->
+          </div><!-- /formStep4 -->
         </div>
       </div>
 
@@ -2385,14 +2395,22 @@ function loadMore() {
 }
 
 // ── FORM STEP NAVIGATION (Progressive Disclosure) ──
+// 4 steps: 1=Cotiza (calc) · 2=Datos · 3=Perfil · 4=Cita
 let currentFormStep = 1;
+const FORM_STEP_HEADS = {
+  1: { title: 'Cotiza tu mensualidad',         sub: 'Ajusta el enganche y el plazo a tu medida.' },
+  2: { title: 'Deja tus datos',                sub: 'Te enviamos la precotización por WhatsApp y correo.' },
+  3: { title: 'Completa tu perfil',            sub: 'Así afinamos el mejor esquema para ti.' },
+  4: { title: 'Agenda tu visita a la agencia', sub: 'Elige el día y hora que te acomode.' }
+};
 function goToFormStep(step) {
   // Validate current step before advancing
   if (step > currentFormStep) {
-    if (currentFormStep === 1) {
-      const step1Fields = ['fName','fLastName1','fLastName2','fPhone','fEmail'];
+    // Step 1 (calc) → Step 2 : no validation required (any slider state valid)
+    if (currentFormStep === 2) {
+      const stepFields = ['fName','fLastName1','fLastName2','fPhone','fEmail'];
       let allValid = true;
-      step1Fields.forEach(id => {
+      stepFields.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         const v = el.value.trim();
@@ -2404,11 +2422,11 @@ function goToFormStep(step) {
       });
       if (!allValid) { if (typeof scrollToFirstError === 'function') scrollToFirstError(); return; }
     }
-    if (currentFormStep === 2) {
-      const step2Fields = ['fBuscaFinanciamiento'];
-      if (document.getElementById('fBuscaFinanciamiento').value === 'SI') step2Fields.push('fCompruebaIngresos');
+    if (currentFormStep === 3) {
+      const stepFields = ['fBuscaFinanciamiento'];
+      if (document.getElementById('fBuscaFinanciamiento').value === 'SI') stepFields.push('fCompruebaIngresos');
       let allValid = true;
-      step2Fields.forEach(id => {
+      stepFields.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         const v = el.value.trim();
@@ -2418,13 +2436,28 @@ function goToFormStep(step) {
       if (!allValid) { if (typeof scrollToFirstError === 'function') scrollToFirstError(); return; }
     }
   }
-  // Update steps
-  if (step === 2 && currentCar) {
-    dataLayer.push({ event: 'form_start', item_name: currentCar.name + ' ' + currentCar.year, item_price: currentCar.price });
+  // form_start fires when user COMMITS from calc → data (actual form engagement)
+  if (step === 2 && currentFormStep === 1 && currentCar) {
+    const downPct = parseInt((document.getElementById('downSlider')||{}).value || 20);
+    const term = (typeof selectedTerm !== 'undefined') ? selectedTerm : 36;
+    const monthly = (typeof calcMonthly === 'function') ? calcMonthly(currentCar.price, downPct, term) : 0;
+    dataLayer.push({
+      event: 'form_start',
+      item_name: currentCar.name + ' ' + currentCar.year,
+      item_price: currentCar.price,
+      down_pct: downPct,
+      term_months: term,
+      monthly_estimate: monthly
+    });
   }
   updateStepSummary(step);
   currentFormStep = step;
-  if (step === 2 || step === 3) setView('agendar-paso-' + step);
+  // Update headline per step
+  const headTitle = document.getElementById('formSectionTitle');
+  const headSub = document.getElementById('formSectionSub');
+  if (headTitle && FORM_STEP_HEADS[step]) headTitle.textContent = FORM_STEP_HEADS[step].title;
+  if (headSub && FORM_STEP_HEADS[step]) headSub.textContent = FORM_STEP_HEADS[step].sub;
+  if (step >= 2 && step <= 4) setView('agendar-paso-' + step);
   document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
   const target = document.getElementById('formStep' + step);
   if (target) target.classList.add('active');
@@ -2435,13 +2468,11 @@ function goToFormStep(step) {
     if (sNum === step) s.classList.add('active');
     else if (sNum < step) s.classList.add('completed');
   });
-  // Scroll form into view
-  const formHead = document.querySelector('.form-section-head');
-  // Auto-focus sobre el primer campo del nuevo step (asi el usuario ve la sucursal/calendario, no se queda arriba)
+  // Auto-focus sobre el primer campo del nuevo step
   setTimeout(function(){
     var stepEl = document.getElementById('formStep' + step);
     if (!stepEl) return;
-    var firstField = stepEl.querySelector('.cita-picker, select:not([type=hidden]), input:not([type=hidden]):not([type=checkbox]), textarea');
+    var firstField = stepEl.querySelector('.cita-picker, select:not([type=hidden]), input:not([type=hidden]):not([type=checkbox]):not([type=range]), textarea');
     var target = firstField || stepEl;
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, 120);
@@ -2903,6 +2934,9 @@ function openModal(id) {
   document.getElementById('detailState').style.display = 'block';
   document.getElementById('confirmState').classList.remove('show');
 
+  // Reset a Step 1 (calculadora) cada vez que se abre un vehiculo
+  if (typeof goToFormStep === 'function') goToFormStep(1);
+
   const modal = document.getElementById('vehicleModal');
   const content = modal.querySelector('.modal-content');
   const resetModalScroll = () => { modal.scrollTop = 0; if (content) content.scrollTop = 0; };
@@ -2965,12 +2999,20 @@ function formatPhone(el) { el.value = el.value.replace(/[^0-9]/g, '').slice(0, 1
 // ── VALIDATION ──
 function updateStepSummary(step) {
   const bar = document.getElementById('stepSummary'); if (!bar) return;
+  // Step 1 = calculadora (no se muestra sticky summary, la calc ya es el foco)
   if (step === 1 || !currentCar) { bar.classList.remove('show'); return; }
   const t = document.getElementById('stepSummaryTitle');
   const m = document.getElementById('stepSummaryMeta');
   if (t) t.textContent = (currentCar.name || '') + ' ' + (currentCar.year || '') + (currentCar.version ? ' · ' + currentCar.version : '');
-  const monthly = typeof calcMonthly === 'function' ? calcMonthly(currentCar.price, 20, 36) : 0;
-  if (m) m.textContent = fmt(currentCar.price) + (monthly ? '  ·  Desde ' + fmt(monthly) + '/mes' : '');
+  // Usa el estado real de la calc que el usuario acaba de cerrar
+  const sliderEl = document.getElementById('downSlider');
+  const downPct = sliderEl ? parseInt(sliderEl.value) || 20 : 20;
+  const term = (typeof selectedTerm !== 'undefined') ? selectedTerm : 36;
+  const monthly = (typeof calcMonthly === 'function') ? calcMonthly(currentCar.price, downPct, term) : 0;
+  const downAmount = Math.round(currentCar.price * downPct / 100);
+  if (m) {
+    m.textContent = (monthly ? fmt(monthly) + '/mes · ' : '') + downPct + '% enganche (' + fmt(downAmount) + ') · ' + term + 'm';
+  }
   bar.classList.add('show');
 }
 
