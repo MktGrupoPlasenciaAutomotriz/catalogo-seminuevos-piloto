@@ -1803,6 +1803,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
             <div class="form-progress-step" data-step="4">
               <div class="form-step-num">4</div>
+              <div class="form-step-label">Sede</div>
+            </div>
+            <div class="form-progress-step" data-step="5">
+              <div class="form-step-num">5</div>
               <div class="form-step-label">Cita</div>
             </div>
           </div>
@@ -1968,68 +1972,116 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
           </div>
 
-          <!-- STEP 4: CITA -->
+          <!-- STEP 4: UBICACION (confirma sede antes de invertir en calendario) -->
           <div class="form-step" id="formStep4">
-          <div class="form-grid">
-            <div class="form-group full">
-              <label class="form-label" for="fDateTime">Fecha y hora de la cita <span class="label-req">Obligatorio</span></label>
-              <input type="hidden" id="fDateTime" value="">
-              <input type="hidden" id="hFechaCita" value="">
-              <input type="hidden" id="hHoraCita" value="">
-              <div class="cita-picker" id="citaPicker">
-                <div class="cita-sucursal-info" id="citaSucursalInfo" role="status" aria-live="polite">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="cita-sucursal-icon"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                  <div class="cita-sucursal-text">
-                    <div class="cita-sucursal-label">Tu cita será en</div>
-                    <div class="cita-sucursal-name" id="citaSucursalName">—</div>
-                    <div class="cita-sucursal-addr" id="citaSucursalAddr">—</div>
-                    <div class="cita-sucursal-note">Este seminuevo solo está en esta sucursal. La cita se agenda aquí.</div>
-                  </div>
+            <div class="sede-card" style="background:var(--neutral-50,#F7FAFC); border:1px solid var(--neutral-200,#E2E8F0); border-radius:12px; padding:16px; margin-bottom:16px;">
+              <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:14px;">
+                <div style="flex-shrink:0; width:44px; height:44px; border-radius:10px; background:var(--color-accent-light,#EBF8FF); color:var(--color-accent,#4299E1); display:flex; align-items:center; justify-content:center;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
                 </div>
-                <div class="cal-warning" id="calWarning" role="status" aria-live="polite">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                  <span>No agendamos citas el mismo día. Selecciona una fecha de mañana en adelante (mínimo 24 h).</span>
+                <div style="flex:1;">
+                  <div style="font-size:12px; font-weight:600; color:var(--ink-500,#64748B); text-transform:uppercase; letter-spacing:0.5px;">Este auto está en</div>
+                  <div id="sedeName" style="font-size:18px; font-weight:700; color:var(--ink-900,#1A202C); line-height:1.25; margin-top:2px;">—</div>
+                  <div id="sedeAddr" style="font-size:14px; color:var(--ink-600,#475569); line-height:1.4; margin-top:4px;">—</div>
                 </div>
-                <div class="cal-wrap">
-                  <div class="cal-header">
-                    <button type="button" class="cal-nav" id="calPrev" onclick="calNav(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-                    <span class="cal-header-title" id="calTitle"></span>
-                    <button type="button" class="cal-nav" id="calNext" onclick="calNav(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-                  </div>
-                  <div class="cal-grid" id="calGrid"></div>
-                </div>
-                <div class="time-slots-wrap" id="timeSlotsWrap" style="display:none;">
-                  <div class="time-slots-label">Selecciona un horario</div>
-                  <div class="time-slots" id="timeSlots"></div>
-                </div>
-                <div class="cita-summary" id="citaSummary"></div>
               </div>
-              <div class="help-text">Mínimo 24 horas de anticipación. Lunes a sábado, 9:00 a 18:30.</div>
-              <div class="form-error-msg" id="fDateTime-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span id="fDateTime-error-text">Elige cuándo quieres visitarnos</span></div>
+
+              <!-- Mapa -->
+              <div class="sede-map-wrap" style="position:relative; border-radius:10px; overflow:hidden; border:1px solid var(--neutral-200,#E2E8F0); margin-bottom:12px; aspect-ratio:16/10; background:var(--neutral-100,#EDF2F7);">
+                <iframe id="sedeMapIframe" src="" width="100%" height="100%" style="border:0; display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa de la sucursal"></iframe>
+              </div>
+
+              <!-- Horarios -->
+              <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:#fff; border:1px solid var(--neutral-200,#E2E8F0); border-radius:8px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-success,#48BB78)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <div>
+                  <div style="font-size:13px; font-weight:600; color:var(--ink-800,#1A202C);">Horarios de atención</div>
+                  <div style="font-size:12px; color:var(--ink-600,#475569);">Lunes a sábado, 9:00 a 18:30</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bailout: si la sede queda lejos, volver al catalogo filtrado por zona -->
+            <div style="text-align:center; margin:12px 0 4px;">
+              <button type="button" onclick="bailoutToLocation()" style="background:none; border:none; color:var(--color-accent,#4299E1); font-size:13px; font-weight:600; cursor:pointer; padding:8px 12px; text-decoration:underline;">
+                ¿Esta sede te queda lejos? Ver autos en otra zona
+              </button>
+            </div>
+
+            <div class="form-step-nav">
+              <button type="button" class="btn-step-prev" onclick="goToFormStep(3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg> Anterior</button>
+              <button type="button" class="btn-step-next" onclick="goToFormStep(5)">Confirmar sede · Agendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></button>
             </div>
           </div>
 
-          <label for="fPrivacy" style="display:flex; align-items:flex-start; gap:8px; margin:16px 0 8px; font-size:13px; color:var(--ink-600, #475569); line-height:1.4; cursor:pointer;">
-            <input type="checkbox" id="fPrivacy" required style="margin-top:3px; min-width:18px; min-height:18px; accent-color:var(--color-accent, #FBC645);">
-            <span>He leído y acepto el <a href="https://grupoplasencia.com/aviso_de_privacidad/" target="_blank" rel="noopener" style="color:var(--color-cyan, #17B7E0); text-decoration:underline;">Aviso de Privacidad</a> de Grupo Plasencia Automotriz.</span>
-          </label>
-          <div class="form-error-msg" id="fPrivacy-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Acepta el aviso de privacidad para continuar</div>
+          <!-- STEP 5: CITA (calendario primero, warning abajo, sucursal compacta) -->
+          <div class="form-step" id="formStep5">
+            <!-- Badge compacto de sede ya confirmada -->
+            <div id="citaSedeBadge" style="display:flex; align-items:center; gap:8px; padding:10px 12px; background:var(--neutral-50,#F7FAFC); border:1px solid var(--neutral-200,#E2E8F0); border-radius:8px; margin-bottom:14px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent,#4299E1)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:11px; color:var(--ink-500,#64748B); font-weight:600; text-transform:uppercase; letter-spacing:0.3px; line-height:1;">Tu cita en</div>
+                <div id="citaSedeBadgeName" style="font-size:14px; font-weight:700; color:var(--ink-900,#1A202C); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div>
+              </div>
+            </div>
 
-          <label for="fMarketing" style="display:flex; align-items:flex-start; gap:8px; margin:4px 0 16px; font-size:13px; color:var(--ink-600, #475569); line-height:1.4; cursor:pointer;">
-            <input type="checkbox" id="fMarketing" style="margin-top:3px; min-width:18px; min-height:18px; accent-color:var(--color-accent, #FBC645);">
-            <span>Acepto que mis datos sean utilizados con fines promocionales y de contacto comercial.</span>
-          </label>
+            <div class="form-grid">
+              <div class="form-group full">
+                <label class="form-label" for="fDateTime">Fecha y hora de la cita <span class="label-req">Obligatorio</span></label>
+                <input type="hidden" id="fDateTime" value="">
+                <input type="hidden" id="hFechaCita" value="">
+                <input type="hidden" id="hHoraCita" value="">
+                <div class="cita-picker" id="citaPicker">
+                  <!-- Referencia legacy oculta: siguen existiendo para compatibilidad con updateCitaSucursalInfo() -->
+                  <div class="cita-sucursal-info" id="citaSucursalInfo" style="display:none;" aria-hidden="true">
+                    <div class="cita-sucursal-name" id="citaSucursalName">—</div>
+                    <div class="cita-sucursal-addr" id="citaSucursalAddr">—</div>
+                  </div>
+                  <!-- CALENDARIO PRIMERO -->
+                  <div class="cal-wrap">
+                    <div class="cal-header">
+                      <button type="button" class="cal-nav" id="calPrev" onclick="calNav(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+                      <span class="cal-header-title" id="calTitle"></span>
+                      <button type="button" class="cal-nav" id="calNext" onclick="calNav(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                    </div>
+                    <div class="cal-grid" id="calGrid"></div>
+                  </div>
+                  <!-- WARNING DEBAJO del calendario (ahora si se ve) -->
+                  <div class="cal-warning" id="calWarning" role="status" aria-live="polite" style="margin-top:10px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span>Mínimo 24 h de anticipación. No agendamos citas el mismo día.</span>
+                  </div>
+                  <div class="time-slots-wrap" id="timeSlotsWrap" style="display:none;">
+                    <div class="time-slots-label">Selecciona un horario</div>
+                    <div class="time-slots" id="timeSlots"></div>
+                  </div>
+                  <div class="cita-summary" id="citaSummary"></div>
+                </div>
+                <div class="form-error-msg" id="fDateTime-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span id="fDateTime-error-text">Elige cuándo quieres visitarnos</span></div>
+              </div>
+            </div>
 
-          <div class="form-step-nav">
-            <button type="button" class="btn-step-prev" onclick="goToFormStep(3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg> Anterior</button>
-          </div>
+            <label for="fPrivacy" style="display:flex; align-items:flex-start; gap:8px; margin:16px 0 8px; font-size:13px; color:var(--ink-600, #475569); line-height:1.4; cursor:pointer;">
+              <input type="checkbox" id="fPrivacy" required style="margin-top:3px; min-width:18px; min-height:18px; accent-color:var(--color-accent, #FBC645);">
+              <span>He leído y acepto el <a href="https://grupoplasencia.com/aviso_de_privacidad/" target="_blank" rel="noopener" style="color:var(--color-cyan, #17B7E0); text-decoration:underline;">Aviso de Privacidad</a> de Grupo Plasencia Automotriz.</span>
+            </label>
+            <div class="form-error-msg" id="fPrivacy-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Acepta el aviso de privacidad para continuar</div>
 
-          <button class="btn-conversion" onclick="submitForm()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            Agendar mi cita
-          </button>
-          <p class="form-privacy">Tus datos solo se usan para tu cita. Protegidos conforme a ley (LFPDPPP).</p>
-          </div><!-- /formStep4 -->
+            <label for="fMarketing" style="display:flex; align-items:flex-start; gap:8px; margin:4px 0 16px; font-size:13px; color:var(--ink-600, #475569); line-height:1.4; cursor:pointer;">
+              <input type="checkbox" id="fMarketing" style="margin-top:3px; min-width:18px; min-height:18px; accent-color:var(--color-accent, #FBC645);">
+              <span>Acepto que mis datos sean utilizados con fines promocionales y de contacto comercial.</span>
+            </label>
+
+            <div class="form-step-nav">
+              <button type="button" class="btn-step-prev" onclick="goToFormStep(4)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg> Anterior</button>
+            </div>
+
+            <button class="btn-conversion" onclick="submitForm()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              Agendar mi cita
+            </button>
+            <p class="form-privacy">Tus datos solo se usan para tu cita. Protegidos conforme a ley (LFPDPPP).</p>
+          </div><!-- /formStep5 -->
         </div>
       </div>
 
@@ -2395,13 +2447,14 @@ function loadMore() {
 }
 
 // ── FORM STEP NAVIGATION (Progressive Disclosure) ──
-// 4 steps: 1=Cotiza (calc) · 2=Datos · 3=Perfil · 4=Cita
+// 5 steps: 1=Cotiza (calc) · 2=Datos · 3=Perfil · 4=Sede · 5=Cita
 let currentFormStep = 1;
 const FORM_STEP_HEADS = {
   1: { title: 'Cotiza tu mensualidad',         sub: 'Ajusta el enganche y el plazo a tu medida.' },
   2: { title: 'Deja tus datos',                sub: 'Te enviamos la precotización por WhatsApp y correo.' },
   3: { title: 'Completa tu perfil',            sub: 'Así afinamos el mejor esquema para ti.' },
-  4: { title: 'Agenda tu visita a la agencia', sub: 'Elige el día y hora que te acomode.' }
+  4: { title: 'Confirma dónde te atenderemos', sub: 'Este auto solo está en esta sede. Revisa ubicación y horarios antes de agendar.' },
+  5: { title: 'Elige fecha y hora',            sub: 'Selecciona el día que te acomode para visitar el auto.' }
 };
 function goToFormStep(step) {
   // Validate current step before advancing
@@ -2435,6 +2488,7 @@ function goToFormStep(step) {
       });
       if (!allValid) { if (typeof scrollToFirstError === 'function') scrollToFirstError(); return; }
     }
+    // Step 4 (sede) → Step 5 : no hay campos que validar, solo confirmacion visual
   }
   // form_start fires when user COMMITS from calc → data (actual form engagement)
   if (step === 2 && currentFormStep === 1 && currentCar) {
@@ -2450,6 +2504,10 @@ function goToFormStep(step) {
       monthly_estimate: monthly
     });
   }
+  // Al entrar a Step 4 (sede) poblar mapa + datos de sucursal
+  if (step === 4 && typeof updateLocationStepMap === 'function') updateLocationStepMap();
+  // Al entrar a Step 5 (cita) poblar badge de sede compacto
+  if (step === 5 && typeof updateCitaSedeBadge === 'function') updateCitaSedeBadge();
   updateStepSummary(step);
   currentFormStep = step;
   // Update headline per step
@@ -2457,7 +2515,7 @@ function goToFormStep(step) {
   const headSub = document.getElementById('formSectionSub');
   if (headTitle && FORM_STEP_HEADS[step]) headTitle.textContent = FORM_STEP_HEADS[step].title;
   if (headSub && FORM_STEP_HEADS[step]) headSub.textContent = FORM_STEP_HEADS[step].sub;
-  if (step >= 2 && step <= 4) setView('agendar-paso-' + step);
+  if (step >= 2 && step <= 5) setView('agendar-paso-' + step);
   document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
   const target = document.getElementById('formStep' + step);
   if (target) target.classList.add('active');
@@ -2476,6 +2534,47 @@ function goToFormStep(step) {
     var target = firstField || stepEl;
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, 120);
+}
+
+// ── Step 4 (Sede): poblar mapa + datos de la sucursal segun currentCar.loc ──
+function updateLocationStepMap() {
+  if (!currentCar || typeof getSucursalMap !== 'function') return;
+  const cfg = getSucursalMap(currentCar.loc);
+  const nameEl = document.getElementById('sedeName');
+  const addrEl = document.getElementById('sedeAddr');
+  const iframe = document.getElementById('sedeMapIframe');
+  if (nameEl) nameEl.textContent = cfg.name;
+  if (addrEl) addrEl.textContent = cfg.addr;
+  if (iframe && cfg.src && iframe.src !== cfg.src) iframe.src = cfg.src;
+}
+
+// ── Step 5 (Cita): badge compacto con el nombre de la sede ya confirmada ──
+function updateCitaSedeBadge() {
+  if (!currentCar || typeof getSucursalMap !== 'function') return;
+  const cfg = getSucursalMap(currentCar.loc);
+  const badgeName = document.getElementById('citaSedeBadgeName');
+  if (badgeName) badgeName.textContent = cfg.name;
+}
+
+// ── Bailout: si la sede queda lejos, cerrar modal + filtrar catalogo por otra sede ──
+function bailoutToLocation() {
+  try {
+    dataLayer.push({
+      event: 'sede_bailout',
+      item_name: currentCar ? (currentCar.name + ' ' + currentCar.year) : '',
+      item_price: currentCar ? currentCar.price : 0,
+      current_loc: currentCar ? currentCar.loc : ''
+    });
+  } catch (e) {}
+  if (typeof closeModal === 'function') closeModal();
+  // Scroll al filtro de ubicacion
+  setTimeout(function(){
+    const filter = document.getElementById('filterLoc');
+    if (filter) {
+      filter.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      filter.focus();
+    }
+  }, 300);
 }
 /* filterCars replaced by filterByType dropdown */
 
