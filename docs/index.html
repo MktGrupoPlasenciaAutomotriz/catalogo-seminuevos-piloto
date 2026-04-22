@@ -1393,13 +1393,21 @@ select.form-input.valid { background-position: right 40px center; }
   padding: 10px 16px;
   padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  /* Entrance / exit animation state */
+  opacity: 0; transform: translateY(100%);
+  transition: opacity 250ms cubic-bezier(0.4,0,0.2,1), transform 250ms cubic-bezier(0.4,0,0.2,1);
+  pointer-events: none;
 }
 @media (max-width: 640px) {
   .sticky-mobile-cta { display: flex; gap: 10px; align-items: center; }
-  /* Offset body bottom so content is not hidden behind sticky bar */
-  body { padding-bottom: 76px; }
+  .sticky-mobile-cta.is-visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  /* Offset body bottom only when sticky is visible, so desktop no sobra padding */
+  body.has-sticky-cta { padding-bottom: 76px; }
   /* Hide sticky bar when modal is open (body is fixed) */
-  body[style*="position: fixed"] .sticky-mobile-cta { display: none; }
+  body[style*="position: fixed"] .sticky-mobile-cta { opacity: 0; transform: translateY(100%); pointer-events: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sticky-mobile-cta { transition: none; }
 }
 .sticky-mobile-cta-btn {
   flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -2566,6 +2574,86 @@ function updateCitaSedeBadge() {
   if (badgeName) badgeName.textContent = cfg.name;
 }
 
+// ── H2: Sticky Mobile CTA — handlers + intersection observer ──
+function stickyCtaBrowse() {
+  try {
+    dataLayer.push({
+      event: 'sticky_cta_browse_click',
+      viewport: 'mobile'
+    });
+  } catch (e) {}
+  const grid = document.getElementById('inventoryGrid');
+  const searchEl = document.getElementById('searchInput');
+  if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Focus del buscador con un pequeño delay para que el scroll termine antes
+  setTimeout(function(){
+    if (searchEl && typeof searchEl.focus === 'function') {
+      try { searchEl.focus({ preventScroll: true }); } catch (e) { searchEl.focus(); }
+    }
+  }, 450);
+}
+
+function stickyCtaWaClick() {
+  try {
+    dataLayer.push({
+      event: 'sticky_cta_wa_click',
+      viewport: 'mobile'
+    });
+  } catch (e) {}
+  // Si el href aun no esta poblado, construirlo ahora con el telefono default + mensaje generico
+  const a = document.getElementById('stickyCtaWa');
+  if (a && (!a.href || a.getAttribute('href') === '#')) {
+    const phone = (typeof ASESOR_ASIGNADO !== 'undefined' && ASESOR_ASIGNADO.telefono)
+      ? ASESOR_ASIGNADO.telefono.replace(/[^0-9]/g,'')
+      : '5213341638050';
+    const msg = 'Hola, vi su inventario de Seminuevos Plasencia en linea y me interesa saber mas.';
+    a.href = 'https://api.whatsapp.com/send/?phone=' + phone + '&text=' + encodeURIComponent(msg) + '&type=phone_number&app_absent=0';
+  }
+}
+
+// Observa el hero: cuando sale del viewport en mobile → muestra sticky CTA
+(function initStickyMobileCta(){
+  function boot() {
+    const hero = document.querySelector('.hero');
+    const bar = document.getElementById('stickyMobileCta');
+    if (!hero || !bar) return;
+    // Pre-poblar el href de WA con datos default (no bloqueante)
+    try { stickyCtaWaClick.call(null); /* noop call just to prepare? */ } catch(e){}
+    const a = document.getElementById('stickyCtaWa');
+    if (a) {
+      const phone = (typeof ASESOR_ASIGNADO !== 'undefined' && ASESOR_ASIGNADO.telefono)
+        ? ASESOR_ASIGNADO.telefono.replace(/[^0-9]/g,'')
+        : '5213341638050';
+      const msg = 'Hola, vi su inventario de Seminuevos Plasencia en linea y me interesa saber mas.';
+      a.href = 'https://api.whatsapp.com/send/?phone=' + phone + '&text=' + encodeURIComponent(msg) + '&type=phone_number&app_absent=0';
+    }
+    let impressionFired = false;
+    const io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        // Solo activamos en viewport mobile (la CSS ya lo hace pero evitamos push de datalayer desktop)
+        const isMobile = window.matchMedia('(max-width: 640px)').matches;
+        if (!entry.isIntersecting) {
+          bar.classList.add('is-visible');
+          document.body.classList.add('has-sticky-cta');
+          if (isMobile && !impressionFired) {
+            impressionFired = true;
+            try { dataLayer.push({ event: 'sticky_cta_impression', viewport: 'mobile' }); } catch (e) {}
+          }
+        } else {
+          bar.classList.remove('is-visible');
+          document.body.classList.remove('has-sticky-cta');
+        }
+      });
+    }, { threshold: 0, rootMargin: '-80px 0px 0px 0px' });
+    io.observe(hero);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+
 // ── Bailout: si la sede queda lejos, cerrar modal + filtrar catalogo por otra sede ──
 function bailoutToLocation() {
   try {
@@ -3696,6 +3784,17 @@ function toggleIngresosFeedback(sel) {
       </a>
     </div>
   </div>
+</div>
+
+<!-- STICKY MOBILE CTA BAR (H2) — aparece cuando el usuario pasa del hero en mobile -->
+<div class="sticky-mobile-cta" id="stickyMobileCta" role="region" aria-label="Acciones rápidas">
+  <button type="button" class="sticky-mobile-cta-btn sticky-mobile-cta-btn--primary" id="stickyCtaBrowse" onclick="stickyCtaBrowse()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Encuentra tu auto
+  </button>
+  <a class="sticky-mobile-cta-btn sticky-mobile-cta-btn--wa" id="stickyCtaWa" href="#" target="_blank" rel="noopener" onclick="stickyCtaWaClick()" aria-label="Hablar con un asesor por WhatsApp" style="flex:0 0 auto; min-width:56px; max-width:56px; padding:14px 0;">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.002-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.488"/></svg>
+  </a>
 </div>
 
 </body>
