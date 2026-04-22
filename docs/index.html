@@ -2735,31 +2735,29 @@ function stickyCtaBrowse() {
   }, 450);
 }
 
-// Observa el hero: cuando sale del viewport en mobile → muestra sticky CTA
+// Sticky CTA: siempre visible en mobile (≤640px). Solo se oculta cuando el modal bloquea el body (body[style*="position: fixed"]).
 (function initStickyMobileCta(){
   function boot() {
-    const hero = document.querySelector('.hero');
     const bar = document.getElementById('stickyMobileCta');
-    if (!hero || !bar) return;
+    if (!bar) return;
+    const mq = window.matchMedia('(max-width: 640px)');
     let impressionFired = false;
-    const io = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        // Solo activamos en viewport mobile (la CSS ya lo hace pero evitamos push de datalayer desktop)
-        const isMobile = window.matchMedia('(max-width: 640px)').matches;
-        if (!entry.isIntersecting) {
-          bar.classList.add('is-visible');
-          document.body.classList.add('has-sticky-cta');
-          if (isMobile && !impressionFired) {
-            impressionFired = true;
-            try { dataLayer.push({ event: 'sticky_cta_impression', viewport: 'mobile' }); } catch (e) {}
-          }
-        } else {
-          bar.classList.remove('is-visible');
-          document.body.classList.remove('has-sticky-cta');
+    function apply() {
+      if (mq.matches) {
+        bar.classList.add('is-visible');
+        document.body.classList.add('has-sticky-cta');
+        if (!impressionFired) {
+          impressionFired = true;
+          try { (window.dataLayer = window.dataLayer || []).push({ event: 'sticky_cta_impression', viewport: 'mobile' }); } catch (e) {}
         }
-      });
-    }, { threshold: 0, rootMargin: '-80px 0px 0px 0px' });
-    io.observe(hero);
+      } else {
+        bar.classList.remove('is-visible');
+        document.body.classList.remove('has-sticky-cta');
+      }
+    }
+    apply();
+    if (mq.addEventListener) mq.addEventListener('change', apply);
+    else if (mq.addListener) mq.addListener(apply);
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
