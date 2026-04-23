@@ -2199,13 +2199,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 const WEBHOOK_URL = 'https://hooks.zapier.com/hooks/catch/27114778/u7dvk6y/';
 var searchDebounce = null;
 
-// Resiliencia de submit: triple-path + retry queue en localStorage.
-// Contexto (22 abril 2026): cliente real ALEJANDRO SANTANA llego al folio
-// GP-HYU-260422-103039 pero el webhook NUNCA llego a Zapier (se confirmo por WA).
-// Causa probable: AdBlocker / privacy extension / interrupcion de red / iframe
-// bloqueado por shields. El patron original "iframe + form.submit()" es
-// fire-and-forget sin visibilidad. Este fix dispara 3 paths en paralelo y
-// encola en localStorage si todos fallan, reintentando en la proxima visita.
+// Resiliencia de submit: single-path con fallback + retry queue en localStorage.
+// Contexto: caso Alejandro Santana (22 abr 2026, folio GP-HYU-260422-103039) —
+// webhook nunca llego a Zapier (confirmado por WA). Causa probable: AdBlocker /
+// extension / red flaky / iframe bloqueado. El primer fix uso triple-path en
+// paralelo y creo registros triplicados. Fix 22 abr 2026 (post-launch): single
+// path — fetch no-cors con keepalive (sobrevive navigation/close tab) como
+// primario, sendBeacon SOLO como fallback cuando fetch falla sincronicamente.
 function normalizePayload(data) {
   const out = {};
   Object.entries(data || {}).forEach(([k, v]) => { out[k] = v == null ? '' : String(v); });
@@ -2216,33 +2216,10 @@ function sendToWebhook(data) {
   if (!WEBHOOK_URL) return;
   const payload = normalizePayload(data);
   const body = new URLSearchParams(payload).toString();
-  let pathAok = false, pathBok = false, pathCok = false;
+  var sent = false;
 
-  // Path A: iframe + form POST (original — Zapier friendly, sobrevive redirect)
-  try {
-    const iframe = document.createElement('iframe');
-    iframe.name = 'zapier_target_' + Date.now();
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = WEBHOOK_URL;
-    form.target = iframe.name;
-    form.style.display = 'none';
-    Object.entries(payload).forEach(([key, val]) => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = key;
-      input.value = val;
-      form.appendChild(input);
-    });
-    document.body.appendChild(form);
-    form.submit();
-    pathAok = true;
-    setTimeout(function(){ try { form.remove(); iframe.remove(); } catch(e){} }, 5000);
-  } catch(e) { console.error('[lead] path A (iframe) fail', e); }
-
-  // Path B: fetch no-cors con keepalive (sobrevive navigation, bypasa iframe restrictions)
+  // Primary: fetch no-cors con keepalive. Sobrevive navigation/tab-close.
+  // Zapier Catch Hook acepta application/x-www-form-urlencoded sin CORS.
   try {
     fetch(WEBHOOK_URL, {
       method: 'POST',
@@ -2250,21 +2227,26 @@ function sendToWebhook(data) {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: body,
       keepalive: true
-    }).then(function(){ pathBok = true; }).catch(function(e){ console.error('[lead] path B (fetch) rejected', e); });
-  } catch(e) { console.error('[lead] path B (fetch) threw', e); }
+    }).catch(function(e){ console.error('[lead] fetch rejected async', e); });
+    sent = true;
+  } catch(e) {
+    console.error('[lead] fetch threw sync, trying beacon fallback', e);
+  }
 
-  // Path C: sendBeacon (mas robusto contra navigation interrumpida)
-  try {
-    if (navigator.sendBeacon) {
-      const blob = new Blob([body], { type: 'application/x-www-form-urlencoded' });
-      pathCok = navigator.sendBeacon(WEBHOOK_URL, blob) === true;
-    }
-  } catch(e) { console.error('[lead] path C (beacon) fail', e); }
+  // Fallback: sendBeacon SOLO si fetch no se pudo despachar sincronicamente.
+  if (!sent) {
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([body], { type: 'application/x-www-form-urlencoded' });
+        sent = navigator.sendBeacon(WEBHOOK_URL, blob) === true;
+      }
+    } catch(e) { console.error('[lead] beacon fail', e); }
+  }
 
-  console.log('[lead] submit', data.folio, { A: pathAok, B: 'async', C: pathCok });
+  console.log('[lead] submit', data.folio, { sent: sent });
 
-  // Si A y C fallaron en el momento (B es async), encolar para retry en proxima visita
-  if (!pathAok && !pathCok) {
+  // Si todo fallo sincronicamente, encolar para retry en proxima visita
+  if (!sent) {
     try {
       const queue = JSON.parse(localStorage.getItem('gp_pending_leads') || '[]');
       queue.push({ url: WEBHOOK_URL, data: payload, ts: Date.now(), folio: data.folio || '' });
@@ -2275,6 +2257,7 @@ function sendToWebhook(data) {
 }
 
 // Al cargar la pagina, reintenta leads encolados (max 7 dias de antiguedad)
+// Importante: SOLO un path (fetch) — si mandamos fetch + beacon se duplicaria el retry.
 (function retryPendingLeads(){
   try {
     const queue = JSON.parse(localStorage.getItem('gp_pending_leads') || '[]');
@@ -2292,9 +2275,6 @@ function sendToWebhook(data) {
           body: new URLSearchParams(item.data).toString(),
           keepalive: true
         });
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon(item.url, new Blob([new URLSearchParams(item.data).toString()], { type: 'application/x-www-form-urlencoded' }));
-        }
         console.log('[lead] retry sent', item.folio);
       } catch(e) { kept.push(item); }
     });
