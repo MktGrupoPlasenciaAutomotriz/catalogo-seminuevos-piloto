@@ -2438,12 +2438,19 @@ let galleryIdx = 0;
 let galleryImgs = [];
 
 // ── REGLA DE NEGOCIO: FINANCIAMIENTO POR ANTIGUEDAD ──
-// Autos con 5+ años de antiguedad no aplican a financiamiento
-// (2026 - 5 + 1 = 2022, cash-only = 2021 y anteriores). El credito de
+// Autos con 10+ años de antiguedad no aplican a financiamiento
+// (2026 - 10 + 1 = 2017, cash-only = 2016 y anteriores). El credito de
 // casa Plasencia no esta disponible para mercado general aun. Autos
 // con year < MIN_FINANCEABLE_YEAR solo aplican a pago de contado.
-// Rodar en enero de cada año: 2027 → 2023, 2028 → 2024, etc.
-const MIN_FINANCEABLE_YEAR = 2022;
+// Rodar en enero de cada año: 2027 → 2018, 2028 → 2019, etc.
+//
+// Historial de umbrales (en orden cronologico):
+//   - 23 abril 2026 AM: se establece en 10 años (MIN=2017).
+//   - 23 abril 2026 PM: se baja a 5 años (MIN=2022) por vendedores.
+//   - 23 abril 2026 PM (tarde): se restaura a 10 años (MIN=2017) —
+//     definitivo. Vendedores confirmaron que la regla correcta es la
+//     original. Los 3 commits quedan para trazabilidad.
+const MIN_FINANCEABLE_YEAR = 2017;
 function isCashOnly(car) { return !!car && (car.year || 0) < MIN_FINANCEABLE_YEAR; }
 
 function galleryNav(dir) {
