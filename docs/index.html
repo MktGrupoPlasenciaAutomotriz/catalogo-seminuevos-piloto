@@ -2380,7 +2380,7 @@ const ASESOR_ASIGNADO = {
 // ── CAPTURE URL PARAMS (fbclid, gclid, gbraid, wbraid, UTMs) + Meta cookies ──
 (function() {
   var params = new URLSearchParams(window.location.search);
-  ['fbclid','gclid','gbraid','wbraid','utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(function(k) {
+  ['fbclid','gclid','gbraid','wbraid','meta_ad_id','meta_placement','utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(function(k) {
     var v = params.get(k);
     if (v) sessionStorage.setItem(k, v);
   });
@@ -3876,6 +3876,8 @@ function submitForm() {
     gclid: sessionStorage.getItem('gclid') || '',
     gbraid: sessionStorage.getItem('gbraid') || '',
     wbraid: sessionStorage.getItem('wbraid') || '',
+    meta_ad_id: sessionStorage.getItem('meta_ad_id') || '',
+    meta_placement: sessionStorage.getItem('meta_placement') || '',
     utm_source: sessionStorage.getItem('utm_source') || '',
     utm_medium: sessionStorage.getItem('utm_medium') || '',
     utm_campaign: sessionStorage.getItem('utm_campaign') || '',
@@ -3887,8 +3889,54 @@ function submitForm() {
     client_user_agent: navigator.userAgent || ''
   };
 
+  const _dlDownPct   = (typeof downPctVal !== 'undefined' ? downPctVal : (typeof downPct !== 'undefined' ? downPct : 0));
+  const _dlMonthly   = (typeof monthlyVal !== 'undefined' ? monthlyVal : (typeof monthly !== 'undefined' ? monthly : 0));
+  const _dlSede      = (document.getElementById('fSucursal')?.value) || (currentCar.loc || '') || '';
+  const _dlTipo      = document.getElementById('fTipoPersona')?.value || '';
+  const _dlBuscaFin  = document.getElementById('fBuscaFinanciamiento')?.value || '';
+  const _dlCompIng   = document.getElementById('fCompruebaIngresos')?.value || '';
+  const _dlTradeIn   = (document.getElementById('fTradeIn')?.value === 'si');
+  const _dlCashOnly  = (_dlBuscaFin === 'NO (CONTADO)');
+  const _dlPromoLabel = currentCar.badge || '';
+  const _dlPromoValue = (function(){
+    if (typeof currentCar.descFinanc === 'number' && currentCar.descFinanc > 0) return currentCar.descFinanc;
+    const m = _dlPromoLabel.match(/\$\s*([\d,]+)/);
+    return m ? parseInt(m[1].replace(/,/g,''), 10) : 0;
+  })();
+  const _dlPromoType = (typeof currentCar.descFinanc !== 'undefined')
+    ? (currentCar.msi > 0 ? 'bono_msi' : (currentCar.mantAnios > 0 ? 'bono_mantenimiento' : 'bono_nuevo'))
+    : ((currentCar.km || 0) > 0 ? 'bono_seminuevo' : 'bono_nuevo');
+
   sendToWebhook(payload);
-  dataLayer.push({ event: 'generate_lead', folio: folio, item_name: currentCar.name + ' ' + currentCar.year, item_price: currentCar.price, lead_value: currentCar.price });
+  dataLayer.push({
+    event: 'generate_lead',
+    folio: folio,
+    item_name: currentCar.name + ' ' + currentCar.year,
+    item_price: currentCar.price,
+    lead_value: currentCar.price,
+    vehicle_brand: currentCar.brand || '',
+    vehicle_year: currentCar.year,
+    vehicle_version: currentCar.version || '',
+    cash_only: _dlCashOnly,
+    down_pct: _dlDownPct,
+    term_months: selectedTerm,
+    monthly_payment: _dlMonthly,
+    sede: _dlSede,
+    tipo_persona: _dlTipo,
+    busca_financiamiento: _dlBuscaFin,
+    comprueba_ingresos: _dlCompIng,
+    auto_a_cuenta: _dlTradeIn,
+    appointment_date: (document.getElementById('hFechaCita')?.value) || (document.getElementById('fDate')?.value) || '',
+    appointment_time: (document.getElementById('hHoraCita')?.value) || (document.getElementById('fTime')?.value) || '',
+    accept_marketing: document.getElementById('fMarketing').checked,
+    promo_id: (currentCar.id || '').toString(),
+    promo_label: _dlPromoLabel,
+    promo_value: _dlPromoValue,
+    promo_type: _dlPromoType,
+    fbclid: sessionStorage.getItem('fbclid') || '',
+    meta_ad_id: sessionStorage.getItem('meta_ad_id') || '',
+    meta_placement: sessionStorage.getItem('meta_placement') || ''
+  });
   window._submitCompleted = true;
 
   lastAppointment = {
