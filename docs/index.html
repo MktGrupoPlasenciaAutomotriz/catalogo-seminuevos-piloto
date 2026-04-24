@@ -1881,8 +1881,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div style="display:flex;align-items:flex-start;gap:10px;">
                   <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent,#4299E1)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                   <div style="font-size:12.5px;color:var(--ink-700,#2D3748);line-height:1.5;">
-                    <strong style="color:var(--ink-900,#1A202C);">Este modelo aplica solo a pago de contado.</strong>
-                    Por política de las instituciones financieras, los vehículos con 10 o más años de antigüedad no son elegibles para crédito automotriz. El crédito de la casa Plasencia aún no está disponible para mercado general.
+                    <strong style="color:var(--ink-900,#1A202C);">Este modelo no aplica a financiamiento.</strong>
+                    En tu visita, el asesor te confirma el precio y, si traes un auto en parte de pago, lo evalúa para reducir el monto.
                   </div>
                 </div>
               </div>
@@ -2043,8 +2043,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <option value="NO (CONTADO)">No, pago de contado</option>
               </select>
               <div id="finCashOnlyNote" style="display:none;margin-top:8px;padding:10px 12px;background:var(--color-accent-light,#EBF8FF);border:1px solid rgba(66,153,225,0.25);border-left:3px solid var(--color-accent,#4299E1);border-radius:8px;font-size:12px;color:var(--ink-700,#2D3748);line-height:1.5;">
-                <strong style="color:var(--ink-900,#1A202C);">Solo pago de contado.</strong>
-                Las financieras no ofrecen crédito para este modelo por su antigüedad (10+ años).
+                <strong style="color:var(--ink-900,#1A202C);">Este modelo no aplica a financiamiento.</strong>
+                En tu visita, el asesor evalúa tu auto si lo traes en parte de pago.
               </div>
               <div class="form-error-msg" id="fBuscaFinanciamiento-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Indica si buscas financiamiento o pago de contado</div>
             </div>
@@ -2424,7 +2424,7 @@ fetch('catalogo-piloto.json')
     if (heroEl) heroEl.textContent = n;
     const stepsEl = document.getElementById('stepsTotalCars');
     if (stepsEl) stepsEl.textContent = n;
-    if (typeof populateYearFilter === 'function') populateYearFilter();
+    if (typeof populateFiltersFromInventory === 'function') populateFiltersFromInventory();
     renderCards('all');
   })
   .catch(err => {
@@ -2438,12 +2438,12 @@ let galleryIdx = 0;
 let galleryImgs = [];
 
 // ── REGLA DE NEGOCIO: FINANCIAMIENTO POR ANTIGUEDAD ──
-// Las financieras no ofrecen credito a vehiculos con 10+ años de antiguedad
-// (2026 - 10 = 2016). El credito de la casa Plasencia no esta disponible
-// para mercado general aun. Autos con year < MIN_FINANCEABLE_YEAR solo
-// aplican a pago de contado.
-// Rodar en enero de cada año: 2027 → 2018, 2028 → 2019, etc.
-const MIN_FINANCEABLE_YEAR = 2017;
+// Autos con 5+ años de antiguedad no aplican a financiamiento
+// (2026 - 5 + 1 = 2022, cash-only = 2021 y anteriores). El credito de
+// casa Plasencia no esta disponible para mercado general aun. Autos
+// con year < MIN_FINANCEABLE_YEAR solo aplican a pago de contado.
+// Rodar en enero de cada año: 2027 → 2023, 2028 → 2024, etc.
+const MIN_FINANCEABLE_YEAR = 2022;
 function isCashOnly(car) { return !!car && (car.year || 0) < MIN_FINANCEABLE_YEAR; }
 
 function galleryNav(dir) {
@@ -2486,22 +2486,89 @@ function filterByPriceSelect(val) { currentPriceFilter = val; visibleCount = ITE
 function filterByLocSelect(val) { currentLocFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_location', filter_value: val }); }
 function filterByYearSelect(val) { currentYearFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_year', filter_value: val }); }
 
-// Puebla el dropdown de año con los valores reales presentes en vehicles[] (orden desc)
-// + agrupadores rapidos "Financiable" / "Solo contado" basados en MIN_FINANCEABLE_YEAR.
-function populateYearFilter() {
-  const sel = document.getElementById('filterYear');
-  if (!sel || !Array.isArray(vehicles) || vehicles.length === 0) return;
-  const years = Array.from(new Set(vehicles.map(v => v.year).filter(y => typeof y === 'number' && y > 0))).sort((a,b) => b - a);
-  const hasCash = years.some(y => y < MIN_FINANCEABLE_YEAR);
-  const hasFinanc = years.some(y => y >= MIN_FINANCEABLE_YEAR);
-  const opts = ['<option value="all">Año</option>'];
-  if (hasFinanc) opts.push('<option value="financ">Financiables (desde ' + MIN_FINANCEABLE_YEAR + ')</option>');
-  if (hasCash) opts.push('<option value="cash">Solo contado (hasta ' + (MIN_FINANCEABLE_YEAR - 1) + ')</option>');
-  if ((hasFinanc || hasCash) && years.length > 0) opts.push('<option disabled>──────────</option>');
-  years.forEach(y => opts.push('<option value="' + y + '">' + y + '</option>'));
-  sel.innerHTML = opts.join('');
-  sel.value = currentYearFilter || 'all';
+// Puebla TODOS los filtros con valores presentes en vehicles[] para evitar
+// mostrar opciones que no tengan resultados (marca/año/ubicacion/rango de
+// precio/tipo de auto). Regla: no ofrecer al usuario filtros que arrojen
+// cero resultados por construccion.
+function populateFiltersFromInventory() {
+  if (!Array.isArray(vehicles) || vehicles.length === 0) return;
+
+  // ── Año ──
+  const yearSel = document.getElementById('filterYear');
+  if (yearSel) {
+    const years = Array.from(new Set(vehicles.map(v => v.year).filter(y => typeof y === 'number' && y > 0))).sort((a,b) => b - a);
+    const hasCash = years.some(y => y < MIN_FINANCEABLE_YEAR);
+    const hasFinanc = years.some(y => y >= MIN_FINANCEABLE_YEAR);
+    const opts = ['<option value="all">Año</option>'];
+    if (hasFinanc) opts.push('<option value="financ">Financiables (desde ' + MIN_FINANCEABLE_YEAR + ')</option>');
+    if (hasCash) opts.push('<option value="cash">No financiables (hasta ' + (MIN_FINANCEABLE_YEAR - 1) + ')</option>');
+    if ((hasFinanc || hasCash) && years.length > 0) opts.push('<option disabled>──────────</option>');
+    years.forEach(y => opts.push('<option value="' + y + '">' + y + '</option>'));
+    yearSel.innerHTML = opts.join('');
+    yearSel.value = currentYearFilter || 'all';
+  }
+
+  // ── Marca ── prioriza TOP_BRANDS presentes, luego resto alfabeticamente, _other si aplica
+  const brandSel = document.getElementById('filterBrand');
+  if (brandSel) {
+    const brandsInInv = Array.from(new Set(vehicles.map(v => v.brand).filter(Boolean)));
+    const topPresent = TOP_BRANDS.filter(b => brandsInInv.includes(b));
+    const otherPresent = brandsInInv.filter(b => !TOP_BRANDS.includes(b)).sort();
+    const opts = ['<option value="all">Marca</option>'];
+    topPresent.forEach(b => opts.push('<option value="' + b + '">' + (b === 'Volkswagen' ? 'VW' : b) + '</option>'));
+    if (otherPresent.length > 0) {
+      // Si hay >3 "otras" mostrar agrupador, si no listar individuales
+      if (otherPresent.length > 3) {
+        opts.push('<option value="_other">Otras</option>');
+      } else {
+        otherPresent.forEach(b => opts.push('<option value="' + b + '">' + b + '</option>'));
+      }
+    }
+    brandSel.innerHTML = opts.join('');
+    brandSel.value = currentBrandFilter || 'all';
+  }
+
+  // ── Ubicacion ── solo sedes con al menos un auto
+  const locSel = document.getElementById('filterLoc');
+  if (locSel) {
+    const locs = Array.from(new Set(vehicles.map(v => v.loc).filter(Boolean))).sort();
+    const opts = ['<option value="all">Ubicación</option>'];
+    locs.forEach(l => opts.push('<option value="' + l + '">' + l + '</option>'));
+    locSel.innerHTML = opts.join('');
+    locSel.value = currentLocFilter || 'all';
+  }
+
+  // ── Precio ── solo rangos con al menos 1 auto
+  const priceSel = document.getElementById('filterPrice');
+  if (priceSel) {
+    const ranges = [
+      { value: '0-200',   label: 'Hasta $200K',     match: p => p <= 200000 },
+      { value: '200-350', label: '$200K - $350K',   match: p => p > 200000 && p <= 350000 },
+      { value: '350-500', label: '$350K - $500K',   match: p => p > 350000 && p <= 500000 },
+      { value: '500-750', label: '$500K - $750K',   match: p => p > 500000 && p <= 750000 },
+      { value: '750+',    label: '$750K+',          match: p => p > 750000 }
+    ];
+    const opts = ['<option value="all">Precio</option>'];
+    ranges.forEach(r => {
+      if (vehicles.some(v => typeof v.price === 'number' && r.match(v.price))) {
+        opts.push('<option value="' + r.value + '">' + r.label + '</option>');
+      }
+    });
+    priceSel.innerHTML = opts.join('');
+    priceSel.value = currentPriceFilter || 'all';
+  }
+
+  // ── Tipo de auto (chips) ── oculta los que no tengan inventario
+  const typesInInv = new Set(vehicles.map(v => (v.type || '').toLowerCase()).filter(Boolean));
+  document.querySelectorAll('.type-chip').forEach(chip => {
+    const t = chip.dataset.type;
+    if (!t || t === 'all') return;
+    chip.style.display = typesInInv.has(t) ? '' : 'none';
+  });
 }
+
+// Alias para compat con llamadores existentes (renombre sin romper codigo historico)
+function populateYearFilter() { populateFiltersFromInventory(); }
 function onSearch(val) {
   searchQuery = val; visibleCount = ITEMS_PER_PAGE; renderCards(currentFilter); updateFilterUI();
   clearTimeout(searchDebounce);
@@ -2636,7 +2703,7 @@ function buildVCardHTML(v) {
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;flex-wrap:wrap;">
           <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 6px;border-radius:4px;background:var(--ink-100,#EDF2F7);color:var(--ink-600,#475569);">${v.brand||''}</span>
           <span style="font-size:9px;color:var(--ink-400,#94A3B8);">${v.loc||''}</span>
-          ${isCashOnly(v) ? '<span class="cash-only-chip" title="Este modelo aplica solo a pago de contado" style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 6px;border-radius:4px;background:var(--color-accent-light,#EBF8FF);color:var(--color-accent,#2B6CB0);border:1px solid rgba(66,153,225,0.35);">Solo contado</span>' : ''}
+          ${isCashOnly(v) ? '<span class="cash-only-chip" title="Este modelo no aplica a financiamiento" style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 6px;border-radius:4px;background:var(--color-accent-light,#EBF8FF);color:var(--color-accent,#2B6CB0);border:1px solid rgba(66,153,225,0.35);">No aplica financiamiento</span>' : ''}
         </div>
         <div class="v-card-title">${v.name} ${v.year}</div>
         <div class="v-card-specs">${v.version} &middot; ${v.km.toLocaleString()} km &middot; ${v.trans}</div>
@@ -3524,7 +3591,7 @@ function updateStepSummary(step) {
   if (t) t.textContent = (currentCar.name || '') + ' ' + (currentCar.year || '') + (currentCar.version ? ' · ' + currentCar.version : '');
   // Cash-only: el sticky summary no tiene mensualidad, solo precio de contado
   if (typeof isCashOnly === 'function' && isCashOnly(currentCar)) {
-    if (m) m.textContent = 'Solo contado · ' + fmt(currentCar.price);
+    if (m) m.textContent = 'Sin financiamiento · ' + fmt(currentCar.price);
     bar.classList.add('show');
     return;
   }
