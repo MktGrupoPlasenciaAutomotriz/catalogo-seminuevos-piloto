@@ -2248,7 +2248,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ════ JAVASCRIPT ════ -->
 <script>
-const WEBHOOK_URL = 'https://hooks.zapier.com/hooks/catch/27114778/u7dvk6y/';
+const WEBHOOK_URL = 'https://crm-plasencia.grupo-plasencia-automotriz.workers.dev/api/lead/seminuevos';
 var searchDebounce = null;
 
 // Resiliencia de submit: single-path con fallback + retry queue + dedup por FOLIO.
@@ -2294,16 +2294,14 @@ function sendToWebhook(data) {
     return;
   }
   const payload = normalizePayload(data);
-  const body = new URLSearchParams(payload).toString();
+  const body = JSON.stringify(payload);
   var sent = false;
 
-  // Primary: fetch no-cors con keepalive. Sobrevive navigation/tab-close.
-  // Zapier Catch Hook acepta application/x-www-form-urlencoded sin CORS.
+  // Primary: fetch keepalive. Sobrevive navigation/tab-close. Worker tiene CORS abierto.
   try {
     fetch(WEBHOOK_URL, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'application/json' },
       body: body,
       keepalive: true
     }).catch(function(e){ console.error('[lead] fetch rejected async', e); });
@@ -2316,7 +2314,7 @@ function sendToWebhook(data) {
   if (!sent) {
     try {
       if (navigator.sendBeacon) {
-        const blob = new Blob([body], { type: 'application/x-www-form-urlencoded' });
+        const blob = new Blob([body], { type: 'application/json' });
         sent = navigator.sendBeacon(WEBHOOK_URL, blob) === true;
       }
     } catch(e) { console.error('[lead] beacon fail', e); }
@@ -2356,9 +2354,8 @@ function sendToWebhook(data) {
       try {
         fetch(item.url, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(item.data).toString(),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(item.data),
           keepalive: true
         });
         markFolioSent(folio);
