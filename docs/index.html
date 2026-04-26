@@ -3774,6 +3774,14 @@ function scrollToFirstError() {
 
 function submitForm() {
   if (submitting) return;
+  // Guard: si currentCar se perdió (cierre de modal accidental, navegación SPA, etc.) no crashear silencioso
+  if (!currentCar) {
+    try { dataLayer.push({ event: 'form_submit_no_vehicle', error: 'currentCar_null' }); } catch (e) {}
+    var ge = document.getElementById('formGlobalError');
+    if (ge) { ge.textContent = 'Se perdió el auto seleccionado. Cierra esta ventana y vuelve a tocar "Agendar cita".'; ge.classList.add('show'); }
+    if (typeof closeModal === 'function') setTimeout(closeModal, 2500);
+    return;
+  }
   clearValidation();
   const fields = ['fName','fLastName1','fLastName2','fPhone','fEmail','fDateTime','fBuscaFinanciamiento'];
   if (document.getElementById('fBuscaFinanciamiento').value === 'SI') fields.push('fCompruebaIngresos');
