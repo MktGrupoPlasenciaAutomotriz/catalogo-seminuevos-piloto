@@ -3098,6 +3098,14 @@ const CAL_MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio',
 const CAL_DAYS_ES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 const CAL_DAYS_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
+// Dias inhabiles (mismo trato que domingo: deshabilitado en calendario, no clickeable).
+// Formato YYYY-MM-DD. Agregar aqui festivos oficiales conforme se confirmen.
+const BLOCKED_DATES = ['2026-05-01'];
+function isBlockedDate(d) {
+  const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  return BLOCKED_DATES.indexOf(iso) !== -1;
+}
+
 function getMinDate() {
   const now = new Date();
   const min = new Date(now.getTime() + 24*60*60*1000);
@@ -3121,6 +3129,7 @@ function isDaySelectable(date) {
   if (d < min) return false;
   if (d > max) return false;
   if (d.getDay() === 0) return false; // Sunday
+  if (isBlockedDate(d)) return false; // dia inhabil
   return true;
 }
 
@@ -3364,6 +3373,7 @@ function validateDateTime() {
   if (slotDt < minDt) { ok = false; msg = 'La cita debe agendarse con al menos 24 horas de anticipación.'; }
   else if (slotDt > maxDt) { ok = false; msg = 'La cita debe estar dentro de los próximos 30 días.'; }
   else if (calSelectedDate.getDay() === 0) { ok = false; msg = 'No agendamos en domingo. Elige de lunes a sábado.'; }
+  else if (isBlockedDate(calSelectedDate)) { ok = false; msg = 'Esa fecha es día inhábil. Elige otra fecha.'; }
 
   if (ok) {
     if (errEl) errEl.classList.remove('show');
