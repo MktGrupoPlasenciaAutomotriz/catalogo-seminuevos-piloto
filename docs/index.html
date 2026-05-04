@@ -177,14 +177,6 @@ body {
 }
 .hero-tagline .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent-2); box-shadow: 0 0 10px var(--color-accent-2); animation: pulse 2s ease-in-out infinite; }
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
-.hero-tagline-disclaimer {
-  font-size: 11px; line-height: 1.45;
-  color: rgba(255,255,255,0.55);
-  margin: -16px 0 24px;
-  letter-spacing: 0.02em;
-  max-width: 540px;
-}
-@media (max-width: 768px) { .hero-tagline-disclaimer { text-align: center; margin-left:auto; margin-right:auto; } }
 
 .hero h1 {
   font-family: var(--font-display);
@@ -431,6 +423,13 @@ body {
   font-size: clamp(26px, 3.5vw, 38px);
   font-weight: 800; color: var(--ink-900);
   letter-spacing: -0.025em;
+}
+.section-disclaimer {
+  font-size: 13px; line-height: 1.55;
+  color: var(--ink-500, #94A3B8);
+  margin: 12px auto 0;
+  max-width: 640px;
+  letter-spacing: 0.01em;
 }
 .inventory-grid { display: grid; grid-template-columns: 1fr; gap: 22px; }
 @media(min-width:560px){ .inventory-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -1494,7 +1493,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="hero-content">
       <div class="hero-eyebrow"><span class="heb-dot"></span>DESDE 1947 · GRUPO PLASENCIA AUTOMOTRIZ</div>
       <div class="hero-tagline"><span class="dot"></span> Catálogo del mes · Bonos hasta $20,000</div>
-      <div class="hero-tagline-disclaimer">Vigencia del 22 de abril al 10 de mayo de 2026. Bonos aplicables según cada unidad, sujetos a disponibilidad y cambios sin previo aviso.</div>
       <div class="hero-vp">75 años acercándote al auto de tus sueños</div>
       <h1>Tu próximo<br><span class="gradient">seminuevo verificado</span></h1>
       <p class="hero-sub">Inspección de 150 puntos, 1 año de garantía y factura original verificada. 19+ marcas, crédito desde 12 meses.</p>
@@ -1668,6 +1666,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="section-head">
       <span class="section-eyebrow">Inventario certificado</span>
       <h2 class="section-title">Catálogo del mes</h2>
+      <p class="section-disclaimer">Vigencia del 22 de abril al 10 de mayo de 2026. Bonos aplicables según cada unidad, sujetos a disponibilidad y cambios sin previo aviso.</p>
     </div>
     <div class="inventory-grid" id="inventoryGrid">
       <!-- JS rendered -->
