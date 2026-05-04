@@ -119,21 +119,16 @@ def get_loc(fields):
 PILOTO_AGENCIAS_CON_BONO = {3852, 4199, 3886, 3736, 3888, 3737, 3885}
 
 def get_bono(fields):
-    """Asigna bono segun oferta comercial abril 2026.
-    $15,000 premium (>=$750K), $10,000 (>=$450K), $7,500 (>=$350K), $5,000 resto.
-    Aplica a los 7 lotes del piloto (Lote Otero + 5 Mazda GDL metro)."""
-    aid = fields.get("AGENCIA_ID")
-    if aid not in PILOTO_AGENCIAS_CON_BONO:
-        return 0
-    price = fields.get("PRECIO", 0) or 0
-    # Bonos altos para vehiculos premium
-    if price >= 750000:
-        return 15000
-    if price >= 450000:
-        return 10000
-    if price >= 350000:
-        return 7500
-    return 5000
+    """Asigna bono segun oferta comercial vigente.
+
+    Oferta abril 2026 (cerrada el 30-abr): escala $5K-$15K segun precio.
+    Oferta mayo 2026 (vigencia 22-abr al 10-may): bono $20,000 sin detalle
+    por unidad (asesor confirma 1:1 con cliente). NO se calcula badge
+    automatico durante esta vigencia.
+
+    Cuando vuelva a haber oferta con badge por unidad, restaurar la
+    escala (ver historico en commit 5f3f155 o anterior)."""
+    return 0
 
 def transform(fields):
     destacado = fields.get("DESTACADO", False)
