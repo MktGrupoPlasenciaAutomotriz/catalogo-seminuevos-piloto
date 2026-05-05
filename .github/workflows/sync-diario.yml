@@ -31,12 +31,10 @@ jobs:
       - name: Run scraper (Maxipublica feed → catalogo.json)
         run: python3 scraper_seminuevos.py
 
-      - name: Upsert a D1 (inventario_seminuevos)
+      - name: Sync a D1 vía crm-sync-worker
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_D1_RW_TOKEN }}
-          CF_ACCOUNT_ID: 3a73c6035cae8b2bfab359a16ec44fca
-          D1_DATABASE_ID: ad3e7ad8-55e0-4436-941a-6e299638af8e
-        run: python3 upsert_d1.py
+          CATALOG_SYNC_SECRET: ${{ secrets.CATALOG_SYNC_SECRET }}
+        run: python3 sync_via_worker.py
 
       - name: Export catalogo piloto (D1 → JSON)
         env:
