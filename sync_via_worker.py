@@ -47,6 +47,8 @@ def main():
     req = urllib.request.Request(URL, data=body, headers={
         "Content-Type": "application/json",
         "X-Sync-Secret": SECRET,
+        # User-Agent custom: Cloudflare bloquea Python-urllib default con error 1010 (bot detection).
+        "User-Agent": "crm-sync-workflow/1.0 (+catalogo-seminuevos-piloto)",
     }, method="POST")
 
     t0 = time.time()
