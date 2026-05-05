@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
 """
-Export catalogo-piloto.json desde Airtable (view Piloto Otero).
-Genera JSON en formato consumible por el prototipo HTML (fetch).
+Export catalogo-piloto.json desde D1 (tabla inventario_seminuevos).
 
-Usa REST API directo con PAT (misma logica que el upserter).
-Lee .env para credenciales.
+Reemplaza la version Airtable. Cero dependencia de Airtable.
+
+Lee filas con piloto_otero=1 AND activo=1 desde D1 via REST API.
+Genera JSON en formato consumible por la landing (fetch).
+
+Variables de entorno:
+  - CLOUDFLARE_API_TOKEN  (scope D1:Read minimo)
+  - CF_ACCOUNT_ID         (default: 3a73c6035cae8b2bfab359a16ec44fca)
+  - D1_DATABASE_ID        (default: ad3e7ad8-55e0-4436-941a-6e299638af8e)
 """
 
 import json
 import os
 import urllib.request
-import urllib.parse
 
-# --- Config ---
-ENV_PATH = os.path.join(os.path.dirname(__file__), ".env")
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), "airtable_config.json")
-OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "docs", "catalogo-piloto.json")
+ROOT = os.path.dirname(os.path.abspath(__file__))
+ENV_PATH = os.path.join(ROOT, ".env")
+OUTPUT_PATH = os.path.join(ROOT, "docs", "catalogo-piloto.json")
+
 
 def load_env():
     env = {}
@@ -26,44 +31,31 @@ def load_env():
                 if "=" in line and not line.startswith("#"):
                     k, v = line.split("=", 1)
                     env[k.strip()] = v.strip()
-    # Fallback to os.environ (GitHub Actions)
-    return {
-        "pat": env.get("AIRTABLE_PAT", os.environ.get("AIRTABLE_PAT", "")),
-        "base_id": env.get("AIRTABLE_BASE_ID", os.environ.get("AIRTABLE_BASE_ID", "")),
-        "table_id": env.get("AIRTABLE_TABLE_ID", os.environ.get("AIRTABLE_TABLE_ID", "")),
-    }
+    return env
 
-def fetch_piloto_otero(pat, base_id, table_id):
-    """Fetch all records from Piloto Otero view via Airtable REST API."""
-    records = []
-    offset = None
-    url_base = f"https://api.airtable.com/v0/{base_id}/{table_id}"
 
-    while True:
-        params = {
-            "view": "Piloto Otero",
-            "pageSize": "100",
-        }
-        if offset:
-            params["offset"] = offset
+def d1_query(sql, params=None):
+    env = load_env()
+    token = env.get("CLOUDFLARE_API_TOKEN") or os.environ.get("CLOUDFLARE_API_TOKEN")
+    account = env.get("CF_ACCOUNT_ID") or os.environ.get("CF_ACCOUNT_ID") or "3a73c6035cae8b2bfab359a16ec44fca"
+    db = env.get("D1_DATABASE_ID") or os.environ.get("D1_DATABASE_ID") or "ad3e7ad8-55e0-4436-941a-6e299638af8e"
+    if not token:
+        raise SystemExit("CLOUDFLARE_API_TOKEN no esta seteado")
 
-        url = url_base + "?" + urllib.parse.urlencode(params)
-        req = urllib.request.Request(url, headers={
-            "Authorization": f"Bearer {pat}",
-            "Content-Type": "application/json",
-        })
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account}/d1/database/{db}/query"
+    body = json.dumps({"sql": sql, "params": params or []}).encode()
+    req = urllib.request.Request(url, data=body, headers={
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }, method="POST")
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        data = json.loads(resp.read().decode())
 
-        with urllib.request.urlopen(req) as resp:
-            data = json.loads(resp.read().decode())
+    if not data.get("success"):
+        raise RuntimeError(f"D1 error: {data.get('errors')}")
+    results = data["result"][0]["results"]
+    return results
 
-        for rec in data.get("records", []):
-            records.append(rec["fields"])
-
-        offset = data.get("offset")
-        if not offset:
-            break
-
-    return records
 
 def segment_to_type(seg):
     seg = (seg or "").lower()
@@ -74,32 +66,15 @@ def segment_to_type(seg):
     if "coupé" in seg or "coupe" in seg or "deportivo" in seg: return "coupe"
     return "sedan"
 
-def get_engine(fields):
-    cyl = fields.get("CILINDROS")
-    hp = fields.get("POTENCIA_HP")
+
+def get_engine(cilindros, hp):
     parts = []
-    if cyl: parts.append(f"{int(cyl)} cil")
+    if cilindros: parts.append(f"{int(cilindros)} cil")
     if hp: parts.append(f"{int(hp)} hp")
     return ", ".join(parts) if parts else ""
 
-def get_img(fields):
-    imgs = fields.get("IMAGENES_URLS")
-    if imgs and isinstance(imgs, str):
-        first = imgs.strip().split("\n")[0].strip()
-        if first: return first
-    thumb = fields.get("THUMBNAIL", "")
-    return thumb or ""
 
-def get_all_imgs(fields):
-    """Return list of all image URLs for gallery."""
-    imgs = fields.get("IMAGENES_URLS")
-    if imgs and isinstance(imgs, str):
-        return [u.strip() for u in imgs.strip().split("\n") if u.strip()]
-    return []
-
-def get_loc(fields):
-    """Nombre legible de la sucursal. Usado como key para el mapping de mapas en la landing."""
-    aid = fields.get("AGENCIA_ID")
+def get_loc(aid):
     return {
         3852: "Lopez Mateos",
         4199: "Mazda Plasencia",
@@ -110,6 +85,7 @@ def get_loc(fields):
         3885: "Mazda Santa Anita",
     }.get(aid, "Lopez Mateos")
 
+
 # --- Bonos de la oferta comercial Abril 2026 (Seminuevos Plasencia) ---
 # Fuente: artes de Meta Ads entregados por Jose Reyes (Gerente Ford+Semi).
 # Regla: TODOS los autos en agencias del piloto reciben bono segun precio.
@@ -118,7 +94,8 @@ def get_loc(fields):
 # Confirmado por Chucho Porras (Dir Mkt): "aplica la misma oferta comercial" para las 5 Mazda nuevas.
 PILOTO_AGENCIAS_CON_BONO = {3852, 4199, 3886, 3736, 3888, 3737, 3885}
 
-def get_bono(fields):
+
+def get_bono(row):
     """Asigna bono segun oferta comercial vigente.
 
     Oferta abril 2026 (cerrada el 30-abr): escala $5K-$15K segun precio.
@@ -130,9 +107,29 @@ def get_bono(fields):
     escala (ver historico en commit 5f3f155 o anterior)."""
     return 0
 
-def transform(fields):
-    destacado = fields.get("DESTACADO", False)
-    bono = get_bono(fields)
+
+def transform(row):
+    """Mapea row de D1 al shape esperado por la landing."""
+    # data_json contiene los campos no-dedicados del scraper
+    extra = {}
+    if row.get("data_json"):
+        try:
+            extra = json.loads(row["data_json"])
+        except Exception:
+            extra = {}
+
+    # IMAGENES_URLS viene en data_json (no es columna dedicada)
+    imgs_raw = extra.get("IMAGENES_URLS")
+    gallery = []
+    if isinstance(imgs_raw, list):
+        gallery = [str(u).strip() for u in imgs_raw if u]
+    elif isinstance(imgs_raw, str):
+        gallery = [u.strip() for u in imgs_raw.strip().split("\n") if u.strip()]
+
+    img = gallery[0] if gallery else (row.get("thumbnail") or "")
+
+    destacado = bool(row.get("destacado"))
+    bono = get_bono(row)
     if bono > 0:
         badge = f"Bono ${bono:,}"
     elif destacado:
@@ -141,53 +138,48 @@ def transform(fields):
         badge = ""
 
     return {
-        "id": fields.get("ID_AUTO", 0),
-        "name": f"{fields.get('MARCA', '')} {fields.get('MODELO', '')}".strip(),
-        "year": fields.get("ANIO", 0) or 0,
-        "version": fields.get("TRIM", "") or "",
-        "type": segment_to_type(fields.get("SEGMENTO", "")),
-        "km": int(fields.get("ODOMETRO_KM", 0) or 0),
-        "trans": fields.get("TRANSMISION", "") or "",
-        "fuel": fields.get("COMBUSTIBLE", "") or "",
-        "engine": get_engine(fields),
-        "color": fields.get("COLOR_EXT", "") or "",
-        "price": int(fields.get("PRECIO", 0) or 0),
-        "img": get_img(fields),
+        "id": row.get("id_auto", 0),
+        "name": f"{row.get('marca','') or ''} {row.get('modelo','') or ''}".strip(),
+        "year": int(row.get("anio") or 0),
+        "version": row.get("trim") or "",
+        "type": segment_to_type(row.get("segmento")),
+        "km": int(row.get("odometro_km") or 0),
+        "trans": row.get("transmision") or "",
+        "fuel": row.get("combustible") or "",
+        "engine": get_engine(row.get("cilindros"), row.get("potencia_hp")),
+        "color": row.get("color_ext") or "",
+        "price": int(row.get("precio") or 0),
+        "img": img,
         "badge": badge,
-        "photos": int(fields.get("TOTAL_IMAGENES", 0) or 0),
-        "loc": get_loc(fields),
-        "brand": fields.get("MARCA", "") or "",
-        "gallery": get_all_imgs(fields),
+        "photos": int(row.get("total_imagenes") or 0),
+        "loc": get_loc(row.get("agencia_id")),
+        "brand": row.get("marca") or "",
+        "gallery": gallery,
     }
 
+
 def main():
-    env = load_env()
-    if not env["pat"]:
-        print("ERROR: AIRTABLE_PAT no encontrado en .env ni en env vars")
-        return
+    print("Leyendo D1 inventario_seminuevos (piloto_otero=1, activo=1)...")
+    rows = d1_query(
+        "SELECT * FROM inventario_seminuevos WHERE piloto_otero = 1 AND activo = 1"
+    )
+    print(f"  {len(rows)} registros activos del piloto")
 
-    print("Leyendo Airtable view 'Piloto Otero'...")
-    records = fetch_piloto_otero(env["pat"], env["base_id"], env["table_id"])
-    print(f"  {len(records)} registros")
-
-    vehicles = [transform(r) for r in records if r.get("ACTIVO", False)]
+    vehicles = [transform(r) for r in rows]
     vehicles.sort(key=lambda x: x["price"], reverse=True)
-    print(f"  {len(vehicles)} activos (ordenados por precio desc)")
 
-    # Ensure output dir exists
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         json.dump(vehicles, f, ensure_ascii=False, indent=None, separators=(",", ":"))
 
     size_kb = os.path.getsize(OUTPUT_PATH) / 1024
     print(f"  Exportado: {OUTPUT_PATH} ({size_kb:.1f} KB)")
 
-    # Stats
     if vehicles:
         prices = [v["price"] for v in vehicles if v["price"]]
         brands = set(v["name"].split()[0] for v in vehicles if v["name"])
         print(f"  Marcas: {len(brands)} | Precio: ${min(prices):,}-${max(prices):,} | Promedio: ${sum(prices)//len(prices):,}")
+
 
 if __name__ == "__main__":
     main()
