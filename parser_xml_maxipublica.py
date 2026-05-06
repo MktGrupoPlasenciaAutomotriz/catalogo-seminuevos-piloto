@@ -70,7 +70,13 @@ DRIVETRAIN_MAP = {
     "4X4": "4x4",
 }
 
-# Agencias del piloto Otero (calculado por el worker, pero util para resumen).
+# Agencias del piloto que se exponen en la landing del piloto.
+#   3852 = Seminuevos Plasencia Lopez Mateos (Lote Otero, Fase 1).
+#   4199, 3886, 3736, 3888, 3737, 3885 = las 6 sucursales Mazda del area
+#   metropolitana de Guadalajara (Fase 2).
+# Explicitamente EXCLUIDAS aunque sean Mazda: 3887 Mazda Vallarta y 3905
+# Mazda Manzanillo (fuera de GDL metro).
+# Mantener sincronizada con PILOTO_OTERO_AGENCIAS en crm-sync-worker/src/index.js.
 PILOTO_AGENCIAS = {3852, 4199, 3886, 3736, 3888, 3737, 3885}
 
 
