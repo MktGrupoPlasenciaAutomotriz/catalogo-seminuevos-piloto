@@ -1580,7 +1580,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
       <div class="hero-stats">
         <div class="hero-stat">
-          <div class="hero-stat-num">19+</div>
+          <div class="hero-stat-num" id="heroTotalBrands">—</div>
           <div class="hero-stat-label">Marcas en lote</div>
         </div>
         <div class="hero-stat">
@@ -1588,7 +1588,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="hero-stat-label">Autos ahora mismo</div>
         </div>
         <div class="hero-stat">
-          <div class="hero-stat-num">$158K</div>
+          <div class="hero-stat-num" id="heroMinPrice">—</div>
           <div class="hero-stat-label">El más accesible</div>
         </div>
       </div>
@@ -1666,6 +1666,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <button type="button" class="type-chip" data-type="hatchback" onclick="filterByTypeChip('hatchback')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3v-6l2-4 3-3h5l3 4 3 2h1v7h-2M15 17H9M3 11h16"/></svg>
         <span>Hatchback</span>
+      </button>
+      <button type="button" class="type-chip" data-type="minivan" onclick="filterByTypeChip('minivan')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3V8a2 2 0 012-2h13l3 5v6h-2M15 17H9M5 11h16M11 6v5"/></svg>
+        <span>Minivan</span>
       </button>
     </div>
     <div class="filter-bar">
@@ -2518,10 +2522,23 @@ fetch('catalogo-piloto.json')
   .then(r => r.json())
   .then(data => {
     vehicles = data;
-    // Contadores dinamicos de inventario (hero + como funciona)
+    // Contadores dinamicos del hero — derivados del inventario REAL para
+    // que nunca queden numeros desactualizados en cards "marketing".
     const n = vehicles.length;
+    const brandsCount = new Set(vehicles.map(v => v.brand).filter(Boolean)).size;
+    const validPrices = vehicles.map(v => v.price).filter(p => typeof p === 'number' && p > 0);
+    const minPrice = validPrices.length ? Math.min(...validPrices) : 0;
     const heroEl = document.getElementById('heroTotalCars');
     if (heroEl) heroEl.textContent = n;
+    const heroBrandsEl = document.getElementById('heroTotalBrands');
+    if (heroBrandsEl) heroBrandsEl.textContent = brandsCount > 0 ? brandsCount : '—';
+    const heroMinEl = document.getElementById('heroMinPrice');
+    if (heroMinEl && minPrice > 0) {
+      // Formato compacto: $179K, $1.2M, etc.
+      heroMinEl.textContent = minPrice >= 1e6
+        ? '$' + (minPrice / 1e6).toFixed(1).replace(/\.0$/, '') + 'M'
+        : '$' + Math.round(minPrice / 1000) + 'K';
+    }
     const stepsEl = document.getElementById('stepsTotalCars');
     if (stepsEl) stepsEl.textContent = n;
     if (typeof populateFiltersFromInventory === 'function') populateFiltersFromInventory();
@@ -2571,6 +2588,13 @@ const ITEMS_PER_PAGE = 12;
 let visibleCount = ITEMS_PER_PAGE;
 
 function fmt(n) { return '$' + n.toLocaleString('es-MX'); }
+
+// Normaliza strings para matching tolerante a acentos + caso. Usar en
+// filtros y lookups donde el dato del feed puede venir con acentos
+// ("Sedán", "Mazda Galerías") y los selectores HTML / dicts vienen sin.
+function _norm(s) {
+  return (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
 
 function badgeClass(b) {
   if (b && b.startsWith('Bono')) return 'bono';
@@ -2665,12 +2689,13 @@ function populateFiltersFromInventory() {
     priceSel.value = currentPriceFilter || 'all';
   }
 
-  // ── Tipo de auto (chips) ── oculta los que no tengan inventario
-  const typesInInv = new Set(vehicles.map(v => (v.type || '').toLowerCase()).filter(Boolean));
+  // ── Tipo de auto (chips) ── oculta los que no tengan inventario.
+  // Usa _norm para que "Sedán" del feed matchee con data-type="sedan".
+  const typesInInv = new Set(vehicles.map(v => _norm(v.type)).filter(Boolean));
   document.querySelectorAll('.type-chip').forEach(chip => {
     const t = chip.dataset.type;
     if (!t || t === 'all') return;
-    chip.style.display = typesInInv.has(t) ? '' : 'none';
+    chip.style.display = typesInInv.has(_norm(t)) ? '' : 'none';
   });
 }
 
@@ -2720,7 +2745,11 @@ function updateFilterUI() {
 
 function renderCards(filter) {
   const grid = document.getElementById('inventoryGrid');
-  let filtered = filter === 'all' ? vehicles : vehicles.filter(v => v.type === filter);
+  // Match de tipo tolerante a acentos: el feed exporta "Sedán" y los
+  // chips/dropdowns usan "sedan" (sin acento). _norm() normaliza ambos.
+  let filtered = filter === 'all'
+    ? vehicles
+    : vehicles.filter(v => _norm(v.type) === _norm(filter));
 
   // Filtro de ubicación
   if (currentLocFilter !== 'all') {
@@ -3896,8 +3925,16 @@ const SUCURSAL_MAPS = {
   }
 };
 
+// Lookup tolerante a acentos: el feed exporta "Mazda Galerías" / "López Mateos"
+// con acentos pero las keys de SUCURSAL_MAPS están sin acentos. _norm()
+// permite matchear ambos sin re-escribir el dict.
+const _SUCURSAL_MAPS_NORM = (() => {
+  const out = {};
+  for (const k of Object.keys(SUCURSAL_MAPS)) out[_norm(k)] = SUCURSAL_MAPS[k];
+  return out;
+})();
 function getSucursalMap(locKey) {
-  return SUCURSAL_MAPS[(locKey || '').toUpperCase()] || SUCURSAL_MAPS['LOPEZ MATEOS'];
+  return _SUCURSAL_MAPS_NORM[_norm(locKey)] || SUCURSAL_MAPS['LOPEZ MATEOS'];
 }
 
 function updateConfirmationMap(locKey) {
