@@ -44,12 +44,15 @@ jobs:
           D1_DATABASE_ID: ad3e7ad8-55e0-4436-941a-6e299638af8e
         run: python3 export_catalogo_piloto.py
 
-      - name: Commit y push catalogo-piloto.json
+      - name: Sync textos marketing del HTML con inventario real
+        run: python3 sync_landing_marketing.py
+
+      - name: Commit y push catalogo-piloto.json + index.html
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/catalogo-piloto.json
-          git diff --cached --quiet && echo "Sin cambios en catalogo" || git commit -m "sync: catalogo-piloto.json $(date -u +%Y-%m-%dT%H:%MZ)"
+          git add docs/catalogo-piloto.json docs/index.html
+          git diff --cached --quiet && echo "Sin cambios en landing" || git commit -m "sync: catalogo + marketing $(date -u +%Y-%m-%dT%H:%MZ)"
           git push
 
       - name: Subir resumen como artifact (debug)
