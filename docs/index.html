@@ -573,6 +573,83 @@ body {
 }
 .spec-chip svg { width: 12px; height: 12px; color: var(--color-accent); }
 
+/* ── FICHA TÉCNICA AMPLIADA (MODAL) ── */
+.modal-ficha {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--ink-50, #F8FAFC);
+  border-radius: 12px;
+  border: 1px solid var(--ink-100);
+}
+.modal-ficha-title {
+  font-family: var(--font-display);
+  font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink-600); margin-bottom: 10px;
+  cursor: help;
+}
+.modal-ficha-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px 16px;
+}
+.ficha-item { display: flex; flex-direction: column; gap: 2px; }
+.ficha-item-label {
+  font-size: 10px; font-weight: 700;
+  color: var(--ink-500);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.ficha-item-value {
+  font-size: 13px; font-weight: 600;
+  color: var(--ink-800, #1A202C);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── EQUIPAMIENTO (MODAL · COLAPSABLE) ── */
+.modal-equipamiento {
+  margin-bottom: 24px;
+  border: 1px solid var(--ink-100);
+  border-radius: 12px;
+  background: white;
+  overflow: hidden;
+}
+.modal-equipamiento summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-display);
+  font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink-700);
+  user-select: none;
+}
+.modal-equipamiento summary::-webkit-details-marker { display: none; }
+.modal-equipamiento summary:hover { background: var(--ink-50); }
+.me-summary-arrow { transition: transform 0.2s ease; font-size: 14px; }
+.modal-equipamiento[open] .me-summary-arrow { transform: rotate(180deg); }
+.me-body { padding: 4px 16px 16px; border-top: 1px solid var(--ink-100); }
+.me-section { padding: 10px 0; border-bottom: 1px solid var(--ink-50); }
+.me-section:last-child { border-bottom: none; }
+.me-section-title {
+  font-size: 11px; font-weight: 700;
+  color: var(--color-accent, #FBC645);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.me-items {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.me-item {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--ink-50);
+  border: 1px solid var(--ink-100);
+  border-radius: var(--radius-full, 9999px);
+  font-size: 11px; font-weight: 500;
+  color: var(--ink-700);
+}
+
 /* ── TRUST BADGES (MODAL) ── */
 .modal-trust { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
 .trust-badge-item {
@@ -1816,6 +1893,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <div class="modal-specs" id="modalSpecs"></div>
 
+        <!-- Ficha técnica ampliada — chips secundarios (puertas, pasajeros, tracción, consumo, tanque, rines).
+             Cada chip se oculta si el dato no esta en el feed (cero invento). Si TODOS están vacíos el bloque
+             entero queda escondido. -->
+        <div class="modal-ficha" id="modalFicha" style="display:none;">
+          <div class="modal-ficha-title" title="Ficha técnica detallada del vehículo. Datos extraídos del feed oficial de Maxipublica. Si un dato no aparece es porque el feed no lo proporciona para este vehículo.">Ficha técnica</div>
+          <div class="modal-ficha-grid" id="modalFichaGrid"></div>
+        </div>
+
+        <!-- Equipamiento (Audio, Confort, Seguridad, Gadgets, etc.) — secciones colapsables.
+             Solo se muestra si el feed expone el bloque EQUIPAMIENTO con secciones parseables. -->
+        <details class="modal-equipamiento" id="modalEquipamiento" style="display:none;">
+          <summary title="Equipamiento detallado del vehículo. Datos extraídos del feed oficial de Maxipublica.">
+            <span class="me-summary-label">Equipamiento incluido</span>
+            <span class="me-summary-arrow" aria-hidden="true">▾</span>
+          </summary>
+          <div class="me-body" id="modalEquipamientoBody"></div>
+        </details>
+
         <div class="modal-trust">
           <div class="trust-badge-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Inspección 150 pts</div>
           <div class="trust-badge-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> 1 año garantía</div>
@@ -2664,9 +2759,9 @@ function renderCards(filter) {
     const q = searchQuery.toLowerCase();
     filtered = filtered.filter(v =>
       (v.name || '').toLowerCase().includes(q) ||
-      (v.version || '').toLowerCase().includes(q) ||
       String(v.year).includes(q) ||
-      (v.color || '').toLowerCase().includes(q)
+      (v.color || '').toLowerCase().includes(q) ||
+      (v.brand || '').toLowerCase().includes(q)
     );
   }
 
@@ -2718,7 +2813,7 @@ function buildVCardHTML(v) {
           ${isCashOnly(v) ? '<span class="cash-only-chip" title="Este modelo no aplica a financiamiento" style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 6px;border-radius:4px;background:var(--color-accent-light,#EBF8FF);color:var(--color-accent,#2B6CB0);border:1px solid rgba(66,153,225,0.35);">No aplica financiamiento</span>' : ''}
         </div>
         <div class="v-card-title">${v.name} ${v.year}</div>
-        <div class="v-card-specs">${v.version} &middot; ${v.km.toLocaleString()} km &middot; ${v.trans}</div>
+        <div class="v-card-specs">${[v.km > 0 ? v.km.toLocaleString() + ' km' : '', v.trans, v.fuel].filter(Boolean).join(' &middot; ')}</div>
         <div class="v-card-price-row">
           <div class="v-card-price" title="Precio de lista, incluye IVA. Sujeto a disponibilidad y cambios sin previo aviso.">${fmt(v.price)}</div>
           <div class="v-card-monthly"><span>Desde</span> ${fmt(monthly)}/mes</div>
@@ -3429,7 +3524,7 @@ function openModal(id) {
   galleryIdx = 0;
   galleryImgs = (currentCar.gallery && currentCar.gallery.length > 0) ? currentCar.gallery : [currentCar.img];
   document.getElementById('modalImg').src = galleryImgs[0];
-  document.getElementById('modalImg').alt = currentCar.name + ' ' + (currentCar.year || '') + ' ' + (currentCar.version || '');
+  document.getElementById('modalImg').alt = `${currentCar.name} ${currentCar.year || ''}`.trim();
   var photoCountEl = document.getElementById('modalPhotoCount');
   var prevBtn = document.getElementById('galleryPrev');
   var nextBtn = document.getElementById('galleryNext');
@@ -3446,7 +3541,11 @@ function openModal(id) {
   document.getElementById('modalName').textContent = `${currentCar.name} ${currentCar.year}`;
   document.getElementById('modalPrice').textContent = fmt(currentCar.price);
   document.getElementById('modalBadge').textContent = currentCar.badge;
-  document.getElementById('modalLocation').textContent = `${currentCar.version} · ${currentCar.km.toLocaleString()} km`;
+  document.getElementById('modalLocation').textContent = [
+    currentCar.brand,
+    currentCar.km > 0 ? `${currentCar.km.toLocaleString()} km` : '',
+    currentCar.fuel,
+  ].filter(Boolean).join(' · ');
   document.getElementById('modalLocText').textContent = `Sucursal ${currentCar.loc}`;
 
   const badgeEl = document.getElementById('modalBadge');
@@ -3460,14 +3559,68 @@ function openModal(id) {
   }
 
   const SPEC_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="3"/></svg>';
-  document.getElementById('modalSpecs').innerHTML = [
-    `${currentCar.km.toLocaleString()} km`,
-    currentCar.year,
-    currentCar.trans,
-    currentCar.fuel,
-    currentCar.engine,
-    currentCar.color
-  ].map(s => `<span class="spec-chip">${SPEC_ICON} ${s}</span>`).join('');
+  // Chips esenciales: omite cualquiera que venga vacio para no mostrar "—" o
+  // valores placeholder. Cero invento — si el feed no lo tiene, el chip no
+  // existe.
+  const _engineParts = [];
+  if (currentCar.cilindros) _engineParts.push(`${currentCar.cilindros} cil`);
+  if (currentCar.hp)        _engineParts.push(`${currentCar.hp} hp`);
+  const _engine = _engineParts.join(', ');
+  const essentialChips = [
+    currentCar.km > 0 ? `${currentCar.km.toLocaleString()} km` : '',
+    currentCar.year || '',
+    currentCar.trans || '',
+    currentCar.fuel || '',
+    _engine,
+    currentCar.color || '',
+  ].filter(Boolean);
+  document.getElementById('modalSpecs').innerHTML = essentialChips
+    .map(s => `<span class="spec-chip">${SPEC_ICON} ${s}</span>`)
+    .join('');
+
+  // Ficha técnica ampliada — items que aparecen solo si el feed los expone.
+  const fichaItems = [
+    { label: 'Tracción',     value: currentCar.traccion || '' },
+    { label: 'Pasajeros',    value: currentCar.pasajeros ? String(currentCar.pasajeros) : '' },
+    { label: 'Puertas',      value: currentCar.puertas   ? String(currentCar.puertas)   : '' },
+    { label: 'Velocidades',  value: currentCar.velocidades ? String(currentCar.velocidades) : '' },
+    { label: 'Color interior', value: currentCar.color_int || '' },
+    { label: 'Tanque',       value: currentCar.tanque_l ? `${currentCar.tanque_l} L` : '' },
+    { label: 'Rines',        value: currentCar.rines ? `${currentCar.rines}″` : '' },
+    { label: 'Consumo combinado', value: currentCar.consumo_combinado ? `${currentCar.consumo_combinado} km/l` : '' },
+    { label: 'Consumo ciudad',    value: currentCar.consumo_ciudad    ? `${currentCar.consumo_ciudad} km/l`    : '' },
+    { label: 'Consumo carretera', value: currentCar.consumo_carretera ? `${currentCar.consumo_carretera} km/l` : '' },
+  ].filter(item => item.value);
+  const fichaWrap = document.getElementById('modalFicha');
+  const fichaGrid = document.getElementById('modalFichaGrid');
+  if (fichaItems.length > 0) {
+    fichaGrid.innerHTML = fichaItems.map(it => `
+      <div class="ficha-item" title="${it.label}: ${it.value}">
+        <span class="ficha-item-label">${it.label}</span>
+        <span class="ficha-item-value">${it.value}</span>
+      </div>`).join('');
+    fichaWrap.style.display = '';
+  } else {
+    fichaWrap.style.display = 'none';
+  }
+
+  // Equipamiento por categoría (Audio, Confort, Seguridad, Gadgets, Eléctrico, Extra, Documentos).
+  // Solo se muestra si el feed expone el bloque EQUIPAMIENTO con secciones parseables.
+  const equip = currentCar.equipamiento || {};
+  const equipSections = Object.keys(equip).filter(k => Array.isArray(equip[k]) && equip[k].length > 0);
+  const equipWrap = document.getElementById('modalEquipamiento');
+  const equipBody = document.getElementById('modalEquipamientoBody');
+  if (equipSections.length > 0) {
+    equipBody.innerHTML = equipSections.map(name => `
+      <div class="me-section" title="${name}: ${equip[name].length} items incluidos según el feed.">
+        <div class="me-section-title">${name}</div>
+        <div class="me-items">${equip[name].map(it => `<span class="me-item">${it}</span>`).join('')}</div>
+      </div>`).join('');
+    equipWrap.style.display = '';
+    equipWrap.open = false; // colapsado por default
+  } else {
+    equipWrap.style.display = 'none';
+  }
 
   // reset calc
   document.getElementById('downSlider').value = 20;
@@ -3610,7 +3763,7 @@ function updateStepSummary(step) {
   if (step === 1 || !currentCar) { bar.classList.remove('show'); return; }
   const t = document.getElementById('stepSummaryTitle');
   const m = document.getElementById('stepSummaryMeta');
-  if (t) t.textContent = (currentCar.name || '') + ' ' + (currentCar.year || '') + (currentCar.version ? ' · ' + currentCar.version : '');
+  if (t) t.textContent = (currentCar.name || '') + ' ' + (currentCar.year || '') + '';
   // Cash-only: el sticky summary no tiene mensualidad, solo precio de contado
   if (typeof isCashOnly === 'function' && isCashOnly(currentCar)) {
     if (m) m.textContent = 'Sin financiamiento · ' + fmt(currentCar.price);
@@ -3877,7 +4030,7 @@ function submitForm() {
     telefono: '+52' + phone,
     email,
     tipo_persona: tipoPersona || 'NO ESPECIFICADO',
-    vehiculo: `${currentCar.name} ${currentCar.year} ${currentCar.version}`.toUpperCase(),
+    vehiculo: `${currentCar.name} ${currentCar.year}`.toUpperCase(),
     anio: currentCar.year,
     km: currentCar.km || 0,
     precio: currentCar.price,
@@ -3939,7 +4092,7 @@ function submitForm() {
     lead_value: currentCar.price,
     vehicle_brand: currentCar.brand || '',
     vehicle_year: currentCar.year,
-    vehicle_version: currentCar.version || '',
+    vehicle_version: '',
     cash_only: _dlCashOnly,
     down_pct: _dlDownPct,
     term_months: selectedTerm,
@@ -3973,11 +4126,10 @@ function submitForm() {
   document.getElementById('confirmFolio').textContent = folio;
   updateConfirmationMap(currentCar.loc);
   const waPhone = ASESOR_ASIGNADO.telefono.replace(/[^0-9]/g, '');
-  const waMsg = `Hola, soy ${nombre} ${ap1}. Acabo de agendar mi cita en Seminuevos Plasencia para el ${dateLabel} a las ${timeLabel}. Vengo por ${currentCar.name} ${currentCar.year} (${currentCar.version}). Mi folio es ${folio}.`;
+  const waMsg = `Hola, soy ${nombre} ${ap1}. Acabo de agendar mi cita en Seminuevos Plasencia para el ${dateLabel} a las ${timeLabel}. Vengo por ${currentCar.name} ${currentCar.year}. Mi folio es ${folio}.`;
   document.getElementById('waAsesor').href = `https://api.whatsapp.com/send/?phone=${waPhone}&text=${encodeURIComponent(waMsg)}&type=phone_number&app_absent=0`;
   document.getElementById('confirmDetails').innerHTML = `
     <p><span>Vehículo</span> <strong>${currentCar.name} ${currentCar.year}</strong></p>
-    <p><span>Versión</span> <strong>${currentCar.version}</strong></p>
     <p><span>Precio</span> <strong>${fmt(currentCar.price)}</strong></p>
     <p><span>Sucursal</span> <strong>${currentCar.loc}</strong></p>
     <p><span>Fecha</span> <strong>${dateLabel}</strong></p>

@@ -1,10 +1,11 @@
-name: Sync diario catalogo Seminuevos
+name: Sync horario catalogo Seminuevos
 
 on:
   schedule:
-    # Cron en UTC. 10:03 UTC = 04:03 hora Guadalajara (CST UTC-6).
-    # Minuto 03 deliberado: evitar el :00 donde todos los crons del mundo pegan al mismo tiempo.
-    - cron: '3 10 * * *'
+    # Cron horario: minuto 4 de cada hora (UTC). El feed XML de Maxipublica
+    # se actualiza cada hora, el offset de 4 min es deliberado para que el
+    # feed ya tenga la version fresca cuando descargamos.
+    - cron: '4 * * * *'
   workflow_dispatch:  # Permite correrlo manualmente desde la pestaña Actions
 
 concurrency:
@@ -17,7 +18,7 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repo
@@ -28,8 +29,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Run scraper (Maxipublica feed → catalogo.json)
-        run: python3 scraper_seminuevos.py
+      - name: Parse feed XML Maxipublica → catalogo.json
+        run: python3 parser_xml_maxipublica.py
 
       - name: Sync a D1 vía crm-sync-worker
         env:
@@ -48,7 +49,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/catalogo-piloto.json
-          git diff --cached --quiet && echo "Sin cambios en catalogo" || git commit -m "sync: catalogo-piloto.json $(date -u +%Y-%m-%d)"
+          git diff --cached --quiet && echo "Sin cambios en catalogo" || git commit -m "sync: catalogo-piloto.json $(date -u +%Y-%m-%dT%H:%MZ)"
           git push
 
       - name: Subir resumen como artifact (debug)
@@ -58,6 +59,5 @@ jobs:
           name: sync-output-${{ github.run_id }}
           path: |
             resumen_carga.txt
-            errores_insercion.json
           if-no-files-found: ignore
-          retention-days: 14
+          retention-days: 7

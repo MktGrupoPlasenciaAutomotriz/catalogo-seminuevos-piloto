@@ -2,7 +2,9 @@
 """
 Export catalogo-piloto.json desde D1 (tabla inventario_seminuevos).
 
-Reemplaza la version Airtable. Cero dependencia de Airtable.
+Cero invenciones: cada campo del JSON proviene 1:1 del feed XML de
+Maxipublica via D1. Si un dato no esta en el feed, no se muestra (la
+landing oculta el chip).
 
 Lee filas con piloto_otero=1 AND activo=1 desde D1 via REST API.
 Genera JSON en formato consumible por la landing (fetch).
@@ -20,6 +22,19 @@ import urllib.request
 ROOT = os.path.dirname(os.path.abspath(__file__))
 ENV_PATH = os.path.join(ROOT, ".env")
 OUTPUT_PATH = os.path.join(ROOT, "docs", "catalogo-piloto.json")
+
+# Mapping de agencia_id → nombre legible para la landing.
+# Cuando alguna pill matchea, se usa este nombre. Cuando NO matchea, se usa
+# el AGENCIA_NOMBRE que viene en el feed (sin invento).
+SUCURSAL_OVERRIDES = {
+    3852: "López Mateos",
+    4199: "Mazda Plasencia",
+    3886: "Mazda Galerías",
+    3736: "Mazda Américas",
+    3888: "Mazda Acueducto",
+    3737: "Mazda González Gallo",
+    3885: "Mazda Santa Anita",
+}
 
 
 def load_env():
@@ -53,64 +68,28 @@ def d1_query(sql, params=None):
 
     if not data.get("success"):
         raise RuntimeError(f"D1 error: {data.get('errors')}")
-    results = data["result"][0]["results"]
-    return results
+    return data["result"][0]["results"]
 
 
-def segment_to_type(seg):
-    seg = (seg or "").lower()
-    if "suv" in seg or "crossover" in seg: return "suv"
-    if "pick" in seg or "camioneta" in seg: return "pickup"
-    if "hatchback" in seg or "hatch" in seg: return "hatchback"
-    if "van" in seg or "minivan" in seg: return "van"
-    if "coupé" in seg or "coupe" in seg or "deportivo" in seg: return "coupe"
-    return "sedan"
-
-
-def get_engine(cilindros, hp):
-    parts = []
-    if cilindros: parts.append(f"{int(cilindros)} cil")
-    if hp: parts.append(f"{int(hp)} hp")
-    return ", ".join(parts) if parts else ""
-
-
-def get_loc(aid):
-    return {
-        3852: "Lopez Mateos",
-        4199: "Mazda Plasencia",
-        3886: "Mazda Galerias",
-        3736: "Mazda Americas",
-        3888: "Mazda Acueducto",
-        3737: "Mazda Gonzalez Gallo",
-        3885: "Mazda Santa Anita",
-    }.get(aid, "Lopez Mateos")
-
-
-# --- Bonos de la oferta comercial Abril 2026 (Seminuevos Plasencia) ---
-# Fuente: artes de Meta Ads entregados por Jose Reyes (Gerente Ford+Semi).
-# Regla: TODOS los autos en agencias del piloto reciben bono segun precio.
-# Fase 1 (abril 2026): Lote Otero (3852 Seminuevos Plasencia Lopez Mateos + 4199 Mazda Plasencia).
-# Fase 2 (abril 2026): extension Mazda GDL metro (3886, 3736, 3888, 3737, 3885).
-# Confirmado por Chucho Porras (Dir Mkt): "aplica la misma oferta comercial" para las 5 Mazda nuevas.
-PILOTO_AGENCIAS_CON_BONO = {3852, 4199, 3886, 3736, 3888, 3737, 3885}
-
-
-def get_bono(row):
-    """Asigna bono segun oferta comercial vigente.
-
-    Oferta abril 2026 (cerrada el 30-abr): escala $5K-$15K segun precio.
-    Oferta mayo 2026 (vigencia 22-abr al 10-may): bono $20,000 sin detalle
-    por unidad (asesor confirma 1:1 con cliente). NO se calcula badge
-    automatico durante esta vigencia.
-
-    Cuando vuelva a haber oferta con badge por unidad, restaurar la
-    escala (ver historico en commit 5f3f155 o anterior)."""
-    return 0
+def get_loc(row, extra):
+    """Sucursal legible. Prioridad:
+       1. Override editorial por agencia_id (formato bonito con acentos).
+       2. AGENCIA_NOMBRE del feed (cae aqui si la agencia es nueva).
+       3. Cadena vacia si nada.
+    """
+    aid = row.get("agencia_id")
+    if aid in SUCURSAL_OVERRIDES:
+        return SUCURSAL_OVERRIDES[aid]
+    return row.get("agencia_nombre") or extra.get("AGENCIA_NOMBRE", "") or ""
 
 
 def transform(row):
-    """Mapea row de D1 al shape esperado por la landing."""
-    # data_json contiene los campos no-dedicados del scraper
+    """Mapea row de D1 al shape esperado por la landing.
+
+    Cero invenciones: cada campo viene del feed XML. Los que no estan en
+    columnas dedicadas vienen del data_json (que el worker pobla con todo
+    lo no-dedicado del payload del scraper).
+    """
     extra = {}
     if row.get("data_json"):
         try:
@@ -118,43 +97,71 @@ def transform(row):
         except Exception:
             extra = {}
 
-    # IMAGENES_URLS viene en data_json (no es columna dedicada)
+    # Imagenes: prefiero data_json (lista en orden), fallback al thumbnail.
     imgs_raw = extra.get("IMAGENES_URLS")
     gallery = []
     if isinstance(imgs_raw, list):
         gallery = [str(u).strip() for u in imgs_raw if u]
     elif isinstance(imgs_raw, str):
         gallery = [u.strip() for u in imgs_raw.strip().split("\n") if u.strip()]
-
     img = gallery[0] if gallery else (row.get("thumbnail") or "")
 
+    # Badge: solo "Destacado" si la columna manual esta marcada. Cero badges
+    # automaticos por bono — cuando regrese oferta con detalle por unidad
+    # restaurar logica historica.
     destacado = bool(row.get("destacado"))
-    bono = get_bono(row)
-    if bono > 0:
-        badge = f"Bono ${bono:,}"
-    elif destacado:
-        badge = "Destacado"
-    else:
-        badge = ""
+    badge = "Destacado" if destacado else ""
+
+    # Equipamiento (parseado por el parser_xml_maxipublica del <description>).
+    # Si no se pudo parsear, queda dict vacio — la UI omite la seccion.
+    equipamiento = extra.get("EQUIPAMIENTO") or {}
+    if not isinstance(equipamiento, dict):
+        equipamiento = {}
 
     return {
+        # Identidad y precio
         "id": row.get("id_auto", 0),
         "name": f"{row.get('marca','') or ''} {row.get('modelo','') or ''}".strip(),
         "year": int(row.get("anio") or 0),
-        "version": row.get("trim") or "",
-        "type": segment_to_type(row.get("segmento")),
-        "km": int(row.get("odometro_km") or 0),
+        "price": int(row.get("precio") or 0),
+        "brand": row.get("marca") or "",
+
+        # Specs principales (chips de cards y modal)
+        "type": (row.get("segmento") or "").lower() or "otro",
         "trans": row.get("transmision") or "",
         "fuel": row.get("combustible") or "",
-        "engine": get_engine(row.get("cilindros"), row.get("potencia_hp")),
         "color": row.get("color_ext") or "",
-        "price": int(row.get("precio") or 0),
+        "km": int(row.get("odometro_km") or 0),
+
+        # Specs ampliados (modal — chips secundarios). None / 0 / "" ⇒ chip oculto.
+        "color_int": extra.get("COLOR_INT") or "",
+        "puertas": extra.get("PUERTAS") or 0,
+        "pasajeros": extra.get("PASAJEROS") or 0,
+        "velocidades": extra.get("VELOCIDADES") or 0,
+        "cilindros": extra.get("CILINDROS") or 0,
+        "hp": extra.get("POTENCIA_HP") or 0,
+        "traccion": row.get("traccion") or extra.get("TRACCION") or "",
+        "tanque_l": extra.get("TANQUE_L") or 0,
+        "rines": extra.get("RINES_PULGADAS") or 0,
+        "consumo_combinado": extra.get("CONSUMO_COMBINADO") or 0,
+        "consumo_ciudad": extra.get("CONSUMO_CIUDAD") or 0,
+        "consumo_carretera": extra.get("CONSUMO_CARRETERA") or 0,
+
+        # Equipamiento por categoria (Audio/Confort/Seguridad/Gadgets/etc.)
+        # Solo se incluye si la seccion tiene items.
+        "equipamiento": equipamiento,
+
+        # Sucursal y agencia
+        "loc": get_loc(row, extra),
+        "agencia_id": row.get("agencia_id"),
+
+        # Imagenes
         "img": img,
-        "badge": badge,
-        "photos": int(row.get("total_imagenes") or 0),
-        "loc": get_loc(row.get("agencia_id")),
-        "brand": row.get("marca") or "",
         "gallery": gallery,
+        "photos": int(row.get("total_imagenes") or len(gallery)),
+
+        # Badge editorial (no se calcula automatico)
+        "badge": badge,
     }
 
 
@@ -178,7 +185,9 @@ def main():
     if vehicles:
         prices = [v["price"] for v in vehicles if v["price"]]
         brands = set(v["name"].split()[0] for v in vehicles if v["name"])
+        with_eq = sum(1 for v in vehicles if v["equipamiento"])
         print(f"  Marcas: {len(brands)} | Precio: ${min(prices):,}-${max(prices):,} | Promedio: ${sum(prices)//len(prices):,}")
+        print(f"  Con equipamiento parseado: {with_eq}/{len(vehicles)}")
 
 
 if __name__ == "__main__":
