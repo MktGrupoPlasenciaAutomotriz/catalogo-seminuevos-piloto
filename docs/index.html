@@ -4752,13 +4752,11 @@ function toggleIngresosFeedback(sel) {
   </div>
 </div>
 
-<!-- STICKY MOBILE CTA BAR (H2) — aparece cuando el usuario pasa del hero en mobile -->
-<div class="sticky-mobile-cta" id="stickyMobileCta" role="region" aria-label="Acciones rápidas">
-  <button type="button" class="sticky-mobile-cta-btn sticky-mobile-cta-btn--primary" id="stickyCtaBrowse" onclick="stickyCtaBrowse()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    Encuentra tu auto
-  </button>
-</div>
+<!-- STICKY MOBILE CTA BAR removido 2026-05-07 (decision director): el bar bottom tapaba
+     viewport y era redundante en zona catalogo. CSS .sticky-mobile-cta + IIFE
+     initStickyMobileCta + funcion stickyCtaBrowse() quedan inertes (el IIFE retorna
+     early con if(!bar) return; el body nunca recibe .has-sticky-cta) por si se
+     decide reactivar. Eventos dataLayer asociados quedan sin disparo. -->
 
 <!-- Modal de mapa de sede individual (consistente con STL y HYU). El #mapModal general con las 7 sucursales sigue existiendo. -->
 <div id="locMapModal" class="loc-map-modal" role="dialog" aria-modal="true" aria-labelledby="locMapTitle" onclick="if(event.target===this)closeLocMapModal()">
