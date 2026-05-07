@@ -100,12 +100,12 @@ body {
 }
 .header .container { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .header-left { display: flex; align-items: center; gap: 14px; }
-.header-logo { height: 28px; max-width: 160px; width: auto; opacity: 1; display: block; }
-@media(min-width:768px){ .header-logo { height: 36px; max-width: 200px; } }
+.header-logo { height: 36px; max-width: 180px; width: auto; opacity: 1; display: block; }
+@media(min-width:768px){ .header-logo { height: 44px; max-width: 220px; } }
 .header-logo-gp-wrap { display: inline-flex; align-items: center; justify-content: center; }
-.header-logo-gp { height: 26px; opacity: 0.95; display: block; }
-@media(min-width:768px){ .header-logo-gp { height: 32px; } }
-.header-logo-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.2); }
+.header-logo-gp { height: 32px; opacity: 0.95; display: block; }
+@media(min-width:768px){ .header-logo-gp { height: 40px; } }
+.header-logo-divider { width: 1px; height: 36px; background: rgba(255,255,255,0.2); }
 .header-badge {
   font-family: var(--font-body); font-size: 10px; font-weight: 700;
   color: rgba(255,255,255,0.7); letter-spacing: 1.5px; text-transform: uppercase;
@@ -1563,9 +1563,9 @@ select.form-input.valid { background-position: right 40px center; }
   flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
   padding: 14px 16px;
   border: none; border-radius: var(--radius-md);
-  font-family: var(--font-display); font-size: 14px; font-weight: 800;
+  font-family: var(--font-display); font-size: 16px; font-weight: 800;
   cursor: pointer; text-decoration: none;
-  min-height: 48px; touch-action: manipulation;
+  min-height: 50px; touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(0,0,0,0);
   transition: all var(--duration-fast) var(--ease);
 }
@@ -1652,19 +1652,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="step-card">
         <div class="step-num">01</div>
         <div class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/></svg></div>
-        <div class="step-title">Busca tu seminuevo verificado</div>
+        <h3 class="step-title">Busca tu seminuevo verificado</h3>
         <div class="step-desc">Filtra por tipo, marca, precio o ubicación. Cada auto incluye inspección de 150 puntos, factura original y 1 año de garantía.</div>
       </div>
       <div class="step-card">
         <div class="step-num">02</div>
         <div class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2.5"/><rect x="7" y="6" width="10" height="3.5" rx="0.5"/><circle cx="8.5" cy="13.5" r="0.6" fill="currentColor" stroke="none"/><circle cx="12" cy="13.5" r="0.6" fill="currentColor" stroke="none"/><circle cx="15.5" cy="13.5" r="0.6" fill="currentColor" stroke="none"/><circle cx="8.5" cy="17" r="0.6" fill="currentColor" stroke="none"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/><circle cx="15.5" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg></div>
-        <div class="step-title">Calcula tu mensualidad</div>
+        <h3 class="step-title">Calcula tu mensualidad</h3>
         <div class="step-desc">Crédito desde 12 meses, enganche desde 25%. La pre-aprobación es soft inquiry: NO afecta tu buró de crédito.</div>
       </div>
       <div class="step-card">
         <div class="step-num">03</div>
         <div class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M9 15l2 2 4-4"/></svg></div>
-        <div class="step-title">Agenda tu visita</div>
+        <h3 class="step-title">Agenda tu visita</h3>
         <div class="step-desc">Eliges día y hora. Tu asesor te contacta por WhatsApp para confirmar. Llegas, manejas y decides con tranquilidad.</div>
       </div>
     </div>
@@ -3043,8 +3043,8 @@ function buildVCardHTML(v) {
         </div>
         <div class="v-card-price-disclaimer" style="font-size:10px;color:var(--ink-400,#94A3B8);margin-top:4px;line-height:1.3;">Precio de lista, incluye IVA. Sujeto a disponibilidad y cambios sin previo aviso.</div>
         <div style="margin-top:10px;display:flex;gap:6px;">
-          ${v.badge ? `<button onclick="event.stopPropagation();this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'" style="flex:1;padding:10px;background:transparent;color:var(--color-accent,#FBC645);border:1.5px solid var(--color-accent,#FBC645);border-radius:8px;font-family:var(--font-display);font-weight:700;font-size:11px;cursor:pointer;transition:all 0.15s;">Ver promoción</button><div style="display:none;position:absolute;left:12px;right:12px;bottom:52px;background:#1A1A1A;color:#F7FAFC;padding:12px 14px;border-radius:10px;font-size:12px;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,0.3);z-index:5;"><strong style="color:var(--color-accent,#FBC645);">${v.badge}</strong><br>Tasa referencial estimada 14.9%. Enganche desde 25%.<br><span style="font-size:10px;color:#A0AEC0;">Catálogo del mes · Vigencia 22 abr al 10 may de 2026. Bono aplicable según cada unidad. Sujeto a disponibilidad y cambios sin previo aviso.</span></div>` : ''}
-          <button onclick="event.stopPropagation();openModal(${v.id})" style="flex:1;padding:10px;background:var(--color-accent,#FBC645);color:#1A1A1A;border:none;border-radius:8px;font-family:var(--font-display);font-weight:700;font-size:11px;cursor:pointer;transition:transform 0.15s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">Agendar cita</button>
+          ${v.badge ? `<button onclick="event.stopPropagation();var d=this.nextElementSibling;var open=d.style.display==='block';d.style.display=open?'none':'block';this.setAttribute('aria-expanded', String(!open));" aria-expanded="false" aria-controls="promo-${v.id}" style="flex:1;padding:12px;min-height:44px;background:transparent;color:var(--color-accent,#FBC645);border:1.5px solid var(--color-accent,#FBC645);border-radius:8px;font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:0.2px;cursor:pointer;transition:all 0.15s;">Ver promoción</button><div style="display:none;position:absolute;left:12px;right:12px;bottom:52px;background:#1A1A1A;color:#F7FAFC;padding:12px 14px;border-radius:10px;font-size:12px;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,0.3);z-index:5;"><strong style="color:var(--color-accent,#FBC645);">${v.badge}</strong><br>Tasa referencial estimada 14.9%. Enganche desde 25%.<br><span style="font-size:10px;color:#A0AEC0;">Catálogo del mes · Vigencia 22 abr al 10 may de 2026. Bono aplicable según cada unidad. Sujeto a disponibilidad y cambios sin previo aviso.</span></div>` : ''}
+          <button onclick="event.stopPropagation();openModal(${v.id})" style="flex:1;padding:12px;min-height:44px;background:var(--color-accent,#FBC645);color:#1A1A1A;border:none;border-radius:8px;font-family:var(--font-display);font-weight:700;font-size:14px;letter-spacing:0.2px;cursor:pointer;transition:transform 0.15s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">Agendar cita</button>
         </div>
       </div>
     </div>`;
