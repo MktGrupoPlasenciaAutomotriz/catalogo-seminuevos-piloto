@@ -17,7 +17,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="shortcut icon" href="favicon.ico">
 <meta name="description" content="Tu próximo seminuevo verificado en Guadalajara. Inspección de 150 puntos, 1 año de garantía y factura original. 25 marcas desde $179K. Crédito desde 12 meses.">
 <link rel="canonical" href="https://seminuevos.grupoplasencia.com/">
-<meta property="og:title" content="Seminuevos Plasencia — Autos certificados desde $179K | Guadalajara">
+<meta property="og:title" content="Seminuevos Plasencia · Autos certificados desde $179K | Guadalajara">
 <meta property="og:description" content="Tu próximo seminuevo verificado · Inspección 150 puntos · 1 año de garantía · factura original · 25 marcas desde $179K · crédito desde 12 meses.">
 <meta property="og:image" content="https://seminuevos.grupoplasencia.com/og-seminuevos.jpg">
 <meta property="og:type" content="website">
@@ -1384,7 +1384,7 @@ body { font-size: 15px; }
   outline: 3px solid var(--color-accent);
   outline-offset: 2px;
 }
-.form-input:focus-visible { outline: none; }
+.form-input:focus-visible { outline: 2px solid var(--color-accent, #FBC645); outline-offset: 2px; }
 .modal-close:focus-visible, .filter-chip:focus-visible, .calc-term-btn:focus-visible,
 .v-card:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
 
@@ -1620,15 +1620,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
       <div class="hero-stats">
         <div class="hero-stat">
-          <div class="hero-stat-num" id="heroTotalBrands">—</div>
+          <div class="hero-stat-num" id="heroTotalBrands">…</div>
           <div class="hero-stat-label">Marcas en lote</div>
         </div>
         <div class="hero-stat">
-          <div class="hero-stat-num" id="heroTotalCars">—</div>
+          <div class="hero-stat-num" id="heroTotalCars">…</div>
           <div class="hero-stat-label">Autos ahora mismo</div>
         </div>
         <div class="hero-stat">
-          <div class="hero-stat-num" id="heroMinPrice">—</div>
+          <div class="hero-stat-num" id="heroMinPrice">…</div>
           <div class="hero-stat-label">El más accesible</div>
         </div>
       </div>
@@ -1646,7 +1646,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="steps-head">
       <div class="steps-kicker">En 3 pasos</div>
       <h2 class="steps-title" id="stepsTitle">Así de simple encuentras tu próximo seminuevo verificado</h2>
-      <p class="steps-sub"><span id="stepsTotalCars">—</span> seminuevos verificados, 19+ marcas. Inspección de 150 puntos y 1 año de garantía.</p>
+      <p class="steps-sub"><span id="stepsTotalCars">…</span> seminuevos verificados, 19+ marcas. Inspección de 150 puntos y 1 año de garantía.</p>
     </div>
     <div class="steps-grid">
       <div class="step-card">
@@ -1755,7 +1755,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="filter-bar-inner">
         <div class="filter-search">
           <svg class="filter-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" placeholder="Buscar marca, modelo o año..." oninput="onSearch(this.value)" id="searchInput">
+          <input type="text" placeholder="Buscar marca, modelo o año..." oninput="onSearch(this.value)" id="searchInput" aria-label="Buscar inventario" autocomplete="off">
         </div>
         <div class="filter-dropdown-wrap" style="display:none;">
           <select onchange="filterByType(this.value)" id="filterType" class="filter-select">
@@ -2048,8 +2048,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <!-- Sticky summary visible en step 2 y 3 -->
           <div class="step-summary" id="stepSummary">
             <div class="step-summary-main">
-              <div class="step-summary-title" id="stepSummaryTitle">—</div>
-              <div class="step-summary-meta" id="stepSummaryMeta">—</div>
+              <div class="step-summary-title" id="stepSummaryTitle">…</div>
+              <div class="step-summary-meta" id="stepSummaryMeta">…</div>
             </div>
           </div>
 
@@ -2271,8 +2271,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
                 <div style="flex:1;">
                   <div style="font-size:12px; font-weight:600; color:var(--ink-500,#64748B); text-transform:uppercase; letter-spacing:0.5px;">Este auto está en</div>
-                  <div id="sedeName" style="font-size:18px; font-weight:700; color:var(--ink-900,#1A202C); line-height:1.25; margin-top:2px;">—</div>
-                  <div id="sedeAddr" style="font-size:14px; color:var(--ink-600,#475569); line-height:1.4; margin-top:4px;">—</div>
+                  <div id="sedeName" style="font-size:18px; font-weight:700; color:var(--ink-900,#1A202C); line-height:1.25; margin-top:2px;">…</div>
+                  <div id="sedeAddr" style="font-size:14px; color:var(--ink-600,#475569); line-height:1.4; margin-top:4px;">…</div>
                 </div>
               </div>
 
@@ -2311,7 +2311,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent,#4299E1)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
               <div style="flex:1; min-width:0;">
                 <div style="font-size:11px; color:var(--ink-500,#64748B); font-weight:600; text-transform:uppercase; letter-spacing:0.3px; line-height:1;">Tu cita en</div>
-                <div id="citaSedeBadgeName" style="font-size:14px; font-weight:700; color:var(--ink-900,#1A202C); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div>
+                <div id="citaSedeBadgeName" style="font-size:14px; font-weight:700; color:var(--ink-900,#1A202C); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">…</div>
               </div>
             </div>
 
@@ -2324,8 +2324,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="cita-picker" id="citaPicker">
                   <!-- Referencia legacy oculta: siguen existiendo para compatibilidad con updateCitaSucursalInfo() -->
                   <div class="cita-sucursal-info" id="citaSucursalInfo" style="display:none;" aria-hidden="true">
-                    <div class="cita-sucursal-name" id="citaSucursalName">—</div>
-                    <div class="cita-sucursal-addr" id="citaSucursalAddr">—</div>
+                    <div class="cita-sucursal-name" id="citaSucursalName">…</div>
+                    <div class="cita-sucursal-addr" id="citaSucursalAddr">…</div>
                   </div>
                   <!-- CALENDARIO PRIMERO -->
                   <div class="cal-wrap">
@@ -2612,7 +2612,7 @@ fetch('catalogo-piloto.json')
     const heroEl = document.getElementById('heroTotalCars');
     if (heroEl) heroEl.textContent = n;
     const heroBrandsEl = document.getElementById('heroTotalBrands');
-    if (heroBrandsEl) heroBrandsEl.textContent = brandsCount > 0 ? brandsCount : '—';
+    if (heroBrandsEl) heroBrandsEl.textContent = brandsCount > 0 ? brandsCount : '…';
     const heroMinEl = document.getElementById('heroMinPrice');
     if (heroMinEl && minPrice > 0) {
       // Formato compacto: $179K, $1.2M, etc.
@@ -3782,7 +3782,7 @@ function openModal(id) {
   }
 
   const SPEC_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="3"/></svg>';
-  // Chips esenciales: omite cualquiera que venga vacio para no mostrar "—" o
+  // Chips esenciales: omite cualquiera que venga vacio para no mostrar "…" o
   // valores placeholder. Cero invento — si el feed no lo tiene, el chip no
   // existe.
   const _engineParts = [];
@@ -4462,7 +4462,7 @@ function generateQuotePDF() {
     doc.setFont('helvetica', valueBold ? 'bold' : 'normal');
     doc.setFontSize(9);
     doc.setTextColor(...cfg.inkColor);
-    doc.text(String(value || '—'), margin + 48, y);
+    doc.text(String(value || '…'), margin + 48, y);
     y += 5;
   }
   function twoColRow(l1, v1, l2, v2) {
@@ -4476,8 +4476,8 @@ function generateQuotePDF() {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9);
     doc.setTextColor(...cfg.inkColor);
-    doc.text(String(v1 || '—'), margin + 2, y + 4.2);
-    doc.text(String(v2 || '—'), margin + colW + 2, y + 4.2);
+    doc.text(String(v1 || '…'), margin + 2, y + 4.2);
+    doc.text(String(v2 || '…'), margin + colW + 2, y + 4.2);
     y += 9;
   }
 
@@ -4491,8 +4491,8 @@ function generateQuotePDF() {
   // ── VEHÍCULO ──
   sectionTitle('VEHÍCULO SEMINUEVO CERTIFICADO');
   row('Modelo:', a.vehiculo, true);
-  twoColRow('Año', a.anio || '—', 'Kilometraje', a.km ? a.km.toLocaleString('es-MX') + ' km' : '—');
-  twoColRow('Categoría de oferta', a.badge || '—', 'Sucursal', a.sucursal || a.agencia);
+  twoColRow('Año', a.anio || '…', 'Kilometraje', a.km ? a.km.toLocaleString('es-MX') + ' km' : '…');
+  twoColRow('Categoría de oferta', a.badge || '…', 'Sucursal', a.sucursal || a.agencia);
   // Precio destacado
   y += 1;
   doc.setFillColor(248, 248, 248);
@@ -4513,7 +4513,7 @@ function generateQuotePDF() {
   sectionTitle('PLAN DE FINANCIAMIENTO');
   const downAmount = Math.round(a.precio * a.enganche_pct / 100);
   twoColRow('Enganche', `${a.enganche_pct}% · $${downAmount.toLocaleString('es-MX')}`, 'Plazo', `${a.plazo_meses} meses`);
-  twoColRow('Tasa referencial anual', `${(cfg.tasaAnual * 100).toFixed(1)}%`, 'Financiamiento', a.busca_financiamiento || '—');
+  twoColRow('Tasa referencial anual', `${(cfg.tasaAnual * 100).toFixed(1)}%`, 'Financiamiento', a.busca_financiamiento || '…');
   if (a.comprueba_ingresos && a.comprueba_ingresos !== 'N/A' && a.comprueba_ingresos !== '') {
     twoColRow('Comprueba ingresos', a.comprueba_ingresos, '', '');
     if ((a.comprueba_ingresos||'').toUpperCase() === 'NO') {
@@ -4656,8 +4656,8 @@ function toggleIngresosFeedback(sel) {
   <div class="loc-map-modal-inner">
     <div class="loc-map-modal-head">
       <div>
-        <div class="loc-map-modal-title" id="locMapTitle">—</div>
-        <div id="locMapAddr" style="font-size:12px;color:var(--ink-600,#475569);margin-top:2px;">—</div>
+        <div class="loc-map-modal-title" id="locMapTitle">…</div>
+        <div id="locMapAddr" style="font-size:12px;color:var(--ink-600,#475569);margin-top:2px;">…</div>
       </div>
       <button type="button" class="loc-map-modal-close" onclick="closeLocMapModal()" aria-label="Cerrar mapa">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
