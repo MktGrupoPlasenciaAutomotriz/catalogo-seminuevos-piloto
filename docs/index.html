@@ -1108,7 +1108,9 @@ input.form-input[type="text"]::placeholder, input.form-input[type="email"]::plac
 .filters-row { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ── MOBILE-FIRST REFINEMENT ── */
-html, body { overflow-x: hidden; max-width: 100vw; }
+/* NO aplicar overflow-x:hidden a <html> — rompe position:sticky de header y filtros.
+   Solo el body lo necesita para prevenir scroll horizontal accidental. */
+body { overflow-x: hidden; max-width: 100vw; }
 body { font-size: 15px; }
 
 /* Inputs >= 16px para evitar zoom en iOS */
