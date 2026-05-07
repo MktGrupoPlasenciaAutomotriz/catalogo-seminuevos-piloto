@@ -464,17 +464,17 @@ body {
 .v-card-badge.good { background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover)); color: #1A1A1A; box-shadow: var(--shadow-brand); }
 .v-card-badge.bono { background: linear-gradient(135deg, #E53E3E, #C53030); color: #fff; box-shadow: 0 6px 14px -4px rgba(229,62,62,0.55); }
 .v-card-loc {
-  position: absolute; top: 12px; right: 12px;
-  background: rgba(11,18,40,0.78);
+  position: absolute; bottom: 6px; right: 6px;
+  background: rgba(15, 26, 46, 0.85);
   color: #fff;
-  font-size: 11px; font-weight: 700;
-  padding: 5px 11px; border-radius: var(--radius-full);
-  backdrop-filter: blur(8px);
-  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.2px;
+  padding: 3px 8px; border-radius: 4px;
+  display: inline-flex; align-items: center; gap: 4px;
+  z-index: 2;
 }
 .v-card-loc svg { width: 11px; height: 11px; }
 .v-card-photos {
-  position: absolute; bottom: 12px; right: 12px;
+  position: absolute; top: 8px; right: 8px;
   background: rgba(0,0,0,0.62); color: #fff;
   font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-full);
   display: inline-flex; align-items: center; gap: 5px;
@@ -1672,6 +1672,41 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span>Minivan</span>
       </button>
     </div>
+    <!-- Filtro de sucursal: chips horizontales scrollables. Patrón unificado con landing-hyundai y landing-stellantis. -->
+    <div class="loc-chips type-chips" role="group" aria-label="Filtrar por sucursal">
+      <button type="button" class="loc-chip type-chip active" data-loc="all" onclick="filterByLocChip('all')" aria-pressed="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        <span>Todas las sedes</span>
+      </button>
+      <button type="button" class="loc-chip type-chip" data-loc="Lopez Mateos" onclick="filterByLocChip('Lopez Mateos')" aria-pressed="false" title="Seminuevos Plasencia · Av. López Mateos Sur 2600, Zapopan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>López Mateos</span>
+      </button>
+      <button type="button" class="loc-chip type-chip" data-loc="Mazda Plasencia" onclick="filterByLocChip('Mazda Plasencia')" aria-pressed="false" title="Mazda Plasencia">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Mazda Plasencia</span>
+      </button>
+      <button type="button" class="loc-chip type-chip" data-loc="Mazda Galerias" onclick="filterByLocChip('Mazda Galerias')" aria-pressed="false" title="Mazda Galerías">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Mazda Galerías</span>
+      </button>
+      <button type="button" class="loc-chip type-chip" data-loc="Mazda Americas" onclick="filterByLocChip('Mazda Americas')" aria-pressed="false" title="Mazda Américas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Mazda Américas</span>
+      </button>
+      <button type="button" class="loc-chip type-chip" data-loc="Mazda Acueducto" onclick="filterByLocChip('Mazda Acueducto')" aria-pressed="false" title="Mazda Acueducto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Mazda Acueducto</span>
+      </button>
+      <button type="button" class="loc-chip type-chip" data-loc="Mazda Gonzalez Gallo" onclick="filterByLocChip('Mazda Gonzalez Gallo')" aria-pressed="false" title="Mazda González Gallo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Mazda Gzz Gallo</span>
+      </button>
+      <button type="button" class="loc-chip type-chip" data-loc="Mazda Santa Anita" onclick="filterByLocChip('Mazda Santa Anita')" aria-pressed="false" title="Mazda Santa Anita">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Mazda Santa Anita</span>
+      </button>
+    </div>
     <div class="filter-bar">
       <div class="filter-bar-inner">
         <div class="filter-search">
@@ -1717,10 +1752,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <!-- Opciones se pueblan dinamicamente desde vehicles[] al cargar catalogo -->
           </select>
         </div>
-        <div class="filter-dropdown-wrap">
+        <!-- Dropdown de ubicación: oculto, reemplazado por chips. Se conserva para compat con activePills/clearAllFilters. -->
+        <div class="filter-dropdown-wrap" style="display:none;">
           <select onchange="filterByLocSelect(this.value)" id="filterLoc" class="filter-select">
             <option value="all">Ubicación</option>
-            <option value="Lopez Mateos">Lopez Mateos</option>
+            <option value="Lopez Mateos">López Mateos</option>
             <option value="Mazda Plasencia">Mazda Plasencia</option>
             <option value="Mazda Galerias">Mazda Galerías</option>
             <option value="Mazda Americas">Mazda Américas</option>
@@ -2615,6 +2651,11 @@ function filterByTypeChip(val) {
 function filterByBrandSelect(val) { currentBrandFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_brand', filter_value: val }); }
 function filterByPriceSelect(val) { currentPriceFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_price', filter_value: val }); }
 function filterByLocSelect(val) { currentLocFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_location', filter_value: val }); }
+function filterByLocChip(val) {
+  filterByLocSelect(val);
+  document.querySelectorAll('.loc-chip').forEach(function(c){ var on = c.dataset.loc === val; c.classList.toggle('active', on); c.setAttribute('aria-pressed', on?'true':'false'); });
+  var dd = document.getElementById('filterLoc'); if (dd) dd.value = val;
+}
 function filterByYearSelect(val) { currentYearFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_year', filter_value: val }); }
 
 // Puebla TODOS los filtros con valores presentes en vehicles[] para evitar
