@@ -179,7 +179,11 @@ body {
   font-weight: 900; line-height: 1.04;
   letter-spacing: -0.035em;
   margin-bottom: 20px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
+@media (max-width: 480px) { .hero h1 { font-size: 30px; line-height: 1.06; } }
 .hero h1 .gradient {
   background: linear-gradient(120deg, #FBC645, #FFD66B 50%, #fff);
   -webkit-background-clip: text;
@@ -264,10 +268,23 @@ body {
   -webkit-backdrop-filter: blur(14px);
   padding: 18px 0;
   border-bottom: 1px solid var(--ink-200);
-  position: sticky; top: 64px; z-index: 90;
+  position: sticky; top: 72px; z-index: 90;
 }
 @media(min-width:768px){ .filters-section { top: 72px; } }
 @media(max-width:600px){ .filters-section { padding: 12px 0; } }
+/* Hide-on-scroll mobile: header + filtros se ocultan al hacer scroll-down despues de pasar el hero,
+   reaparecen con scroll-up. Recupera ~256px de viewport util en mobile (50% en iPhone SE). */
+.header, .filters-section { transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+@media (max-width: 768px) {
+  .header.is-hidden { transform: translateY(-100%); }
+  /* filters-section vive en sticky top:72px, hay que sumar ese offset al transform
+     para que salga totalmente del viewport (si no, queda visible la parte baja). */
+  .filters-section.is-hidden { transform: translateY(calc(-100% - 72px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .header, .filters-section { transition: none; }
+  .header.is-hidden, .filters-section.is-hidden { transform: none; }
+}
 /* Hint card de sede seleccionada (consistente con Stellantis y Hyundai) */
 .loc-info-card { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; margin:8px 0 4px; background: linear-gradient(135deg, #1A1A1A 0%, #2A2419 100%); border:1px solid #3A3320; border-left:3px solid var(--color-accent,#FBC645); border-radius:8px; font-size:12px; color:#E2E8F0; line-height:1.4; }
 .loc-info-card .loc-info-pin { width:18px; height:18px; flex-shrink:0; color:var(--color-accent,#FBC645); margin-top:1px; }
@@ -336,6 +353,13 @@ body {
 /* Type icon chips */
 .type-chips { display:flex; gap:8px; overflow-x:auto; padding:8px 0 12px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
 .type-chips::-webkit-scrollbar { display:none; }
+/* Gradient fade-out cue derecho para indicar overflow horizontal en chip rows mobile */
+@media (max-width: 768px) {
+  .type-chips, .filters-row {
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 24px), transparent 100%);
+            mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 24px), transparent 100%);
+  }
+}
 .type-chip { display:inline-flex; align-items:center; gap:8px; padding:11px 16px; min-height:44px; background:#fff; border:1.5px solid var(--ink-200); border-radius:999px; font-family:var(--font-body); font-size:13px; font-weight:700; color:var(--ink-700); cursor:pointer; flex-shrink:0; transition:all 0.15s ease; white-space:nowrap; }
 .type-chip:hover { border-color:var(--color-accent); color:var(--ink-900); transform:translateY(-1px); }
 .type-chip.active { background:var(--color-accent); color:var(--ink-900); border-color:var(--color-accent); box-shadow:0 4px 10px rgba(251,198,69,0.35); }
@@ -1809,11 +1833,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <button onclick="clearAllFilters()" class="filter-clear" id="filterClearBtn" style="display:none;">✕ Limpiar</button>
       </div>
       <div class="filter-active-pills" id="activePills"></div>
-      <div class="filter-count"><strong id="carCount">0</strong> vehiculos</div>
-    </div>
-    <div style="font-size:11px;color:var(--ink-400,#94A3B8);margin-top:2px;padding:0 4px;line-height:1.4;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      Cada seminuevo está en una de nuestras <strong>7 ubicaciones en Guadalajara</strong>: Seminuevos Plasencia (López Mateos) y 6 sucursales Mazda (Galerías, Américas, Acueducto, González Gallo, Plasencia y Santa Anita). <a href="#" onclick="event.preventDefault();document.getElementById('mapModal').style.display='flex'" style="color:var(--color-accent,#FBC645);text-decoration:underline;font-weight:600;">Ver en mapa →</a>
+      <div class="filter-count" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span><strong id="carCount">0</strong> vehiculos</span>
+        <a href="#" onclick="event.preventDefault();document.getElementById('mapModal').style.display='flex'" aria-label="Ver mapa con las 7 ubicaciones en Guadalajara" style="display:inline-flex;align-items:center;gap:4px;color:var(--ink-500,#718096);text-decoration:none;font-weight:600;font-size:12px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          7 sedes GDL
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -3239,6 +3265,63 @@ function updateCitaSedeBadge() {
   if (badgeName) badgeName.textContent = cfg.name;
 }
 
+// ── Hide-on-scroll header + filtros (mobile) ──
+// Recupera viewport ocultando header/filtros al scroll-down. Solo aplica is-hidden
+// cuando ambos estan en su posicion sticky pegada (si filters esta aun en flujo
+// natural por debajo del sticky-top, ocultarlo lo traeria al viewport en lugar de
+// sacarlo). Reaparece con cualquier scroll-up. Solo aplica <=768px.
+(function initHideOnScroll(){
+  const header = document.querySelector('.header');
+  const filters = document.querySelector('.filters-section');
+  if (!header || !filters) return;
+  const mq = window.matchMedia('(max-width: 768px)');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const HIDE_THRESHOLD = 5;
+  const REVEAL_THRESHOLD = 5;
+  const MIN_SCROLL_BEFORE_HIDE = 200;
+  const FILTERS_STICKY_TOP = 72;
+  const STICKY_TOLERANCE = 2;
+  let lastY = window.scrollY;
+  let ticking = false;
+  function isFiltersPinned(){
+    // filters esta sticky-pegado cuando su getBoundingClientRect().top ~= sticky top.
+    // Hay que medir SIN el is-hidden aplicado porque transform afecta el rect.
+    const wasHidden = filters.classList.contains('is-hidden');
+    if (wasHidden) filters.classList.remove('is-hidden');
+    const top = filters.getBoundingClientRect().top;
+    if (wasHidden) filters.classList.add('is-hidden');
+    return top <= FILTERS_STICKY_TOP + STICKY_TOLERANCE;
+  }
+  function update(){
+    const y = Math.max(0, window.scrollY);
+    const diff = y - lastY;
+    if (!mq.matches || reducedMotion.matches) {
+      header.classList.remove('is-hidden');
+      filters.classList.remove('is-hidden');
+    } else if (y < MIN_SCROLL_BEFORE_HIDE) {
+      header.classList.remove('is-hidden');
+      filters.classList.remove('is-hidden');
+    } else if (diff > HIDE_THRESHOLD) {
+      header.classList.add('is-hidden');
+      // Solo ocultar filtros si ya estan pegados (si no, el transform los traeria al viewport)
+      if (isFiltersPinned()) filters.classList.add('is-hidden');
+      else filters.classList.remove('is-hidden');
+    } else if (diff < -REVEAL_THRESHOLD) {
+      header.classList.remove('is-hidden');
+      filters.classList.remove('is-hidden');
+    }
+    lastY = y;
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if (!ticking) { requestAnimationFrame(update); ticking = true; }
+  }, { passive: true });
+  // Reset al cambiar viewport (rotacion / resize)
+  if (mq.addEventListener) mq.addEventListener('change', function(){
+    if (!mq.matches) { header.classList.remove('is-hidden'); filters.classList.remove('is-hidden'); }
+  });
+})();
+
 // ── H2: Sticky Mobile CTA — handlers + intersection observer ──
 function stickyCtaBrowse() {
   try {
@@ -3258,15 +3341,22 @@ function stickyCtaBrowse() {
   }, 450);
 }
 
-// Sticky CTA: siempre visible en mobile (≤640px). Solo se oculta cuando el modal bloquea el body (body[style*="position: fixed"]).
+// Sticky CTA: aparece despues de pasar el hero (IntersectionObserver) y se oculta cuando
+// el usuario llega al inventoryGrid (porque ya esta en el catalogo, redundante).
+// Antes apareca desde scroll=0 violando UX-CRO-Patterns.md Patron 4. Fix 2026-05-07.
 (function initStickyMobileCta(){
   function boot() {
     const bar = document.getElementById('stickyMobileCta');
     if (!bar) return;
+    const hero = document.querySelector('.hero');
+    const grid = document.getElementById('inventoryGrid');
     const mq = window.matchMedia('(max-width: 640px)');
     let impressionFired = false;
-    function apply() {
-      if (mq.matches) {
+    let heroOut = false;
+    let gridIn = false;
+    function applyVisibility() {
+      const shouldShow = mq.matches && heroOut && !gridIn;
+      if (shouldShow) {
         bar.classList.add('is-visible');
         document.body.classList.add('has-sticky-cta');
         if (!impressionFired) {
@@ -3276,11 +3366,31 @@ function stickyCtaBrowse() {
       } else {
         bar.classList.remove('is-visible');
         document.body.classList.remove('has-sticky-cta');
+        // Telemetria de dismiss cuando se oculta porque el usuario entro al catalogo
+        if (gridIn && impressionFired) {
+          try { (window.dataLayer = window.dataLayer || []).push({ event: 'sticky_cta_dismissed_in_catalog', viewport: 'mobile' }); } catch (e) {}
+          impressionFired = false;
+        }
       }
     }
-    apply();
-    if (mq.addEventListener) mq.addEventListener('change', apply);
-    else if (mq.addListener) mq.addListener(apply);
+    if (hero && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function(entries){
+        // hero sale del viewport (no intersecta) cuando bottom < top del root → heroOut true
+        heroOut = !entries[0].isIntersecting;
+        applyVisibility();
+      }, { rootMargin: '-80px 0px 0px 0px', threshold: 0 }).observe(hero);
+    } else {
+      heroOut = true; // fallback: comportamiento previo
+    }
+    if (grid && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function(entries){
+        gridIn = entries[0].isIntersecting;
+        applyVisibility();
+      }, { rootMargin: '-100px 0px -40% 0px', threshold: 0 }).observe(grid);
+    }
+    if (mq.addEventListener) mq.addEventListener('change', applyVisibility);
+    else if (mq.addListener) mq.addListener(applyVisibility);
+    applyVisibility();
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
