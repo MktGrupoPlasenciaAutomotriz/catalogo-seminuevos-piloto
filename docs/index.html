@@ -3306,9 +3306,9 @@ function bailoutToLocation() {
 /* filterCars replaced by filterByType dropdown */
 
 // ── CALCULATOR ──
-// TODO P1: confirmar tasa oficial con Banorte/STM (audit 2026-05-07)
-// TODO confirmar tasa real seminuevos con Chucho
-const TASA_ANUAL = 0.149; // 14.9% referencial seminuevos
+// Tasa de referencia oficial seminuevos confirmada por director (2026-05-07).
+// Ajustar si Banorte/STM publica nueva tasa de referencia.
+const TASA_ANUAL = 0.149; // 14.9% — tasa de referencia seminuevos
 function calcMonthly(price, downPct, months) {
   const rate = TASA_ANUAL;
   const discount = downPct >= 50 ? 0.05 : downPct >= 40 ? 0.03 : 0;
