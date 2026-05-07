@@ -92,9 +92,13 @@ body {
 /* ── HEADER ── */
 .header {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(11, 18, 40, 0.78);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  /* Background opacity 0.92 (era 0.78) + blur reducido a 14px (era 20px) para evitar
+     artifacts visuales (líneas tipo "pantalla rota") cuando el rim-lighting amarillo
+     del hero IA cinematográfico atraviesa el header al hacer scroll.
+     Bug reportado por director 2026-05-07. STL/HYU no afectados (heros menos contrastados). */
+  background: rgba(11, 18, 40, 0.92);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
   border-bottom: 1px solid rgba(255,255,255,0.08);
   padding: 14px 0;
 }
