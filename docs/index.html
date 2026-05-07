@@ -264,13 +264,35 @@ body {
 
 /* ── FILTERS ── */
 .filters-section {
-  background: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.92);
   backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 18px 0;
   border-bottom: 1px solid var(--ink-200);
   position: sticky; top: 64px; z-index: 90;
 }
 @media(min-width:768px){ .filters-section { top: 72px; } }
+@media(max-width:600px){ .filters-section { padding: 12px 0; } }
+/* Hint card de sede seleccionada (consistente con Stellantis y Hyundai) */
+.loc-info-card { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; margin:8px 0 4px; background: linear-gradient(135deg, #1A1A1A 0%, #2A2419 100%); border:1px solid #3A3320; border-left:3px solid var(--color-accent,#FBC645); border-radius:8px; font-size:12px; color:#E2E8F0; line-height:1.4; }
+.loc-info-card .loc-info-pin { width:18px; height:18px; flex-shrink:0; color:var(--color-accent,#FBC645); margin-top:1px; }
+.loc-info-card .loc-info-body { flex:1; min-width:0; }
+.loc-info-card .loc-info-name { font-weight:800; color:#F7FAFC; font-size:13px; margin-bottom:2px; }
+.loc-info-card .loc-info-addr { color:#CBD5E0; }
+.loc-info-card .loc-info-hours { color:#A0AEC0; font-size:11px; margin-top:2px; }
+.loc-info-card .loc-info-actions { display:inline-flex; gap:10px; margin-top:6px; flex-wrap:wrap; }
+.loc-info-card .loc-info-link { color:var(--color-accent,#FBC645); font-weight:700; font-size:12px; text-decoration:none; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+.loc-info-card .loc-info-link:hover { text-decoration:underline; }
+@media(max-width:600px){ .loc-info-card { font-size:11.5px; padding:9px 11px; } .loc-info-card .loc-info-name { font-size:12.5px; } }
+.loc-map-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:1000; align-items:center; justify-content:center; padding:16px; }
+.loc-map-modal.is-open { display:flex; }
+.loc-map-modal-inner { background:#fff; border-radius:14px; max-width:680px; width:100%; max-height:90vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 25px 60px rgba(0,0,0,0.3); }
+.loc-map-modal-head { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--ink-200,#E2E8F0); }
+.loc-map-modal-title { font-family:var(--font-display); font-weight:800; font-size:16px; color:var(--ink-900,#0F172A); }
+.loc-map-modal-close { background:transparent; border:none; cursor:pointer; padding:6px; color:var(--ink-500,#64748B); border-radius:6px; }
+.loc-map-modal-close:hover { background:var(--ink-100,#F1F5F9); color:var(--ink-900,#0F172A); }
+.loc-map-modal-iframe { width:100%; aspect-ratio:16/10; border:0; display:block; }
+.loc-map-modal-foot { padding:12px 18px; font-size:12px; color:var(--ink-600,#475569); border-top:1px solid var(--ink-200,#E2E8F0); display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
 .filters-wrap { display: flex; align-items: center; gap: 16px; }
 .filters-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; flex: 1; -webkit-overflow-scrolling: touch; }
 .filter-chip {
@@ -301,7 +323,7 @@ body {
 /* Type icon chips */
 .type-chips { display:flex; gap:8px; overflow-x:auto; padding:8px 0 12px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
 .type-chips::-webkit-scrollbar { display:none; }
-.type-chip { display:inline-flex; align-items:center; gap:8px; padding:10px 16px; background:#fff; border:1.5px solid var(--ink-200); border-radius:999px; font-family:var(--font-body); font-size:13px; font-weight:700; color:var(--ink-700); cursor:pointer; flex-shrink:0; transition:all 0.15s ease; white-space:nowrap; }
+.type-chip { display:inline-flex; align-items:center; gap:8px; padding:11px 16px; min-height:44px; background:#fff; border:1.5px solid var(--ink-200); border-radius:999px; font-family:var(--font-body); font-size:13px; font-weight:700; color:var(--ink-700); cursor:pointer; flex-shrink:0; transition:all 0.15s ease; white-space:nowrap; }
 .type-chip:hover { border-color:var(--color-accent); color:var(--ink-900); transform:translateY(-1px); }
 .type-chip.active { background:var(--color-accent); color:var(--ink-900); border-color:var(--color-accent); box-shadow:0 4px 10px rgba(251,198,69,0.35); }
 .type-chip svg { width:20px; height:20px; flex-shrink:0; }
@@ -1707,6 +1729,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span>Mazda Santa Anita</span>
       </button>
     </div>
+    <!-- Hint de sede seleccionada -->
+    <div id="locInfo" class="loc-info-card" style="display:none;" role="region" aria-live="polite"></div>
     <div class="filter-bar">
       <div class="filter-bar-inner">
         <div class="filter-search">
@@ -2651,10 +2675,58 @@ function filterByTypeChip(val) {
 function filterByBrandSelect(val) { currentBrandFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_brand', filter_value: val }); }
 function filterByPriceSelect(val) { currentPriceFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_price', filter_value: val }); }
 function filterByLocSelect(val) { currentLocFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_location', filter_value: val }); }
+// Datos de las 7 sucursales del piloto Seminuevos. Direcciones via Google Maps query (no inventamos coords).
+var SEDE_INFO = {
+  'Lopez Mateos': { nombre: 'Seminuevos Plasencia · López Mateos', direccion: 'Av. López Mateos Sur 2600, Col. La Calma, Zapopan, Jal.', horario: 'Lun a Vie 9:00-18:00 · Sáb 9:00-14:00', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Seminuevos+Plasencia+Lopez+Mateos+2600+Zapopan', embedUrl: 'https://www.google.com/maps?q=Seminuevos+Plasencia+Lopez+Mateos+2600+Zapopan&output=embed' },
+  'Mazda Plasencia': { nombre: 'Mazda Plasencia', direccion: 'Mazda Plasencia, Guadalajara, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Mazda+Plasencia+Guadalajara', embedUrl: 'https://www.google.com/maps?q=Mazda+Plasencia+Guadalajara&output=embed' },
+  'Mazda Galerias': { nombre: 'Mazda Galerías', direccion: 'Galerías Guadalajara, Zapopan, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Mazda+Galerias+Guadalajara', embedUrl: 'https://www.google.com/maps?q=Mazda+Galerias+Guadalajara&output=embed' },
+  'Mazda Americas': { nombre: 'Mazda Américas', direccion: 'Av. Américas, Guadalajara, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Mazda+Americas+Guadalajara', embedUrl: 'https://www.google.com/maps?q=Mazda+Americas+Guadalajara&output=embed' },
+  'Mazda Acueducto': { nombre: 'Mazda Acueducto', direccion: 'Av. Acueducto, Zapopan, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Mazda+Acueducto+Zapopan', embedUrl: 'https://www.google.com/maps?q=Mazda+Acueducto+Zapopan&output=embed' },
+  'Mazda Gonzalez Gallo': { nombre: 'Mazda González Gallo', direccion: 'Av. González Gallo, Guadalajara, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Mazda+Gonzalez+Gallo+Guadalajara', embedUrl: 'https://www.google.com/maps?q=Mazda+Gonzalez+Gallo+Guadalajara&output=embed' },
+  'Mazda Santa Anita': { nombre: 'Mazda Santa Anita', direccion: 'Av. López Mateos Sur, Tlajomulco de Zúñiga, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Mazda+Santa+Anita+Tlajomulco', embedUrl: 'https://www.google.com/maps?q=Mazda+Santa+Anita+Tlajomulco&output=embed' }
+};
+
+function renderLocInfo(val) {
+  var el = document.getElementById('locInfo');
+  if (!el) return;
+  if (val === 'all' || !SEDE_INFO[val]) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  var s = SEDE_INFO[val];
+  el.innerHTML =
+    '<svg class="loc-info-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
+    '<div class="loc-info-body">' +
+      '<div class="loc-info-name">' + s.nombre + '</div>' +
+      '<div class="loc-info-addr">' + s.direccion + '</div>' +
+      '<div class="loc-info-hours">' + s.horario + '</div>' +
+      '<div class="loc-info-actions">' +
+        '<a class="loc-info-link" href="#" onclick="event.preventDefault();openLocMapModal(\'' + val + '\');">Ver mapa aquí</a>' +
+        '<a class="loc-info-link" href="' + s.mapsUrl + '" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>' +
+      '</div>' +
+    '</div>';
+  el.style.display = 'flex';
+}
+
+function openLocMapModal(val) {
+  var s = SEDE_INFO[val]; if (!s) return;
+  document.getElementById('locMapTitle').textContent = s.nombre;
+  document.getElementById('locMapAddr').textContent = s.direccion;
+  document.getElementById('locMapIframe').src = s.embedUrl;
+  document.getElementById('locMapMaps').href = s.mapsUrl;
+  document.getElementById('locMapModal').classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+  if (typeof dataLayer !== 'undefined') dataLayer.push({ event: 'open_loc_map', sede: val });
+}
+
+function closeLocMapModal() {
+  document.getElementById('locMapModal').classList.remove('is-open');
+  document.getElementById('locMapIframe').src = '';
+  document.body.style.overflow = '';
+}
+
 function filterByLocChip(val) {
   filterByLocSelect(val);
   document.querySelectorAll('.loc-chip').forEach(function(c){ var on = c.dataset.loc === val; c.classList.toggle('active', on); c.setAttribute('aria-pressed', on?'true':'false'); });
   var dd = document.getElementById('filterLoc'); if (dd) dd.value = val;
+  renderLocInfo(val);
 }
 function filterByYearSelect(val) { currentYearFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_year', filter_value: val }); }
 
@@ -4496,6 +4568,26 @@ function toggleIngresosFeedback(sel) {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     Encuentra tu auto
   </button>
+</div>
+
+<!-- Modal de mapa de sede individual (consistente con STL y HYU). El #mapModal general con las 7 sucursales sigue existiendo. -->
+<div id="locMapModal" class="loc-map-modal" role="dialog" aria-modal="true" aria-labelledby="locMapTitle" onclick="if(event.target===this)closeLocMapModal()">
+  <div class="loc-map-modal-inner">
+    <div class="loc-map-modal-head">
+      <div>
+        <div class="loc-map-modal-title" id="locMapTitle">—</div>
+        <div id="locMapAddr" style="font-size:12px;color:var(--ink-600,#475569);margin-top:2px;">—</div>
+      </div>
+      <button type="button" class="loc-map-modal-close" onclick="closeLocMapModal()" aria-label="Cerrar mapa">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <iframe id="locMapIframe" class="loc-map-modal-iframe" src="" loading="lazy" title="Mapa de la sede" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <div class="loc-map-modal-foot">
+      <span>¿Listo para venir? Agenda tu cita y tu asesor te contacta por WhatsApp.</span>
+      <a id="locMapMaps" href="#" target="_blank" rel="noopener" class="loc-info-link" style="color:var(--color-accent,#FBC645);font-weight:700;">Abrir en Google Maps ↗</a>
+    </div>
+  </div>
 </div>
 
 </body>
