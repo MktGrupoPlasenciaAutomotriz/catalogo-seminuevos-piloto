@@ -293,6 +293,24 @@ body {
 .loc-map-modal-close:hover { background:var(--ink-100,#F1F5F9); color:var(--ink-900,#0F172A); }
 .loc-map-modal-iframe { width:100%; aspect-ratio:16/10; border:0; display:block; }
 .loc-map-modal-foot { padding:12px 18px; font-size:12px; color:var(--ink-600,#475569); border-top:1px solid var(--ink-200,#E2E8F0); display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+/* Empty state cuando ningun filtro produce coincidencias (paleta dark Sem) */
+.empty-state-card { padding:32px 20px; text-align:center; background:#1A1A1A; border:1px solid #2D2D2D; border-radius:14px; max-width:560px; margin:0 auto; color:#E2E8F0; }
+.empty-state-icon { font-size:36px; margin-bottom:8px; }
+.empty-state-title { font-family:var(--font-display); font-weight:800; font-size:18px; color:#F7FAFC; margin-bottom:14px; }
+.empty-state-pills-label { font-size:11px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:#A0AEC0; margin:8px 0 6px; }
+.empty-state-pills { display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-bottom:14px; }
+.empty-pill { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; background:#2D2D2D; border:1px solid #3A3A3A; border-radius:999px; font-size:12px; font-weight:600; color:#E2E8F0; cursor:pointer; min-height:32px; transition:all 0.15s; }
+.empty-pill:hover { background:#7F1D1D; border-color:#FCA5A5; color:#FECACA; }
+.empty-pill span { font-weight:800; opacity:0.6; }
+.empty-suggestion { background:linear-gradient(135deg, #2A2419 0%, #3A3320 100%); border:1px solid #4A4030; border-left:3px solid var(--color-accent,#FBC645); border-radius:8px; padding:12px 14px; margin:10px auto 16px; font-size:13px; color:#F7FAFC; line-height:1.5; max-width:480px; text-align:left; }
+.empty-suggestion-icon { display:inline-block; margin-right:4px; }
+.empty-suggestion-btn { display:inline-block; margin-left:8px; padding:5px 11px; background:var(--color-accent,#FBC645); color:#1A1A1A; border:none; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; }
+.empty-suggestion-btn:hover { opacity:0.92; }
+.empty-state-cta { padding:12px 24px; min-height:44px; background:var(--color-accent,#FBC645); color:#1A1A1A; border:none; border-radius:9999px; font-family:var(--font-display); font-size:14px; font-weight:700; cursor:pointer; transition:all 0.15s; }
+.empty-state-cta:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(251,198,69,0.25); }
+.empty-state-divider { display:flex; align-items:center; gap:14px; margin:24px auto 8px; max-width:420px; color:#A0AEC0; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; }
+.empty-state-divider::before, .empty-state-divider::after { content:''; flex:1; height:1px; background:#3A3A3A; }
+@media(max-width:600px){ .empty-state-card { padding:24px 14px; } .empty-state-title { font-size:16px; } .empty-suggestion-btn { display:block; margin:8px 0 0; } }
 .filters-wrap { display: flex; align-items: center; gap: 16px; }
 .filters-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; flex: 1; -webkit-overflow-scrolling: touch; }
 .filter-chip {
@@ -1665,6 +1683,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 
 <!-- ════ FILTERS ════ -->
+<!-- catalog-zone wrapper: limita el sticky de .filters-section al area de catalogo -->
+<div class="catalog-zone">
 <section class="filters-section">
   <div class="container">
     <!-- Type icon chips -->
@@ -1814,6 +1834,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 </section>
+</div><!-- /.catalog-zone -->
 
 <!-- ════ REVIEWS (Google) ════ -->
 <section class="reviews-section" aria-labelledby="reviewsTitle">
@@ -2698,8 +2719,7 @@ function renderLocInfo(val) {
       '<div class="loc-info-addr">' + s.direccion + '</div>' +
       '<div class="loc-info-hours">' + s.horario + '</div>' +
       '<div class="loc-info-actions">' +
-        '<a class="loc-info-link" href="#" onclick="event.preventDefault();openLocMapModal(\'' + val + '\');">Ver mapa aquí</a>' +
-        '<a class="loc-info-link" href="' + s.mapsUrl + '" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>' +
+        '<a class="loc-info-link" href="#" onclick="event.preventDefault();openLocMapModal(\'' + val + '\');">Ver ubicación en mapa</a>' +
       '</div>' +
     '</div>';
   el.style.display = 'flex';
@@ -2710,7 +2730,6 @@ function openLocMapModal(val) {
   document.getElementById('locMapTitle').textContent = s.nombre;
   document.getElementById('locMapAddr').textContent = s.direccion;
   document.getElementById('locMapIframe').src = s.embedUrl;
-  document.getElementById('locMapMaps').href = s.mapsUrl;
   document.getElementById('locMapModal').classList.add('is-open');
   document.body.style.overflow = 'hidden';
   if (typeof dataLayer !== 'undefined') dataLayer.push({ event: 'open_loc_map', sede: val });
@@ -2842,6 +2861,77 @@ function updateFilters() {
   updateFilterUI();
 }
 
+// ── SMART EMPTY STATE ──
+function _typeLabel(t){var L={suv:'SUV',sedan:'Sedán',pickup:'Pick-up',hatchback:'Hatchback',minivan:'Minivan'};return L[t]||t;}
+function _priceLabel(p){return p;}
+
+function _countWithoutFilter(skipKey) {
+  var arr = vehicles;
+  if (skipKey !== 'tipo' && currentFilter !== 'all') arr = arr.filter(function(v){return _norm(v.type) === _norm(currentFilter);});
+  if (skipKey !== 'sede' && currentLocFilter !== 'all') arr = arr.filter(function(v){return v.loc === currentLocFilter;});
+  if (skipKey !== 'marca' && currentBrandFilter !== 'all') {
+    if (currentBrandFilter === '_other') arr = arr.filter(function(v){return !TOP_BRANDS.includes(v.brand);});
+    else arr = arr.filter(function(v){return v.brand === currentBrandFilter;});
+  }
+  if (skipKey !== 'precio' && currentPriceFilter !== 'all') {
+    var p = currentPriceFilter;
+    if (p === '0-300') arr = arr.filter(function(v){return v.price <= 300000;});
+    else if (p === '300-450') arr = arr.filter(function(v){return v.price > 300000 && v.price <= 450000;});
+    else if (p === '450-700') arr = arr.filter(function(v){return v.price > 450000 && v.price <= 700000;});
+    else if (p === '700-1m') arr = arr.filter(function(v){return v.price > 700000 && v.price <= 1000000;});
+    else if (p === '1m+') arr = arr.filter(function(v){return v.price > 1000000;});
+  }
+  if (skipKey !== 'anio' && currentYearFilter !== 'all') arr = arr.filter(function(v){return String(v.year) === String(currentYearFilter);});
+  if (skipKey !== 'busqueda' && searchQuery) {
+    var q = searchQuery.toLowerCase();
+    arr = arr.filter(function(v){
+      return (v.name||'').toLowerCase().includes(q) || String(v.year).includes(q) || (v.color||'').toLowerCase().includes(q) || (v.brand||'').toLowerCase().includes(q);
+    });
+  }
+  return arr.length;
+}
+
+function getActiveFilters() {
+  var out = [];
+  if (currentFilter !== 'all') out.push({key:'tipo', label:'Tipo: '+_typeLabel(currentFilter), clear:"filterByTypeChip('all')"});
+  if (currentLocFilter !== 'all') out.push({key:'sede', label:'Sede: '+currentLocFilter, clear:"filterByLocChip('all')"});
+  if (currentBrandFilter !== 'all') out.push({key:'marca', label:'Marca: '+(currentBrandFilter==='_other'?'Otras':currentBrandFilter), clear:"filterByBrandSelect('all');document.getElementById('filterBrand').value='all'"});
+  if (currentPriceFilter !== 'all') out.push({key:'precio', label:'Precio: '+_priceLabel(currentPriceFilter), clear:"filterByPriceSelect('all');document.getElementById('filterPrice').value='all'"});
+  if (currentYearFilter !== 'all') out.push({key:'anio', label:'Año: '+currentYearFilter, clear:"filterByYearSelect('all');document.getElementById('filterYear').value='all'"});
+  if (searchQuery) out.push({key:'busqueda', label:'Búsqueda: "'+searchQuery+'"', clear:"document.getElementById('searchInput').value='';onSearch('')"});
+  return out;
+}
+
+function getSmartSuggestion() {
+  var actives = getActiveFilters();
+  if (actives.length < 1) return null;
+  var best = null;
+  actives.forEach(function(f){
+    var n = _countWithoutFilter(f.key);
+    if (n > 0 && (!best || n > best.count)) best = {filter: f, count: n};
+  });
+  return best;
+}
+
+function renderEmptyStateHTML() {
+  var actives = getActiveFilters();
+  var suggestion = getSmartSuggestion();
+  var pillsHTML = actives.map(function(f){
+    return '<button class="empty-pill" onclick="' + f.clear.replace(/"/g,'&quot;') + ';updateFilters();" aria-label="Quitar filtro ' + f.label + '">' + f.label + ' <span aria-hidden="true">✕</span></button>';
+  }).join('');
+  var suggestionHTML = suggestion
+    ? '<div class="empty-suggestion"><span class="empty-suggestion-icon">💡</span> Quita <strong>«' + suggestion.filter.label + '»</strong> y te mostramos <strong>' + suggestion.count + ' ' + (suggestion.count===1?'auto':'autos') + '</strong>. <button class="empty-suggestion-btn" onclick="' + suggestion.filter.clear.replace(/"/g,'&quot;') + ';updateFilters();">Quitar este filtro</button></div>'
+    : '';
+  return '<div class="empty-state-card" style="grid-column:1/-1;" role="status" aria-live="polite">' +
+    '<div class="empty-state-icon" aria-hidden="true">🔍</div>' +
+    '<div class="empty-state-title">No encontramos autos con esos filtros</div>' +
+    (actives.length ? '<div class="empty-state-pills-label">Filtros activos:</div><div class="empty-state-pills">' + pillsHTML + '</div>' : '') +
+    suggestionHTML +
+    '<button class="empty-state-cta" onclick="clearAllFilters()">↺ Ver todo el inventario</button>' +
+    '<div class="empty-state-divider"><span>O explora estos modelos populares</span></div>' +
+  '</div>';
+}
+
 function updateFilterUI() {
   var hasFilters = currentFilter !== 'all' || currentBrandFilter !== 'all' || currentPriceFilter !== 'all' || currentLocFilter !== 'all' || currentYearFilter !== 'all' || searchQuery;
   document.getElementById('filterClearBtn').style.display = hasFilters ? '' : 'none';
@@ -2911,16 +3001,7 @@ function renderCards(filter) {
   document.getElementById('carCount').textContent = filtered.length > showing ? showing + ' de ' + filtered.length : filtered.length;
 
   if (filtered.length === 0) {
-    const suggestions = getSuggestions(3);
-    const msgText = searchQuery ? 'para "' + searchQuery.replace(/</g,'&lt;') + '"' : 'con esos filtros';
-    grid.innerHTML =
-      '<div style="grid-column:1/-1;text-align:center;padding:40px 20px 20px;">' +
-        '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;margin-bottom:10px;color:var(--ink-500);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
-        '<div style="font-weight:800;font-size:18px;color:var(--ink-900);margin-bottom:8px;font-family:var(--font-display);">No encontramos autos ' + msgText + '</div>' +
-        '<div style="font-size:14px;color:var(--ink-500);margin-bottom:18px;">Pero te sugerimos estos — los más atractivos del inventario:</div>' +
-        '<button onclick="clearAllFilters()" style="padding:10px 20px;background:transparent;border:1.5px solid var(--ink-300);border-radius:9999px;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink-700);font-family:var(--font-body);">↺ Ver todo el inventario</button>' +
-      '</div>' +
-      suggestions.map(buildVCardHTML).join('');
+    grid.innerHTML = renderEmptyStateHTML() + getSuggestions(3).map(buildVCardHTML).join('');
     return;
   }
 
@@ -4585,7 +4666,6 @@ function toggleIngresosFeedback(sel) {
     <iframe id="locMapIframe" class="loc-map-modal-iframe" src="" loading="lazy" title="Mapa de la sede" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
     <div class="loc-map-modal-foot">
       <span>¿Listo para venir? Agenda tu cita y tu asesor te contacta por WhatsApp.</span>
-      <a id="locMapMaps" href="#" target="_blank" rel="noopener" class="loc-info-link" style="color:var(--color-accent,#FBC645);font-weight:700;">Abrir en Google Maps ↗</a>
     </div>
   </div>
 </div>
