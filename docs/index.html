@@ -4432,7 +4432,10 @@ function submitForm() {
     lead_value: currentCar.price,
     vehicle_brand: currentCar.brand || '',
     vehicle_year: currentCar.year,
-    vehicle_version: '',
+    // Deuda upstream documentada en Backlog-Post-MVP.md: el feed XML de
+    // Maxipublica no entrega TRIM separado del name. Defensive coding —
+    // si en el futuro el feed enriquece este campo, se auto-activa.
+    vehicle_version: currentCar.version || '',
     cash_only: _dlCashOnly,
     down_pct: _dlDownPct,
     term_months: selectedTerm,
