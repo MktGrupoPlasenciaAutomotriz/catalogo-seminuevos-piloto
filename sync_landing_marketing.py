@@ -55,17 +55,19 @@ def main():
 
     print(f"Inventario actual: {n_cars} autos · {n_brands} marcas · desde {min_price_compact}")
 
-    # Composicion de textos. Plantillas fijas con valores reales del inventario.
-    new_title = f"Seminuevos Plasencia Guadalajara | Autos certificados desde {min_price_compact}"
+    # Composicion de textos alineados con el concepto rector "Sin Sorpresas"
+    # y la propuesta de valor: 8 sucursales en GDL, 75 años de operación,
+    # inventario actualizado al día. Inventario (n_cars) se inyecta dinámico.
+    new_title = "Seminuevos Plasencia · Sin sorpresas · 8 sucursales en Guadalajara · 75 años"
     new_desc = (
-        f"Tu próximo seminuevo verificado en Guadalajara. Inspección de 150 puntos, "
-        f"1 año de garantía y factura original. {n_brands} marcas desde {min_price_compact}. "
-        f"Crédito desde 12 meses."
+        f"Tu próximo seminuevo, sin sorpresas. {n_cars} autos certificados en 8 sucursales "
+        f"de Guadalajara. Inspección de 150 puntos, garantía de un año y factura original "
+        f"verificada. Crédito desde 12 meses."
     )
-    new_og_title = f"Seminuevos Plasencia — Autos certificados desde {min_price_compact} | Guadalajara"
+    new_og_title = "Seminuevos Plasencia · Sin sorpresas · 75 años en Guadalajara"
     new_og_desc = (
-        f"Tu próximo seminuevo verificado · Inspección 150 puntos · 1 año de garantía · "
-        f"factura original · {n_brands} marcas desde {min_price_compact} · crédito desde 12 meses."
+        f"{n_cars} autos certificados en 8 sucursales de Guadalajara · "
+        f"Inspección 150 puntos · Garantía de un año · Factura original · Crédito desde 12 meses."
     )
 
     with open(HTML_PATH, "r", encoding="utf-8") as f:
