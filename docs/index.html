@@ -1745,6 +1745,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
         <span>López Mateos</span>
       </button>
+      <button type="button" class="loc-chip type-chip" data-loc="Bugambilias" onclick="filterByLocChip('Bugambilias')" aria-pressed="false" title="Seminuevos Plasencia · Av. López Mateos Sur 8550, Bugámbilias, Zapopan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Bugámbilias</span>
+      </button>
       <button type="button" class="loc-chip type-chip" data-loc="Mazda Plasencia" onclick="filterByLocChip('Mazda Plasencia')" aria-pressed="false" title="Mazda Plasencia">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
         <span>Mazda Plasencia</span>
@@ -1822,6 +1826,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <select onchange="filterByLocSelect(this.value)" id="filterLoc" class="filter-select">
             <option value="all">Ubicación</option>
             <option value="Lopez Mateos">López Mateos</option>
+            <option value="Bugambilias">Bugambilias</option>
             <option value="Mazda Plasencia">Mazda Plasencia</option>
             <option value="Mazda Galerias">Mazda Galerías</option>
             <option value="Mazda Americas">Mazda Américas</option>
@@ -2461,9 +2466,10 @@ function filterByTypeChip(val) {
 function filterByBrandSelect(val) { currentBrandFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_brand', filter_value: val, ...getTrackingContext() }); }
 function filterByPriceSelect(val) { currentPriceFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_price', filter_value: val, ...getTrackingContext() }); }
 function filterByLocSelect(val) { currentLocFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_loc', filter_value: val, ...getTrackingContext() }); }
-// Datos de las 7 sucursales del piloto Seminuevos. Direcciones via Google Maps query (no inventamos coords).
+// Datos de las 8 sucursales del piloto Seminuevos. Direcciones via Google Maps query (no inventamos coords).
 var SEDE_INFO = {
   'Lopez Mateos': { nombre: 'Seminuevos Plasencia · López Mateos', direccion: 'Av. López Mateos Sur 2600, Col. La Calma, Zapopan, Jal.', horario: 'Lun a Vie 9:00-18:00 · Sáb 9:00-14:00', embedUrl: 'https://www.google.com/maps?q=Seminuevos+Plasencia+Lopez+Mateos+2600+Zapopan&output=embed' },
+  'Bugambilias': { nombre: 'Seminuevos Plasencia · Bugámbilias', direccion: 'Av. López Mateos Sur 8550, Bugambilias, 45238 Zapopan, Jal.', horario: 'Lun a Vie 9:30-19:30 · Sáb 9:30-19:00 · Dom 11:00-18:00', telefono: '33 3251 7440', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3734.671918270622!2d-103.4359611!3d20.6014516!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ad00129909bf%3A0xe6b05b0dfc15a19a!2sSeminuevos%20Plasencia%20Bugambilias!5e0!3m2!1ses!2smx!4v1778861975691!5m2!1ses!2smx' },
   'Mazda Plasencia': { nombre: 'Mazda Plasencia', direccion: 'Mazda Plasencia, Guadalajara, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps?q=Mazda+Plasencia+Guadalajara&output=embed' },
   'Mazda Galerias': { nombre: 'Mazda Galerías', direccion: 'Galerías Guadalajara, Zapopan, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps?q=Mazda+Galerias+Guadalajara&output=embed' },
   'Mazda Americas': { nombre: 'Mazda Américas', direccion: 'Av. Américas, Guadalajara, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps?q=Mazda+Americas+Guadalajara&output=embed' },

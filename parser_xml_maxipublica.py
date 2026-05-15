@@ -74,10 +74,11 @@ DRIVETRAIN_MAP = {
 #   3852 = Seminuevos Plasencia Lopez Mateos (Lote Otero, Fase 1).
 #   4199, 3886, 3736, 3888, 3737, 3885 = las 6 sucursales Mazda del area
 #   metropolitana de Guadalajara (Fase 2).
+#   4054 = Seminuevos Plasencia Bugambilias (Fase 3, mayo 2026, +80 autos).
 # Explicitamente EXCLUIDAS aunque sean Mazda: 3887 Mazda Vallarta y 3905
 # Mazda Manzanillo (fuera de GDL metro).
 # Mantener sincronizada con PILOTO_OTERO_AGENCIAS en crm-sync-worker/src/index.js.
-PILOTO_AGENCIAS = {3852, 4199, 3886, 3736, 3888, 3737, 3885}
+PILOTO_AGENCIAS = {3852, 4199, 3886, 3736, 3888, 3737, 3885, 4054}
 
 
 # ---------- Helpers ----------

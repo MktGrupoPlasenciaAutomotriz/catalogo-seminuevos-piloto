@@ -34,6 +34,7 @@ SUCURSAL_OVERRIDES = {
     3888: "Mazda Acueducto",
     3737: "Mazda González Gallo",
     3885: "Mazda Santa Anita",
+    4054: "Bugambilias",
 }
 
 
