@@ -1840,7 +1840,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="filter-active-pills" id="activePills"></div>
       <div class="filter-count" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <span><strong id="carCount">0</strong> vehiculos</span>
-        <a href="#" onclick="event.preventDefault();document.getElementById('mapModal').style.display='flex'" aria-label="Ver mapa con las 7 ubicaciones en Guadalajara" style="display:inline-flex;align-items:center;gap:4px;color:var(--ink-500,#718096);text-decoration:none;font-weight:600;font-size:12px;">
+        <a href="#" onclick="event.preventDefault();document.getElementById('mapModal').style.display='flex'" aria-label="Ver mapa con las 8 ubicaciones en Guadalajara" style="display:inline-flex;align-items:center;gap:4px;color:var(--ink-500,#718096);text-decoration:none;font-weight:600;font-size:12px;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
           7 sedes GDL
         </a>
@@ -3740,7 +3740,7 @@ function generateRegistrationPDF() {
   sectionTitle('SUCURSAL DONDE SE ENCUENTRA EL AUTO');
   row('Sucursal:', sucMap.name, true);
   row('Dirección:', sucMap.addr);
-  row('Teléfono:', cfg.telefono);
+  row('Atención al cliente:', cfg.telefono);
   y += 2;
 
   // ── ASESOR ──
