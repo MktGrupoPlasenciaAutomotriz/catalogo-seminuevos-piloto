@@ -104,12 +104,15 @@ body {
 }
 .header .container { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .header-left { display: flex; align-items: center; gap: 14px; }
-.header-logo { height: 48px; max-width: 200px; width: auto; opacity: 1; display: block; }
-@media(min-width:768px){ .header-logo { height: 60px; max-width: 240px; } }
+/* Logo Seminuevos: PNG con fondo blanco → mix-blend-mode: screen
+   para que el blanco se "queme" sobre el header oscuro y solo se
+   vea la marca. NUNCA dejar fondo blanco visible. */
+.header-logo { height: 42px; max-width: 200px; width: auto; opacity: 1; display: block; mix-blend-mode: screen; }
+@media(min-width:768px){ .header-logo { height: 52px; max-width: 240px; } }
 .header-logo-gp-wrap { display: inline-flex; align-items: center; justify-content: center; }
-.header-logo-gp { height: 36px; opacity: 0.95; display: block; }
-@media(min-width:768px){ .header-logo-gp { height: 44px; } }
-.header-logo-divider { width: 1px; height: 36px; background: rgba(255,255,255,0.2); }
+.header-logo-gp { height: 32px; opacity: 0.95; display: block; mix-blend-mode: screen; }
+@media(min-width:768px){ .header-logo-gp { height: 40px; } }
+.header-logo-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.2); }
 .header-badge {
   font-family: var(--font-body); font-size: 10px; font-weight: 700;
   color: rgba(255,255,255,0.7); letter-spacing: 1.5px; text-transform: uppercase;
@@ -140,7 +143,7 @@ body {
 }
 .hero::before {
   content:''; position:absolute; inset:0;
-  background: linear-gradient(90deg, #000 0%, rgba(0,0,0,0.88) 40%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.3) 100%);
+  background: linear-gradient(90deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.72) 35%, rgba(0,0,0,0.30) 65%, rgba(0,0,0,0.08) 100%);
   pointer-events:none;
 }
 .hero::after {
@@ -156,13 +159,13 @@ body {
 .hero-content { position: relative; z-index: 1; text-align: left; max-width: 640px; }
 @media (max-width: 768px) {
   .hero { padding: 64px 0 72px; min-height: auto; background-position: 65% center; }
-  .hero::before { background: linear-gradient(180deg, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.85) 50%, #000 100%); }
+  .hero::before { background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.72) 55%, rgba(0,0,0,0.82) 100%); }
   .hero-content { text-align: center; max-width: 100%; }
 }
 .hero-tagline {
   display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(66,153,225,0.12);
-  border: 1px solid rgba(66,153,225,0.35);
+  background: rgba(251,198,69,0.08);
+  border: 1px solid rgba(251,198,69,0.28);
   border-radius: var(--radius-full);
   padding: 8px 18px;
   font-size: 11px; font-weight: 700; color: var(--color-accent-2);
@@ -175,15 +178,17 @@ body {
 
 .hero h1 {
   font-family: var(--font-display);
-  font-size: clamp(34px, 6vw, 64px);
-  font-weight: 900; line-height: 1.04;
+  font-size: clamp(34px, 5.2vw, 60px);
+  font-weight: 900; line-height: 1.05;
   letter-spacing: -0.035em;
   margin-bottom: 20px;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-  hyphens: auto;
+  /* Nunca hifenizar palabras: "seminuevo" se rompía como "semi-nuevo". */
+  word-break: keep-all;
+  overflow-wrap: normal;
+  hyphens: none;
+  -webkit-hyphens: none;
 }
-@media (max-width: 480px) { .hero h1 { font-size: 30px; line-height: 1.06; } }
+@media (max-width: 480px) { .hero h1 { font-size: 28px; line-height: 1.08; letter-spacing: -0.02em; } }
 .hero h1 .gradient {
   background: linear-gradient(120deg, #FBC645, #FFD66B 50%, #fff);
   -webkit-background-clip: text;
@@ -220,10 +225,11 @@ body {
 @media (max-width: 768px) { .hero-legacy-strip { justify-content:center; margin-left:auto; margin-right:auto; } }
 .hero-sub {
   font-size: clamp(15px, 1.6vw, 18px);
-  color: rgba(255,255,255,0.7);
-  line-height: 1.65; margin-bottom: 40px;
-  max-width: 640px; margin-left: auto; margin-right: auto;
+  color: rgba(255,255,255,0.78);
+  line-height: 1.6; margin: 0 0 32px;
+  max-width: 560px;
 }
+@media (max-width: 768px) { .hero-sub { margin-left: auto; margin-right: auto; } }
 
 .hero-stats {
   display: flex; flex-wrap: wrap; gap: 10px; margin: 32px 0 28px;
@@ -1629,29 +1635,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <section class="hero">
   <div class="container">
     <div class="hero-content">
-      <div class="hero-eyebrow"><span class="heb-dot"></span>DESDE 1947 · GRUPO PLASENCIA AUTOMOTRIZ · 8 SUCURSALES EN GDL</div>
+      <div class="hero-eyebrow"><span class="heb-dot"></span>DESDE 1947 · GRUPO PLASENCIA · 8 SUCURSALES EN GDL</div>
       <div class="hero-tagline"><span class="dot"></span> Inventario certificado · actualizado al día</div>
-      <div class="hero-vp">Lo que ves es lo que recibes. Hace 75 años así.</div>
-      <h1>Tu próximo seminuevo,<br><span class="gradient">sin sorpresas.</span></h1>
+      <h1>Tu próximo<br>seminuevo,<br><span class="gradient">sin sorpresas.</span></h1>
       <p class="hero-sub">Inspección de 150 puntos, garantía de un año y factura original verificada. Crédito desde 12 meses.</p>
+      <!-- Stats consolidado: defensive ranges del strategy paper + datos dinámicos del feed -->
       <div class="hero-legacy-strip">
         <span><b>+75</b>años en GDL</span><span class="leg-sep">·</span>
         <span><b>8</b>sucursales</span><span class="leg-sep">·</span>
-        <span><b>+260</b>autos certificados</span>
-      </div>
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hero-stat-num" id="heroTotalBrands">…</div>
-          <div class="hero-stat-label">Marcas en lote</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num" id="heroTotalCars">…</div>
-          <div class="hero-stat-label">Autos ahora mismo</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num" id="heroMinPrice">…</div>
-          <div class="hero-stat-label">El más accesible</div>
-        </div>
+        <span><b id="heroTotalCars">+260</b>autos certificados</span><span class="leg-sep">·</span>
+        <span>desde <b id="heroMinPrice">$179K</b></span>
       </div>
       <button class="hero-cta" onclick="document.querySelector('.inventory-section').scrollIntoView({behavior:'smooth'})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -1699,7 +1692,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="trust-item" title="Sin sorpresas en el precio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg> Precio publicado · crédito desde 12 meses</div>
     <div class="trust-item" title="Sin sorpresas en el proceso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Te llama tu asesor en menos de 2 horas</div>
     <div class="trust-item" title="Sin sorpresas en la postventa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> 1 año de garantía escrita</div>
-    <div class="trust-item"><strong><svg class="trust-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-7h6v7"/></svg> 75 años · 8 sucursales en GDL</strong></div>
+    <div class="trust-item"><svg class="trust-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-7h6v7"/></svg> 75 años · 8 sucursales en GDL</div>
   </div>
 </div>
 
@@ -2109,6 +2102,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="confirmation-title">Listo. Esto es lo que sigue.</div>
         <p class="confirmation-subtitle" id="confirmSubtitle">Tu asesor te escribe por WhatsApp para confirmar la visita.</p>
 
+        <!-- Folio primero: es el dato operativo más importante para el vendedor -->
+        <div class="confirmation-folio" id="confirmFolio">GP-SEM-000000</div>
+
         <!-- QUE SIGUE -->
         <div class="next-steps">
           <div class="next-step-item">
@@ -2124,7 +2120,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="next-step-text">Llega a la sucursal con tu folio. El asesor ya tiene tus datos y el auto listo para mostrarte.</div>
           </div>
         </div>
-        <div class="confirmation-folio" id="confirmFolio">GP-SEM-000000</div>
 
         <div class="confirmation-details" id="confirmDetails"></div>
 
@@ -2375,7 +2370,13 @@ fetch('catalogo-piloto.json')
     const validPrices = vehicles.map(v => v.price).filter(p => typeof p === 'number' && p > 0);
     const minPrice = validPrices.length ? Math.min(...validPrices) : 0;
     const heroEl = document.getElementById('heroTotalCars');
-    if (heroEl) heroEl.textContent = n;
+    if (heroEl) {
+      // Defensive range según strategy paper: usar rango redondeado hacia abajo
+      // a la decena más cercana, con piso de +260. Evita rotar el copy del hero
+      // cada vez que sube/baja el inventario en 1-2 unidades.
+      const defensiveCount = Math.max(260, Math.floor(n / 10) * 10);
+      heroEl.textContent = '+' + defensiveCount;
+    }
     const heroBrandsEl = document.getElementById('heroTotalBrands');
     if (heroBrandsEl) heroBrandsEl.textContent = brandsCount > 0 ? brandsCount : '…';
     const heroMinEl = document.getElementById('heroMinPrice');
