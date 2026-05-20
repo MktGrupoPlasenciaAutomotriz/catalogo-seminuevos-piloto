@@ -2462,6 +2462,17 @@ function filterByTypeChip(val) {
 function filterByBrandSelect(val) { currentBrandFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_brand', filter_value: val, ...getTrackingContext() }); }
 function filterByPriceSelect(val) { currentPriceFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_price', filter_value: val, ...getTrackingContext() }); }
 function filterByLocSelect(val) { currentLocFilter = val; visibleCount = ITEMS_PER_PAGE; updateFilters(); if (val !== 'all') dataLayer.push({ event: 'filter_loc', filter_value: val, ...getTrackingContext() }); }
+
+// Normalizacion para matching de sucursal (sin acentos + lowercase + trim).
+// El JSON del catalogo trae 'Lopez Mateos' como 'López Mateos' (con acento),
+// 'Mazda Americas' como 'Mazda Américas', 'Mazda Galerias' como 'Mazda Galerías',
+// y 'Mazda Gonzalez Gallo' como 'Mazda González Gallo'. Los chips HTML estan sin
+// acentos. Sin esta normalizacion, esos 4 chips filtraban a 0 autos (LM=41 autos,
+// Americas=30, Galerias=27, GonzalezGallo=13 todos invisibles).
+function normLoc(s) {
+  if (!s) return '';
+  return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+}
 // Datos de las 8 sucursales del piloto Seminuevos. Direcciones via Google Maps query (no inventamos coords).
 var SEDE_INFO = {
   'Lopez Mateos': { nombre: 'Seminuevos Plasencia · López Mateos', direccion: 'Av. López Mateos Sur 2600, Jardines del Sol, Zapopan, Jal.', horario: 'Lun a Vie 9:00-18:00 · Sáb 9:00-14:00', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.6418057207534!2d-103.4083277!3d20.643452099999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ac5c80179401%3A0x8ed321a0e1445e25!2sSeminuevos%20Plasencia!5e0!3m2!1ses!2smx!4v1774907986396!5m2!1ses!2smx' },
@@ -2635,7 +2646,7 @@ function _priceLabel(p){return p;}
 function _countWithoutFilter(skipKey) {
   var arr = vehicles;
   if (skipKey !== 'tipo' && currentFilter !== 'all') arr = arr.filter(function(v){return _norm(v.type) === _norm(currentFilter);});
-  if (skipKey !== 'sede' && currentLocFilter !== 'all') arr = arr.filter(function(v){return v.loc === currentLocFilter;});
+  if (skipKey !== 'sede' && currentLocFilter !== 'all') arr = arr.filter(function(v){return normLoc(v.loc) === normLoc(currentLocFilter);});
   if (skipKey !== 'marca' && currentBrandFilter !== 'all') {
     if (currentBrandFilter === '_other') arr = arr.filter(function(v){return !TOP_BRANDS.includes(v.brand);});
     else arr = arr.filter(function(v){return v.brand === currentBrandFilter;});
@@ -2721,9 +2732,10 @@ function renderCards(filter) {
     ? vehicles
     : vehicles.filter(v => _norm(v.type) === _norm(filter));
 
-  // Filtro de ubicación
+  // Filtro de ubicación — normalizado para resilir a diferencias de acentos
+  // entre el JSON del catalogo y los chips HTML (ver normLoc arriba).
   if (currentLocFilter !== 'all') {
-    filtered = filtered.filter(v => v.loc === currentLocFilter);
+    filtered = filtered.filter(v => normLoc(v.loc) === normLoc(currentLocFilter));
   }
 
   // Filtro de marca
