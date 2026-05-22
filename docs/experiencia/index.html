@@ -361,7 +361,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </main>
 
 <div class="institutional-footer">
-  Plasencia Seminuevos &middot; Tu opinion la lee directo el Director.
+  Plasencia Seminuevos &middot; Tu opinión la lee directo el Director.
 </div>
 
 <script>
@@ -427,51 +427,51 @@ function spaSetStep(stepId, titleSuffix) {
 const FLOW = [
   { id: 'welcome',   render: renderWelcome },
   { id: 'q1',        render: () => renderRadio('q1',
-      '¿Recuerdas haber registrado tu interes en un auto con Plasencia Seminuevos?', [
-        { v: 'si',          label: 'Si, lo recuerdo' },
+      '¿Recuerdas haber registrado tu interés en un auto con Plasencia Seminuevos?', [
+        { v: 'si',          label: 'Sí, lo recuerdo' },
         { v: 'no_recuerdo', label: 'No recuerdo bien' },
-        { v: 'no_fui_yo',   label: 'No fui yo, alguien uso mi informacion' },
+        { v: 'no_fui_yo',   label: 'No fui yo, alguien usó mi información' },
       ]),
     next: () => answers.q1 === 'no_fui_yo' ? 'cierre_fraude' : 'q2'
   },
   { id: 'q2',        render: () => renderRadio('q2',
-      '¿Alguien del equipo de Plasencia te contacto despues de tu registro?', [
-        { v: 'varias_veces',   label: 'Si, varias veces' },
-        { v: 'una_vez',        label: 'Si, una vez' },
+      '¿Alguien del equipo de Plasencia te contactó después de tu registro?', [
+        { v: 'varias_veces',   label: 'Sí, varias veces' },
+        { v: 'una_vez',        label: 'Sí, una vez' },
         { v: 'no_contactado',  label: 'No me han contactado' },
         { v: 'no_recuerdo',    label: 'No recuerdo' },
       ]),
     next: () => (answers.q2 === 'no_contactado' || answers.q2 === 'no_recuerdo') ? 'q4' : 'q3'
   },
   { id: 'q3',        render: () => renderRadio('q3',
-      '¿Que tan rapido te contactaron desde que diste tus datos?', [
-        { v: 'mismo_dia',     label: 'El mismo dia' },
-        { v: 'al_siguiente',  label: 'Al dia siguiente' },
-        { v: 'dos_tres_dias', label: '2 o 3 dias despues' },
-        { v: 'mas_tres_dias', label: 'Mas de 3 dias despues' },
+      '¿Qué tan rápido te contactaron desde que diste tus datos?', [
+        { v: 'mismo_dia',     label: 'El mismo día' },
+        { v: 'al_siguiente',  label: 'Al día siguiente' },
+        { v: 'dos_tres_dias', label: '2 o 3 días después' },
+        { v: 'mas_tres_dias', label: 'Más de 3 días después' },
         { v: 'no_recuerdo',   label: 'No recuerdo' },
       ]),
     next: () => 'q4'
   },
   { id: 'q4',        render: () => renderRadio('q4',
       '¿Visitaste alguna sucursal de Plasencia Seminuevos?', [
-        { v: 'si_fui',        label: 'Si, fui a la sucursal' },
-        { v: 'quise_ir',      label: 'Quise ir pero no se concreto' },
+        { v: 'si_fui',        label: 'Sí, fui a la sucursal' },
+        { v: 'quise_ir',      label: 'Quise ir pero no se concretó' },
         { v: 'no_fui',        label: 'No fui a la sucursal' },
       ]),
     next: () => 'q4b'
   },
-  // q4b/q4c/q4d — validacion de compra real (deteccion de cartera robada)
+  // q4b/q4c/q4d — validación de compra real (detección de cartera robada)
   { id: 'q4b',       render: () => renderRadio('q4b',
-      'Mas alla de tu interes inicial, ¿finalmente compraste algun auto seminuevo en estos meses?', [
-        { v: 'si',              label: 'Si, compre un auto' },
-        { v: 'sigo_buscando',   label: 'Sigo buscando, aun no compro' },
+      'Más allá de tu interés inicial, ¿finalmente compraste algún auto seminuevo en estos meses?', [
+        { v: 'si',              label: 'Sí, compré un auto' },
+        { v: 'sigo_buscando',   label: 'Sigo buscando, aún no compro' },
         { v: 'no',              label: 'No, ya no voy a comprar' },
       ]),
     next: () => answers.q4b === 'si' ? 'q4c' : postQ4Logic()
   },
   { id: 'q4c',       render: () => renderRadio('q4c',
-      '¿Donde lo compraste?', [
+      '¿Dónde lo compraste?', [
         { v: 'en_plasencia',     label: 'En Plasencia Seminuevos' },
         { v: 'en_otra_agencia',  label: 'En otra agencia' },
         { v: 'a_un_particular',  label: 'A un particular' },
@@ -481,8 +481,8 @@ const FLOW = [
   },
   { id: 'q4d',       render: renderQ4d, next: () => postQ4Logic() },
   { id: 'q5',        render: () => renderScale('q5',
-      'Califica la atencion del vendedor que te atendio',
-      'Pesima', 'Excelente'),
+      'Califica la atención del vendedor que te atendió',
+      'Pésima', 'Excelente'),
     next: () => 'q6'
   },
   { id: 'q6',        render: () => renderScale('q6',
@@ -491,21 +491,21 @@ const FLOW = [
     next: () => (surveyData?.etapa_al_enviar === 'Ganada' || answers.q4b === 'si') ? 'q8' : 'q7'
   },
   { id: 'q7',        render: () => renderRadio('q7',
-      'Si finalmente NO compraste con Plasencia, ¿cual fue la razon principal?', [
+      'Si finalmente NO compraste con Plasencia, ¿cuál fue la razón principal?', [
         { v: 'precio',           label: 'El precio' },
-        { v: 'no_convencio',     label: 'No me convencio el auto' },
-        { v: 'otra_agencia',     label: 'Encontre algo mejor en otra agencia' },
+        { v: 'no_convencio',     label: 'No me convenció el auto' },
+        { v: 'otra_agencia',     label: 'Encontré algo mejor en otra agencia' },
         { v: 'mal_seguimiento',  label: 'Mal trato o seguimiento' },
-        { v: 'deje_necesitarlo', label: 'Deje de necesitarlo' },
+        { v: 'deje_necesitarlo', label: 'Dejé de necesitarlo' },
         { v: 'sigo_proceso',     label: 'Sigo en proceso, no he decidido' },
-        { v: 'otra',             label: 'Otra razon' },
+        { v: 'otra',             label: 'Otra razón' },
       ]),
     next: () => 'q8'
   },
   { id: 'q8',        render: () => renderRadio('q8',
-      '¿Comprarias un auto seminuevo con Plasencia en el futuro?', [
-        { v: 'definitivamente_si',   label: 'Definitivamente si' },
-        { v: 'probablemente_si',     label: 'Probablemente si' },
+      '¿Comprarías un auto seminuevo con Plasencia en el futuro?', [
+        { v: 'definitivamente_si',   label: 'Definitivamente sí' },
+        { v: 'probablemente_si',     label: 'Probablemente sí' },
         { v: 'tal_vez',              label: 'Tal vez' },
         { v: 'probablemente_no',     label: 'Probablemente no' },
         { v: 'definitivamente_no',   label: 'Definitivamente no' },
@@ -525,7 +525,7 @@ function setProgress(stepId) {
   else if (stepId === 'submit' || stepId === 'cierre' || stepId === 'cierre_fraude') {
     counter.textContent = ''; fill.style.width = '100%';
   } else {
-    counter.textContent = `Paso ${currentIdx} de ${totalSteps - 1}`;
+    counter.textContent = `Pregunta ${currentIdx} de ${totalSteps - 1}`;
     fill.style.width = `${(currentIdx / (totalSteps - 1)) * 100}%`;
   }
 }
@@ -536,17 +536,17 @@ async function init() {
     const resp = await fetch(`${API_BASE}/api/lead/experiencia/${encodeURIComponent(TOKEN)}`);
     const data = await resp.json();
     if (!resp.ok) {
-      if (data.error === 'expired') return showError('Link expirado', data.message || 'Este link ya expiro.');
-      if (data.error === 'not_found') return showError('Link no encontrado', 'El link no es valido o ya expiro.');
+      if (data.error === 'expired') return showError('Link expirado', data.message || 'Este link ya expiró.');
+      if (data.error === 'not_found') return showError('Link no encontrado', 'El link no es válido o ya expiró.');
       return showError('Error al cargar', 'No pudimos cargar tu encuesta. Intenta de nuevo en un momento.');
     }
     if (data.already_responded) {
-      return showSuccess('Ya respondiste esta encuesta', 'Gracias por haber compartido tu experiencia. Si quieres agregar algo, contactanos por WhatsApp.');
+      return showSuccess('Ya respondiste esta encuesta', 'Gracias por haber compartido tu experiencia. Si quieres agregar algo, contáctanos por WhatsApp.');
     }
     surveyData = data;
     goto('welcome');
   } catch (e) {
-    showError('Sin conexion', 'Verifica tu internet e intenta de nuevo.');
+    showError('Sin conexión', 'Verifica tu internet e intenta de nuevo.');
   }
 }
 
@@ -595,14 +595,14 @@ function renderWelcome() {
   $('#app').innerHTML = `
     <div class="card step">
       <h1>Hola ${escapeHtml(d.primer_nombre)} 👋</h1>
-      <p>Hace tiempo registraste interes en un auto en Plasencia Seminuevos. Queremos saber como te trataron y que podemos mejorar.</p>
+      <p>Hace tiempo registraste interés en un auto en Plasencia Seminuevos. Queremos saber cómo te trataron y qué podemos mejorar.</p>
       <div class="lead-context">
         ${d.auto_interes ? `<div class="row"><span>🚗</span><div><strong>${escapeHtml(d.auto_interes)}</strong></div></div>` : ''}
         ${d.sucursal ? `<div class="row"><span>📍</span><div>Sucursal <strong>${escapeHtml(d.sucursal)}</strong></div></div>` : ''}
         ${fecha ? `<div class="row"><span>📅</span><div>Registrado el <strong>${fecha}</strong></div></div>` : ''}
-        <div class="disclaimer">Si algun dato no coincide contigo, escribelo al final en el comentario.</div>
+        <div class="disclaimer">Si algún dato no coincide contigo, escríbelo al final en el comentario.</div>
       </div>
-      <p>Son 8 preguntas, menos de 2 minutos. Tu respuesta llega directo al equipo de direccion. Es confidencial.</p>
+      <p>Son 8 preguntas, menos de 2 minutos. Tu respuesta llega directo al equipo de dirección. Es confidencial.</p>
       <div class="actions">
         <button class="btn btn-primary" onclick="goto('q1')">Empezar &nbsp;→</button>
       </div>
@@ -622,7 +622,7 @@ function renderRadio(key, question, options) {
       <h2>${question}</h2>
       <div class="options">${opts}</div>
       <div class="actions">
-        ${stepIndex > 1 ? '<button class="btn btn-ghost" onclick="back()">← Atras</button>' : '<span></span>'}
+        ${stepIndex > 1 ? '<button class="btn btn-ghost" onclick="back()">← Atrás</button>' : '<span></span>'}
         <button class="btn btn-primary" id="btnNext" ${answers[key] ? '' : 'disabled'} onclick="nextStep()">Siguiente →</button>
       </div>
     </div>
@@ -640,7 +640,7 @@ function renderRadio(key, question, options) {
 
 function renderScale(key, question, labelLow, labelHigh) {
   const buttons = [1,2,3,4,5].map(n => {
-    const labels = ['Pesimo','Malo','Regular','Bueno','Excelente'];
+    const labels = ['Pésimo','Malo','Regular','Bueno','Excelente'];
     return `<button class="scale-btn ${answers[key] == n ? 'selected' : ''}" data-v="${n}">${n}<small>${labels[n-1]}</small></button>`;
   }).join('');
   $('#app').innerHTML = `
@@ -649,7 +649,7 @@ function renderScale(key, question, labelLow, labelHigh) {
       <div class="scale">${buttons}</div>
       <div class="scale-labels"><span>${labelLow}</span><span>${labelHigh}</span></div>
       <div class="actions">
-        <button class="btn btn-ghost" onclick="back()">← Atras</button>
+        <button class="btn btn-ghost" onclick="back()">← Atrás</button>
         <button class="btn btn-primary" id="btnNext" ${answers[key] ? '' : 'disabled'} onclick="nextStep()">Siguiente →</button>
       </div>
     </div>
@@ -664,7 +664,7 @@ function renderScale(key, question, labelLow, labelHigh) {
   });
 }
 
-// Despues de q4 (o q4b/c/d): si q2 fue "no me contactaron" → salta q5 (atencion).
+// Después de q4 (o q4b/c/d): si q2 fue "no me contactaron" → salta q5 (atención).
 function postQ4Logic() {
   return (answers.q2 === 'no_contactado' || answers.q2 === 'no_recuerdo') ? 'q6' : 'q5';
 }
@@ -673,12 +673,12 @@ function renderQ4d() {
   const v = answers.q4d || '';
   $('#app').innerHTML = `
     <div class="card step">
-      <h2>Para confirmarlo en nuestros sistemas, ¿que modelo compraste y en que sucursal?</h2>
-      <p class="muted">A veces los registros internos se quedan incompletos. Ayudanos a tener la informacion correcta.</p>
-      <textarea id="q4dBox" maxlength="200" placeholder="ej. Mazda 3 2020, sucursal Lopez Mateos, fecha aproximada marzo">${escapeHtml(v)}</textarea>
+      <h2>Para confirmarlo en nuestros sistemas, ¿qué modelo compraste y en qué sucursal?</h2>
+      <p class="muted">A veces los registros internos se quedan incompletos. Ayúdanos a tener la información correcta.</p>
+      <textarea id="q4dBox" maxlength="200" placeholder="ej. Mazda 3 2020, sucursal López Mateos, fecha aproximada marzo">${escapeHtml(v)}</textarea>
       <div class="char-counter"><span id="q4dCount">${v.length}</span> / 200</div>
       <div class="actions">
-        <button class="btn btn-ghost" onclick="back()">← Atras</button>
+        <button class="btn btn-ghost" onclick="back()">← Atrás</button>
         <button class="btn btn-primary" id="btnNext" ${v.trim().length >= 3 ? '' : 'disabled'} onclick="nextStep()">Siguiente →</button>
       </div>
     </div>
@@ -697,10 +697,10 @@ function renderComment() {
     <div class="card step">
       <h2>¿Algo que el equipo deba saber para mejorar?</h2>
       <p class="muted">Opcional. Tu comentario lo lee directo el Director. Escribe lo que quieras.</p>
-      <textarea id="commentBox" maxlength="1000" placeholder="(Opcional) Aqui puedes escribir lo que quieras compartir...">${escapeHtml(v)}</textarea>
+      <textarea id="commentBox" maxlength="1000" placeholder="(Opcional) Aquí puedes escribir lo que quieras compartir...">${escapeHtml(v)}</textarea>
       <div class="char-counter"><span id="charCount">${v.length}</span> / 1000</div>
       <div class="actions">
-        <button class="btn btn-ghost" onclick="back()">← Atras</button>
+        <button class="btn btn-ghost" onclick="back()">← Atrás</button>
         <button class="btn btn-primary cta-cierre" onclick="saveCommentAndSubmit()">Enviar mi respuesta ✓</button>
       </div>
     </div>
@@ -746,7 +746,7 @@ async function submit() {
         if (typeof dataLayer !== 'undefined') {
           dataLayer.push({ event: 'experience_survey_already_responded', ...getTrackingContext() });
         }
-        return showSuccess('Ya respondiste esta encuesta', 'Gracias por tu tiempo.');
+        return showSuccess('Ya respondiste esta encuesta', '¡Gracias por tu tiempo!');
       }
       if (typeof dataLayer !== 'undefined') {
         dataLayer.push({ event: 'experience_survey_submit_error', error_code: data.error || resp.status, ...getTrackingContext() });
@@ -776,24 +776,24 @@ async function submit() {
     if (typeof dataLayer !== 'undefined') {
       dataLayer.push({ event: 'experience_survey_submit_error', error_code: 'network', ...getTrackingContext() });
     }
-    showError('Sin conexion', 'Verifica tu internet e intenta de nuevo.');
+    showError('Sin conexión', 'Verifica tu internet e intenta de nuevo.');
   }
 }
 
 function renderCierre() {
   setProgress('cierre');
-  // Escape valve: si calificacion atencion o seguimiento <=2, ofrecemos contacto directo
+  // Escape valve: si calificación atención o seguimiento <=2, ofrecemos contacto directo
   const atencion = parseInt(answers.q5 || '5', 10);
   const seguimiento = parseInt(answers.q6 || '5', 10);
   const ofrecerContacto = atencion <= 2 || seguimiento <= 2;
-  const waMsg = encodeURIComponent(`Hola, soy ${surveyData?.primer_nombre || ''}. Acabo de responder la encuesta de experiencia (folio ${surveyData?.folio || ''}) y queria comentarte algo directamente.`);
+  const waMsg = encodeURIComponent(`Hola, soy ${surveyData?.primer_nombre || ''}. Acabo de responder la encuesta de experiencia (folio ${surveyData?.folio || ''}) y quería comentarte algo directamente.`);
   $('#app').innerHTML = `
     <div class="card step state-msg">
       <div class="cierre-icon">✓</div>
       <h2>¡Gracias, ${escapeHtml(surveyData?.primer_nombre || 'por tu tiempo')}!</h2>
-      <p>Tu respuesta ya llego al equipo de direccion. La vamos a usar para mejorar el servicio y entender donde estamos fallando.</p>
+      <p>Tu respuesta ya llegó al equipo de dirección. La vamos a usar para mejorar el servicio y entender dónde estamos fallando.</p>
       ${ofrecerContacto ? `
-        <p class="muted" style="margin-top: 20px;">¿Quieres compartir mas detalles directamente con el Director de Marketing?</p>
+        <p class="muted" style="margin-top: 20px;">¿Quieres compartir más detalles directamente con el Director de Marketing?</p>
         <a class="btn btn-wa" href="https://wa.me/${DIRECTOR_WA}?text=${waMsg}" target="_blank" rel="noopener">
           💬 Hablar con el Director de Marketing por WhatsApp
         </a>
@@ -808,8 +808,8 @@ function renderCierreFraude() {
     <div class="card step state-msg">
       <div class="icon">🛡️</div>
       <h2>Gracias por avisarnos</h2>
-      <p>Vamos a revisar el registro. Si quieres compartir mas detalles, escribenos:</p>
-      <a class="btn btn-wa" href="https://wa.me/${DIRECTOR_WA}?text=${encodeURIComponent('Hola, alguien uso mi informacion para registrar interes en un auto en Plasencia Seminuevos (folio ' + (surveyData?.folio || '') + ').')}" target="_blank" rel="noopener">
+      <p>Vamos a revisar el registro. Si quieres compartir más detalles, escríbenos:</p>
+      <a class="btn btn-wa" href="https://wa.me/${DIRECTOR_WA}?text=${encodeURIComponent('Hola, alguien usó mi información para registrar interés en un auto en Plasencia Seminuevos (folio ' + (surveyData?.folio || '') + ').')}" target="_blank" rel="noopener">
         💬 Reportar al Director de Marketing por WhatsApp
       </a>
     </div>
