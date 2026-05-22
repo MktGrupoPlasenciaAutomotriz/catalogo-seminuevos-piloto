@@ -638,9 +638,9 @@ function renderCierre() {
       <h2>¡Gracias, ${escapeHtml(surveyData?.primer_nombre || 'por tu tiempo')}!</h2>
       <p>Tu respuesta ya llego al equipo de direccion. La vamos a usar para mejorar el servicio y entender donde estamos fallando.</p>
       ${ofrecerContacto ? `
-        <p class="muted" style="margin-top: 20px;">¿Quieres compartir mas detalles directamente con el Director?</p>
+        <p class="muted" style="margin-top: 20px;">¿Quieres compartir mas detalles directamente con el Director de Marketing?</p>
         <a class="btn btn-wa" href="https://wa.me/${DIRECTOR_WA}?text=${waMsg}" target="_blank" rel="noopener">
-          💬 Hablar con el Director por WhatsApp
+          💬 Hablar con el Director de Marketing por WhatsApp
         </a>
       ` : ''}
     </div>
@@ -655,7 +655,7 @@ function renderCierreFraude() {
       <h2>Gracias por avisarnos</h2>
       <p>Vamos a revisar el registro. Si quieres compartir mas detalles, escribenos:</p>
       <a class="btn btn-wa" href="https://wa.me/${DIRECTOR_WA}?text=${encodeURIComponent('Hola, alguien uso mi informacion para registrar interes en un auto en Plasencia Seminuevos (folio ' + (surveyData?.folio || '') + ').')}" target="_blank" rel="noopener">
-        💬 Reportar al Director por WhatsApp
+        💬 Reportar al Director de Marketing por WhatsApp
       </a>
     </div>
   `;
