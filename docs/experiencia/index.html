@@ -1,6 +1,13 @@
 <!doctype html>
 <html lang="es-MX">
 <head>
+<!-- Google Tag Manager — mismo container que la landing principal Seminuevos -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WKV7LZ7T');</script>
+<!-- End Google Tag Manager -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
@@ -329,6 +336,10 @@
 </style>
 </head>
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKV7LZ7T"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
 <header class="app-header" id="appHeader">
   <div class="row">
@@ -363,6 +374,54 @@ const TOKEN = params.get('t') || params.get('token') || '';
 let surveyData = null;
 let answers = {};
 let stepIndex = 0;
+
+// ── Tracking context (mismo patron que landing Seminuevos canonica) ──
+// UTM, click IDs, ga_client_id (de cookie _ga), folio del lead.
+// Se incluye en cada dataLayer.push para mantener atribucion en GA4.
+function getTrackingContext() {
+  const utm = {};
+  const u = new URLSearchParams(location.search);
+  ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gclid','fbclid','msclkid','wbraid','gbraid','ttclid'].forEach(k => {
+    const v = u.get(k); if (v) utm[k] = v;
+  });
+  let gaClientId = '';
+  try {
+    const m = document.cookie.match(/_ga=GA1\.\d+\.([0-9]+\.[0-9]+)/);
+    if (m) gaClientId = m[1];
+  } catch(e) {}
+  return {
+    ga_client_id: gaClientId,
+    folio: surveyData?.folio || '',
+    marca: 'seminuevos',
+    sucursal: surveyData?.sucursal || '',
+    vendedor_asignado: surveyData?.vendedor_nombre || '',
+    etapa_origen: surveyData?.etapa_al_enviar || '',
+    ...utm,
+  };
+}
+
+// SPA navigation: cada paso es un "page" en GA4 via virtual_pageview.
+// Usamos hash (#paso-N) en lugar de pathname porque seminuevos.grupoplasencia.com
+// no tiene server-side routing para /experiencia/<step>.
+function spaSetStep(stepId, titleSuffix) {
+  const hash = '#' + stepId;
+  const targetUrl = location.pathname + location.search + hash;
+  if (location.pathname + location.search + location.hash !== targetUrl) {
+    try { history.replaceState({ step: stepId }, '', targetUrl); } catch(e) {}
+  }
+  const title = 'Voz del Cliente · ' + (titleSuffix || stepId);
+  document.title = title;
+  if (typeof dataLayer !== 'undefined') {
+    dataLayer.push({
+      event: 'virtual_pageview',
+      page_path: targetUrl,
+      page_title: title,
+      page_location: location.origin + targetUrl,
+      step: stepId,
+      ...getTrackingContext(),
+    });
+  }
+}
 
 // Definicion del flujo de pantallas con logica condicional
 const FLOW = [
@@ -503,6 +562,26 @@ function showSuccess(title, msg) {
 function goto(stepId) {
   stepIndex = FLOW.findIndex(s => s.id === stepId);
   setProgress(stepId);
+  // SPA: actualiza URL + dispara virtual_pageview en cada paso
+  const STEP_TITLES = {
+    welcome: 'Bienvenida',
+    q1: 'P1 — Recuerda registro',
+    q2: 'P2 — Contacto recibido',
+    q3: 'P3 — Velocidad de contacto',
+    q4: 'P4 — Visita a sucursal',
+    q4b: 'P5 — Compraste auto',
+    q4c: 'P6 — Donde compraste',
+    q4d: 'P7 — Modelo y sucursal',
+    q5: 'P8 — Atencion vendedor',
+    q6: 'P9 — Seguimiento',
+    q7: 'P10 — Razon no compra',
+    q8: 'P11 — Comprarias futuro',
+    q9: 'P12 — Comentario libre',
+    submit: 'Enviando',
+    cierre: 'Gracias',
+    cierre_fraude: 'Reporte fraude',
+  };
+  spaSetStep(stepId, STEP_TITLES[stepId] || stepId);
   if (stepId === 'submit') return submit();
   if (stepId === 'cierre_fraude') return renderCierreFraude();
   if (stepId === 'cierre') return renderCierre();
@@ -662,11 +741,41 @@ async function submit() {
     });
     const data = await resp.json();
     if (!resp.ok) {
-      if (data.error === 'already_responded') return showSuccess('Ya respondiste esta encuesta', 'Gracias por tu tiempo.');
+      if (data.error === 'already_responded') {
+        // GA4: registramos intentos duplicados como evento separado para debug
+        if (typeof dataLayer !== 'undefined') {
+          dataLayer.push({ event: 'experience_survey_already_responded', ...getTrackingContext() });
+        }
+        return showSuccess('Ya respondiste esta encuesta', 'Gracias por tu tiempo.');
+      }
+      if (typeof dataLayer !== 'undefined') {
+        dataLayer.push({ event: 'experience_survey_submit_error', error_code: data.error || resp.status, ...getTrackingContext() });
+      }
       return showError('No pudimos guardar tu respuesta', 'Intenta de nuevo en un momento.');
+    }
+    // ── EVENTO DE CONVERSION ───────────────────────────────────────────
+    // event_id usa el folio del lead original (ej. GP-SEM-260518-121556),
+    // mismo identificador que vive en D1 (experience_survey.folio) y se
+    // ve en el dashboard /voz-cliente. Permite cross-reference GA4 ↔ CRM.
+    if (typeof dataLayer !== 'undefined') {
+      dataLayer.push({
+        event: 'experience_survey_completed',
+        event_id: (surveyData?.folio || '') + '_ExperienciaSubmit',
+        survey_id: data.survey_id,
+        // Respuestas clave como custom params (registrar en GA4 como custom dimensions)
+        declaro_compra: answers.q4b || '',
+        donde_compro: answers.q4c || '',
+        atencion: answers.q5 || '',
+        seguimiento: answers.q6 || '',
+        compraria_futuro: answers.q8 || '',
+        ...getTrackingContext(),
+      });
     }
     renderCierre();
   } catch (e) {
+    if (typeof dataLayer !== 'undefined') {
+      dataLayer.push({ event: 'experience_survey_submit_error', error_code: 'network', ...getTrackingContext() });
+    }
     showError('Sin conexion', 'Verifica tu internet e intenta de nuevo.');
   }
 }
