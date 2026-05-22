@@ -400,8 +400,27 @@ const FLOW = [
         { v: 'quise_ir',      label: 'Quise ir pero no se concreto' },
         { v: 'no_fui',        label: 'No fui a la sucursal' },
       ]),
-    next: () => (answers.q2 === 'no_contactado') ? 'q6' : 'q5'
+    next: () => 'q4b'
   },
+  // q4b/q4c/q4d — validacion de compra real (deteccion de cartera robada)
+  { id: 'q4b',       render: () => renderRadio('q4b',
+      'Mas alla de tu interes inicial, ¿finalmente compraste algun auto seminuevo en estos meses?', [
+        { v: 'si',              label: 'Si, compre un auto' },
+        { v: 'sigo_buscando',   label: 'Sigo buscando, aun no compro' },
+        { v: 'no',              label: 'No, ya no voy a comprar' },
+      ]),
+    next: () => answers.q4b === 'si' ? 'q4c' : postQ4Logic()
+  },
+  { id: 'q4c',       render: () => renderRadio('q4c',
+      '¿Donde lo compraste?', [
+        { v: 'en_plasencia',     label: 'En Plasencia Seminuevos' },
+        { v: 'en_otra_agencia',  label: 'En otra agencia' },
+        { v: 'a_un_particular',  label: 'A un particular' },
+        { v: 'prefiero_no_decir', label: 'Prefiero no decir' },
+      ]),
+    next: () => answers.q4c === 'en_plasencia' ? 'q4d' : postQ4Logic()
+  },
+  { id: 'q4d',       render: renderQ4d, next: () => postQ4Logic() },
   { id: 'q5',        render: () => renderScale('q5',
       'Califica la atencion del vendedor que te atendio',
       'Pesima', 'Excelente'),
@@ -410,7 +429,7 @@ const FLOW = [
   { id: 'q6',        render: () => renderScale('q6',
       'Califica el seguimiento posterior (o la falta del mismo)',
       'Nulo o muy malo', 'Excelente'),
-    next: () => (surveyData?.etapa_al_enviar === 'Ganada') ? 'q8' : 'q7'
+    next: () => (surveyData?.etapa_al_enviar === 'Ganada' || answers.q4b === 'si') ? 'q8' : 'q7'
   },
   { id: 'q7',        render: () => renderRadio('q7',
       'Si finalmente NO compraste con Plasencia, ¿cual fue la razon principal?', [
@@ -563,6 +582,33 @@ function renderScale(key, question, labelLow, labelHigh) {
       answers[key] = el.dataset.v;
       $('#btnNext').disabled = false;
     });
+  });
+}
+
+// Despues de q4 (o q4b/c/d): si q2 fue "no me contactaron" → salta q5 (atencion).
+function postQ4Logic() {
+  return (answers.q2 === 'no_contactado' || answers.q2 === 'no_recuerdo') ? 'q6' : 'q5';
+}
+
+function renderQ4d() {
+  const v = answers.q4d || '';
+  $('#app').innerHTML = `
+    <div class="card step">
+      <h2>Para confirmarlo en nuestros sistemas, ¿que modelo compraste y en que sucursal?</h2>
+      <p class="muted">A veces los registros internos se quedan incompletos. Ayudanos a tener la informacion correcta.</p>
+      <textarea id="q4dBox" maxlength="200" placeholder="ej. Mazda 3 2020, sucursal Lopez Mateos, fecha aproximada marzo">${escapeHtml(v)}</textarea>
+      <div class="char-counter"><span id="q4dCount">${v.length}</span> / 200</div>
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="back()">← Atras</button>
+        <button class="btn btn-primary" id="btnNext" ${v.trim().length >= 3 ? '' : 'disabled'} onclick="nextStep()">Siguiente →</button>
+      </div>
+    </div>
+  `;
+  const box = $('#q4dBox');
+  box.addEventListener('input', () => {
+    $('#q4dCount').textContent = box.value.length;
+    answers.q4d = box.value;
+    $('#btnNext').disabled = box.value.trim().length < 3;
   });
 }
 
