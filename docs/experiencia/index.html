@@ -541,9 +541,34 @@ async function init() {
       return showError('Error al cargar', 'No pudimos cargar tu encuesta. Intenta de nuevo en un momento.');
     }
     if (data.already_responded) {
+      try { localStorage.removeItem('experiencia_pending_' + TOKEN); } catch(e){}
       return showSuccess('Ya respondiste esta encuesta', 'Gracias por haber compartido tu experiencia. Si quieres agregar algo, contáctanos por WhatsApp.');
     }
     surveyData = data;
+
+    // RECOVERY: si hay respuestas pendientes de un submit fallido previo,
+    // ofrece al cliente recuperarlas en lugar de empezar de cero.
+    let pending = null;
+    try {
+      const raw = localStorage.getItem('experiencia_pending_' + TOKEN);
+      if (raw) pending = JSON.parse(raw);
+    } catch(e) {}
+
+    if (pending && pending.responses && Object.keys(pending.responses).length > 0) {
+      const minutesAgo = Math.round((Date.now() - new Date(pending.attempted_at).getTime()) / 60000);
+      $('#app').innerHTML = `
+        <div class="card step">
+          <h2>Tenemos tus respuestas guardadas</h2>
+          <p>Hace ${minutesAgo > 0 ? minutesAgo + ' min' : 'unos momentos'} intentaste enviar tu encuesta pero el envío no se completó. Tus respuestas están seguras en este dispositivo.</p>
+          <div class="actions" style="flex-direction:column;gap:10px;">
+            <button class="btn btn-primary cta-cierre" style="width:100%;" onclick="resumePending()">Enviar mis respuestas guardadas</button>
+            <button class="btn btn-ghost" style="width:100%;" onclick="discardPending()">Empezar de nuevo</button>
+          </div>
+        </div>`;
+      window._pendingPayload = pending;
+      return;
+    }
+
     goto('welcome');
   } catch (e) {
     showError('Sin conexión', 'Verifica tu internet e intenta de nuevo.');
@@ -553,6 +578,18 @@ async function init() {
 function showError(title, msg) {
   $('#progressCounter').textContent = ''; $('#progressFill').style.width = '0%';
   $('#app').innerHTML = `<div class="card state-msg"><div class="icon">⚠️</div><h2>${title}</h2><p>${msg}</p></div>`;
+}
+
+// Resume pending submit from localStorage
+function resumePending() {
+  if (!window._pendingPayload) return;
+  answers = window._pendingPayload.responses || {};
+  submit();
+}
+function discardPending() {
+  try { localStorage.removeItem('experiencia_pending_' + TOKEN); } catch(e){}
+  window._pendingPayload = null;
+  goto('welcome');
 }
 function showSuccess(title, msg) {
   $('#progressCounter').textContent = ''; $('#progressFill').style.width = '100%';
@@ -731,53 +768,103 @@ function nextStep() {
   goto(step.next());
 }
 
-async function submit() {
-  $('#app').innerHTML = `<div class="card state-msg"><div class="icon">⏳</div><h2>Enviando tu respuesta...</h2></div>`;
+// Helper: POST con timeout 10s + retry exponencial (3 intentos)
+async function submitWithRetry(payload, attempt = 1) {
+  const TIMEOUT_MS = 10000;
+  const MAX_ATTEMPTS = 3;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
     const resp = await fetch(`${API_BASE}/api/lead/experiencia/submit`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: TOKEN, responses: answers })
+      body: JSON.stringify(payload),
+      signal: controller.signal,
     });
-    const data = await resp.json();
-    if (!resp.ok) {
-      if (data.error === 'already_responded') {
-        // GA4: registramos intentos duplicados como evento separado para debug
-        if (typeof dataLayer !== 'undefined') {
-          dataLayer.push({ event: 'experience_survey_already_responded', ...getTrackingContext() });
-        }
-        return showSuccess('Ya respondiste esta encuesta', '¡Gracias por tu tiempo!');
-      }
-      if (typeof dataLayer !== 'undefined') {
-        dataLayer.push({ event: 'experience_survey_submit_error', error_code: data.error || resp.status, ...getTrackingContext() });
-      }
-      return showError('No pudimos guardar tu respuesta', 'Intenta de nuevo en un momento.');
-    }
-    // ── EVENTO DE CONVERSION ───────────────────────────────────────────
-    // event_id usa el folio del lead original (ej. GP-SEM-260518-121556),
-    // mismo identificador que vive en D1 (experience_survey.folio) y se
-    // ve en el dashboard /voz-cliente. Permite cross-reference GA4 ↔ CRM.
-    if (typeof dataLayer !== 'undefined') {
-      dataLayer.push({
-        event: 'experience_survey_completed',
-        event_id: (surveyData?.folio || '') + '_ExperienciaSubmit',
-        survey_id: data.survey_id,
-        // Respuestas clave como custom params (registrar en GA4 como custom dimensions)
-        declaro_compra: answers.q4b || '',
-        donde_compro: answers.q4c || '',
-        atencion: answers.q5 || '',
-        seguimiento: answers.q6 || '',
-        compraria_futuro: answers.q8 || '',
-        ...getTrackingContext(),
-      });
-    }
-    renderCierre();
+    clearTimeout(timeoutId);
+    return { ok: resp.ok, status: resp.status, data: await resp.json().catch(() => ({})) };
   } catch (e) {
-    if (typeof dataLayer !== 'undefined') {
-      dataLayer.push({ event: 'experience_survey_submit_error', error_code: 'network', ...getTrackingContext() });
+    clearTimeout(timeoutId);
+    // Reintenta network errors o timeouts hasta MAX_ATTEMPTS
+    if (attempt < MAX_ATTEMPTS) {
+      const backoffMs = Math.min(1000 * Math.pow(2, attempt - 1), 4000);
+      await new Promise(r => setTimeout(r, backoffMs));
+      return submitWithRetry(payload, attempt + 1);
     }
-    showError('Sin conexión', 'Verifica tu internet e intenta de nuevo.');
+    return { ok: false, status: 0, data: {}, networkError: e.message || 'timeout' };
   }
+}
+
+async function submit() {
+  // BACKUP CRITICO: guarda respuestas en localStorage ANTES de hacer cualquier
+  // network call. Si el browser truena, el cliente recarga, o el submit falla,
+  // las respuestas viven aqui y pueden recuperarse. Persiste hasta que el
+  // submit sea exitoso confirmado por el servidor.
+  const payload = { token: TOKEN, responses: answers, attempted_at: new Date().toISOString() };
+  try { localStorage.setItem('experiencia_pending_' + TOKEN, JSON.stringify(payload)); } catch (e) {}
+
+  $('#app').innerHTML = `<div class="card state-msg"><div class="icon">⏳</div><h2>Enviando tu respuesta...</h2><p class="muted" style="margin-top:14px;font-size:13px;">Esto puede tardar unos segundos. Por favor no cierres esta ventana.</p></div>`;
+
+  const result = await submitWithRetry(payload);
+
+  // Network/timeout despues de 3 intentos
+  if (result.networkError) {
+    if (typeof dataLayer !== 'undefined') {
+      dataLayer.push({ event: 'experience_survey_submit_error', error_code: 'network_after_retry', error_msg: result.networkError, ...getTrackingContext() });
+    }
+    return showRetryableError('Tu respuesta NO se guardó', 'Tuvimos un problema de conexión. Tus respuestas están seguras en este dispositivo. Haz clic en "Intentar de nuevo" para enviarlas.', () => submit());
+  }
+
+  if (!result.ok) {
+    if (result.data.error === 'already_responded') {
+      try { localStorage.removeItem('experiencia_pending_' + TOKEN); } catch(e){}
+      if (typeof dataLayer !== 'undefined') {
+        dataLayer.push({ event: 'experience_survey_already_responded', ...getTrackingContext() });
+      }
+      return showSuccess('Ya respondiste esta encuesta', '¡Gracias por tu tiempo!');
+    }
+    if (typeof dataLayer !== 'undefined') {
+      dataLayer.push({ event: 'experience_survey_submit_error', error_code: result.data.error || result.status, ...getTrackingContext() });
+    }
+    // No-network errors (400, 410, 500): show retryable error too
+    return showRetryableError('No pudimos guardar tu respuesta', 'El servidor reportó un problema. Tus respuestas están seguras. Intenta de nuevo.', () => submit());
+  }
+
+  // ÉXITO CONFIRMADO por el servidor — limpia el backup
+  try { localStorage.removeItem('experiencia_pending_' + TOKEN); } catch(e){}
+
+  // ── EVENTO DE CONVERSION ───────────────────────────────────────────
+  if (typeof dataLayer !== 'undefined') {
+    dataLayer.push({
+      event: 'experience_survey_completed',
+      event_id: (surveyData?.folio || '') + '_ExperienciaSubmit',
+      survey_id: result.data.survey_id,
+      declaro_compra: answers.q4b || '',
+      donde_compro: answers.q4c || '',
+      atencion: answers.q5 || '',
+      seguimiento: answers.q6 || '',
+      compraria_futuro: answers.q8 || '',
+      ...getTrackingContext(),
+    });
+  }
+  renderCierre();
+}
+
+// Modal de error con boton de retry — NO destruye answers, permite reintentar
+function showRetryableError(title, msg, retryFn) {
+  $('#app').innerHTML = `
+    <div class="card state-msg">
+      <div class="icon">⚠️</div>
+      <h2>${title}</h2>
+      <p>${msg}</p>
+      <div style="margin-top:18px;">
+        <button class="btn btn-primary" style="width:100%;background:var(--color-conversion);" onclick="window._retryFn && window._retryFn()">Intentar de nuevo</button>
+      </div>
+      <p style="margin-top:14px;font-size:12px;color:var(--ink-500);">Si el problema sigue, contáctanos por WhatsApp y mándanos tu nombre + folio: <strong>${surveyData?.folio || ''}</strong></p>
+      <a class="btn btn-wa" style="margin-top:10px;" href="https://wa.me/${DIRECTOR_WA}?text=${encodeURIComponent('Hola, no pude enviar mi encuesta. Folio: ' + (surveyData?.folio || ''))}" target="_blank" rel="noopener">💬 Reportar el problema</a>
+    </div>
+  `;
+  window._retryFn = retryFn;
 }
 
 function renderCierre() {
