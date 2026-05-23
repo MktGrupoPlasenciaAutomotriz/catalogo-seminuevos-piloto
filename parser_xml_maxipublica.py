@@ -2,7 +2,7 @@
 Parser XML del feed oficial de Maxipublica.
 
 Fuente UNICA de verdad del catalogo Seminuevos Plasencia:
-  https://maxipublica-inventory-feeds.s3.amazonaws.com/campaigns/xml/group/vehicle_feed_group_e1490ae1e92f.xml
+  https://inventory-feed.maxipublica.com/campaigns/xml/group/vehicle_feed_group_e1490ae1e92f.xml
 
 Reemplaza al scraper anterior que pegaba al API JSON privado de la web.
 Cero invenciones: solo lo que viene en campos estructurados del XML, mas
@@ -22,7 +22,10 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 
 # ---------- Config ----------
-FEED_URL = "https://maxipublica-inventory-feeds.s3.amazonaws.com/campaigns/xml/group/vehicle_feed_group_e1490ae1e92f.xml"
+# 2026-05-23: Maxipublica migró el feed a su dominio propio (antes era el bucket
+# S3 directo: maxipublica-inventory-feeds.s3.amazonaws.com). Mismo archivo, mismo
+# contenido, host nuevo. Validado HTTP 200 + 3.2 MB el día del cambio.
+FEED_URL = "https://inventory-feed.maxipublica.com/campaigns/xml/group/vehicle_feed_group_e1490ae1e92f.xml"
 
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 CATALOGO_JSON = os.path.join(OUT_DIR, "catalogo.json")
