@@ -3013,9 +3013,14 @@ function bailoutToLocation() {
   try {
     dataLayer.push({
       event: 'sede_bailout',
+      item_id: currentCar ? (currentCar.id || '') : '',
+      vin: currentCar ? (currentCar.vin || '') : '',
       item_name: currentCar ? (currentCar.name + ' ' + currentCar.year) : '',
       item_price: currentCar ? currentCar.price : 0,
-      current_loc: currentCar ? currentCar.loc : ''
+      item_brand: currentCar ? (currentCar.brand || '') : '',
+      vehicle_year: currentCar ? currentCar.year : 0,
+      current_loc: currentCar ? currentCar.loc : '',
+      ...getTrackingContext()
     });
   } catch (e) {}
   if (typeof closeModal === 'function') closeModal();
@@ -3044,7 +3049,23 @@ function setView(viewName, detail) {
   const targetUrl = window.location.pathname + window.location.search + hash;
   if (window.location.pathname + window.location.search + window.location.hash === targetUrl) return;
   try { history.pushState({ view: viewName, detail: detail || null }, '', targetUrl); } catch(e) {}
-  dataLayer.push({ event: 'virtual_pageview', page_path: targetUrl, page_title: title, ...getTrackingContext() });
+  // virtual_pageview enriquecido con contexto del vehículo cuando aplique.
+  // Si la vista es de detalle ('vehiculo' con detail=id), incluimos item_id+vin
+  // para que ese page_view sea atribuible al listing exacto. Si es vista de
+  // listado / pantalla genérica, item_id/vin quedan vacíos.
+  dataLayer.push({
+    event: 'virtual_pageview',
+    page_path: targetUrl,
+    page_title: title,
+    item_id: (viewName === 'vehiculo' && currentCar) ? (currentCar.id || '') : '',
+    vin: (viewName === 'vehiculo' && currentCar) ? (currentCar.vin || '') : '',
+    item_name: (viewName === 'vehiculo' && currentCar) ? (currentCar.name + ' ' + currentCar.year) : '',
+    item_price: (viewName === 'vehiculo' && currentCar) ? currentCar.price : 0,
+    item_brand: (viewName === 'vehiculo' && currentCar) ? (currentCar.brand || '') : '',
+    vehicle_year: (viewName === 'vehiculo' && currentCar) ? currentCar.year : 0,
+    sede: (viewName === 'vehiculo' && currentCar) ? (currentCar.loc || '') : '',
+    ...getTrackingContext()
+  });
 }
 window.addEventListener('popstate', function() {
   _spaNavigating = true;
@@ -3194,6 +3215,8 @@ function openModal(id) {
     try {
       dataLayer.push({
         event: 'form_start',
+        item_id: currentCar.id || '',
+        vin: currentCar.vin || '',
         item_name: currentCar.name + ' ' + currentCar.year,
         item_price: currentCar.price,
         vehicle_brand: currentCar.brand || '',
@@ -3225,8 +3248,13 @@ function closeModal() {
         event: 'modal_close_before_submit',
         last_step_reached: currentFormStep,
         last_step_name: (FORM_STEP_HEADS[currentFormStep]||{}).title || '',
+        item_id: currentCar.id || '',
+        vin: currentCar.vin || '',
         item_name: currentCar.name + ' ' + currentCar.year,
         item_price: currentCar.price,
+        vehicle_brand: currentCar.brand || '',
+        vehicle_year: currentCar.year,
+        sede: currentCar.loc || '',
         ...getTrackingContext()
       });
     }
