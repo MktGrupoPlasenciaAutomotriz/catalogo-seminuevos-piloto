@@ -262,6 +262,13 @@ def parse_listing(listing):
     availability = (listing.findtext("availability") or "").strip().lower()
     state = (listing.findtext("state_of_vehicle") or "").strip().upper()
 
+    # VIN (Vehicle Identification Number). En el feed XML viene como <vin>...</vin>.
+    # Coverage real ~61% global, >95% en Bugambilias / Lopez Mateos / Mazda Plasencia / Acueducto.
+    # Sucursales sin VIN (Galerias / Americas / Gonzalez Gallo) emiten <vin></vin> — queda None.
+    vin = (listing.findtext("vin") or "").strip().upper()
+    if not vin or len(vin) < 11:  # VIN válido ISO 3779 = 17 chars; aceptamos >=11 por tolerancia
+        vin = None
+
     dealer_id_raw = (listing.findtext("dealer_id") or "").strip()
     agencia_id, agencia_nombre = parse_dealer(dealer_id_raw)
     dealer_phone = (listing.findtext("dealer_phone") or "").strip()
@@ -294,6 +301,7 @@ def parse_listing(listing):
     return {
         # Campos directos del XML (estructurados)
         "ID_AUTO": vid,
+        "VIN": vin,  # 17-char ISO 3779. None si feed lo trae vacío.
         "TITULO": title,
         "MARCA": make,
         "MODELO": model,
