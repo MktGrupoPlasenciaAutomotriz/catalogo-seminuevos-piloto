@@ -122,6 +122,10 @@ def transform(row):
     return {
         # Identidad y precio
         "id": row.get("id_auto", 0),
+        # VIN: 17-char ISO 3779 cuando Maxipublica lo expone. Permite que el
+        # dataLayer client-side incluya vin en view_item / generate_lead →
+        # atribución VIN-perfecta en GA4 + Meta CAPI.
+        "vin": row.get("vin") or "",
         "name": f"{row.get('marca','') or ''} {row.get('modelo','') or ''}".strip(),
         "year": int(row.get("anio") or 0),
         "price": int(row.get("precio") or 0),

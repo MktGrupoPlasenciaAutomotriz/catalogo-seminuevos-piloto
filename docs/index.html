@@ -3061,7 +3061,7 @@ function openModal(id) {
   currentCar = vehicles.find(v => v.id === id);
   if (!currentCar) return;
   setView('vehiculo', id);
-  dataLayer.push({ event: 'view_item', item_id: currentCar.id || '', item_name: currentCar.name + ' ' + currentCar.year, item_price: currentCar.price, item_brand: currentCar.brand || '', vehicle_year: currentCar.year, sede: currentCar.loc || '', ...getTrackingContext() });
+  dataLayer.push({ event: 'view_item', item_id: currentCar.id || '', vin: currentCar.vin || '', item_name: currentCar.name + ' ' + currentCar.year, item_price: currentCar.price, item_brand: currentCar.brand || '', vehicle_year: currentCar.year, sede: currentCar.loc || '', ...getTrackingContext() });
 
   // Gallery setup
   galleryIdx = 0;
@@ -3532,9 +3532,10 @@ function submitForm() {
     telefono: '+52' + phone,
     email,
     tipo_persona: '',
-    // auto_id_origen: id_auto de Maxipublica del listing que el cliente vio.
-    // Permite cruzar lead → inventario_seminuevos → VIN sin matching heurístico (migration 0035).
+    // auto_id_origen: id_auto Maxipublica del listing visto. Migration 0035.
+    // vin_auto_visto: VIN del listing (cuando Maxipublica lo expone). Atribución VIN-perfecta.
     auto_id_origen: currentCar.id || null,
+    vin_auto_visto: currentCar.vin || '',
     vehiculo: `${currentCar.name} ${currentCar.year}`.toUpperCase(),
     anio: currentCar.year,
     km: currentCar.km || 0,
@@ -3584,6 +3585,10 @@ function submitForm() {
     folio: folio,
     currency: 'MXN',
     value: currentCar.price,
+    // item_id (currentCar.id) + vin → permite atribución VIN-perfecta en GA4.
+    // vin viene del feed XML Maxipublica (62% coverage global, >95% en 4 sucursales piloto).
+    item_id: currentCar.id || '',
+    vin: currentCar.vin || '',
     item_name: currentCar.name + ' ' + currentCar.year,
     item_price: currentCar.price,
     lead_value: currentCar.price,
