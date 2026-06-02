@@ -267,29 +267,175 @@ body {
 }
 .trust-item svg { width: 18px; height: 18px; color: var(--color-accent); flex-shrink: 0; }
 
-/* ── FILTERS ── */
-.filters-section {
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  padding: 18px 0;
+/* ── SEARCH BAR (sticky on top, slim ~56px) ──
+   Reemplazo del filter-bar sticky anterior. Solo lleva search + sort + toggle drawer mobile.
+   Los filtros viven ahora en .filter-sidebar dentro de .catalog-grid. */
+.search-bar {
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--ink-200);
-  position: sticky; top: 72px; z-index: 90;
+  padding: 10px 0;
+  position: sticky; top: 72px; z-index: 89;
 }
-@media(min-width:768px){ .filters-section { top: 72px; } }
-@media(max-width:600px){ .filters-section { padding: 12px 0; } }
-/* Hide-on-scroll mobile: header + filtros se ocultan al hacer scroll-down despues de pasar el hero,
-   reaparecen con scroll-up. Recupera ~256px de viewport util en mobile (50% en iPhone SE). */
-.header, .filters-section { transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+.search-bar-inner { display: flex; align-items: center; gap: 10px; }
+.search-bar-inner .filter-search { flex: 1; min-width: 0; }
+.sort-select {
+  min-height: 44px; padding: 0 36px 0 14px;
+  border: 1.5px solid var(--ink-200); border-radius: 9999px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;
+  font-weight: 600; font-size: 13px; color: var(--ink-700);
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  font-family: var(--font-body);
+}
+.sort-select:focus { outline: none; border-color: var(--color-accent); }
+.filters-toggle-mobile { display: none; }   /* solo aparece en mobile via media query */
+
+/* ── FILTER SIDEBAR + CATALOG GRID ──
+   Desktop ≥1024: 280px sidebar + grid en columnas | Mobile <1024: sidebar es drawer off-canvas. */
+.filters-section { padding: 0; border: none; background: transparent; }   /* legacy wrapper, ya no es sticky ni tiene bg */
+.catalog-grid {
+  display: grid; grid-template-columns: 1fr; gap: 0;
+  padding: 24px 0 40px;
+}
+@media (min-width: 1024px) {
+  .catalog-grid { grid-template-columns: 288px 1fr; gap: 32px; }
+}
+
+.filter-sidebar {
+  background: #fff;
+  border: 1px solid var(--ink-200);
+  border-radius: 16px;
+  padding: 20px 18px;
+}
+@media (min-width: 1024px) {
+  .filter-sidebar {
+    position: sticky; top: 140px;          /* 72 header + 56 search + 12 gap */
+    max-height: calc(100vh - 160px);
+    overflow-y: auto; overflow-x: hidden;
+    align-self: start;
+  }
+  .filter-sidebar::-webkit-scrollbar { width: 6px; }
+  .filter-sidebar::-webkit-scrollbar-thumb { background: var(--ink-200); border-radius: 3px; }
+}
+
+.filter-sidebar-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.filter-sidebar-title { font-family: var(--font-display); font-weight: 800; font-size: 16px; color: var(--ink-900); margin: 0; }
+.filter-sidebar-close { display: none; background: transparent; border: none; cursor: pointer; padding: 6px; color: var(--ink-500); font-size: 20px; line-height: 1; }
+
+.filter-group { border-top: 1px solid var(--ink-200); padding: 14px 0; }
+.filter-group:first-of-type { border-top: none; padding-top: 0; }
+.filter-group-title {
+  font-family: var(--font-display); font-weight: 700; font-size: 12px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-800); margin: 0 0 10px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+details.filter-group { padding-bottom: 4px; }
+details.filter-group > summary {
+  list-style: none; cursor: pointer; user-select: none;
+  font-family: var(--font-display); font-weight: 700; font-size: 12px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-800); padding: 4px 0 10px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+details.filter-group > summary::-webkit-details-marker { display: none; }
+details.filter-group > summary::after {
+  content: ''; width: 8px; height: 8px;
+  border-right: 2px solid var(--ink-500); border-bottom: 2px solid var(--ink-500);
+  transform: rotate(45deg); transition: transform .2s; flex-shrink: 0; margin-top: -3px;
+}
+details.filter-group[open] > summary::after { transform: rotate(-135deg); margin-top: 3px; }
+
+/* Sidebar overrides para chips: que sí se acomoden verticalmente */
+.filter-sidebar .type-chips { display: flex; flex-wrap: wrap; gap: 6px; overflow: visible; padding: 0; -webkit-mask-image: none; mask-image: none; }
+.filter-sidebar .type-chip { padding: 8px 12px; font-size: 12px; min-height: 36px; flex: 0 0 auto; }
+.filter-sidebar .type-chip svg { width: 16px; height: 16px; }
+.filter-sidebar .loc-chips { display: flex; flex-direction: column; gap: 4px; }
+.filter-sidebar .loc-chip { width: 100%; justify-content: flex-start; padding: 8px 12px; font-size: 12px; min-height: 36px; }
+
+/* Selects dentro del sidebar: full-width verticales */
+.filter-sidebar .filter-dropdown-wrap { width: 100%; }
+.filter-sidebar .filter-select { width: 100%; padding: 10px 32px 10px 14px; }
+
+/* Pills activas: arriba en sidebar, no margen-top */
+.filter-sidebar .filter-active-pills { margin: 0 0 12px; }
+
+/* Filter clear button full-width al final del sidebar */
+.filter-sidebar .filter-clear { width: 100%; text-align: center; margin-top: 8px; }
+
+/* Footer del drawer (solo mobile, contiene CTA "Ver N autos") */
+.filter-sidebar-foot { display: none; }
+
+/* Catalog count line (vive arriba del grid, donde antes vivía dentro del filter-bar) */
+.catalog-headline {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; gap: 12px; flex-wrap: wrap;
+}
+.catalog-count { font-size: 14px; color: var(--ink-600); }
+.catalog-count strong { color: var(--ink-900); font-weight: 800; }
+
+/* ── MOBILE drawer: el sidebar se vuelve off-canvas ── */
+@media (max-width: 1023px) {
+  .filters-toggle-mobile {
+    display: inline-flex; align-items: center; gap: 6px;
+    min-height: 44px; padding: 0 14px;
+    background: var(--ink-900); color: #fff;
+    border: none; border-radius: 9999px;
+    font-family: var(--font-body); font-weight: 700; font-size: 13px;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+  .filters-toggle-mobile:hover { background: var(--ink-800); }
+  .filters-toggle-badge {
+    background: var(--color-accent); color: #1A1A1A;
+    padding: 1px 7px; border-radius: 9999px; font-size: 11px; font-weight: 800;
+  }
+  .filters-toggle-badge[hidden] { display: none; }
+
+  .filter-sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: min(86vw, 380px); max-height: 100vh;
+    border-radius: 0; border: none;
+    z-index: 1100;
+    transform: translateX(-100%);
+    transition: transform .25s cubic-bezier(.4,0,.2,1);
+    padding: 18px 18px 88px; overflow-y: auto;
+    box-shadow: 0 0 30px rgba(0,0,0,.18);
+  }
+  .filter-sidebar.is-open { transform: translateX(0); }
+  .filter-sidebar-close { display: inline-flex; }
+  .filter-sidebar-foot {
+    display: flex; gap: 8px;
+    position: fixed; bottom: 0; left: 0;
+    width: min(86vw, 380px);
+    background: #fff; border-top: 1px solid var(--ink-200);
+    padding: 12px 16px; z-index: 1101;
+  }
+  .filter-apply-mobile {
+    flex: 1; min-height: 48px;
+    background: var(--color-accent); color: #1A1A1A;
+    border: none; border-radius: 9999px;
+    font-family: var(--font-display); font-weight: 800; font-size: 14px;
+    cursor: pointer;
+  }
+  .filter-drawer-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.5);
+    z-index: 1099;
+  }
+  .filter-drawer-overlay[hidden] { display: none; }
+  body.is-drawer-open { overflow: hidden; }
+}
+
+/* Header hide-on-scroll mobile: preservado (filters ya no es sticky, solo header) */
+.header { transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+.search-bar { transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
 @media (max-width: 768px) {
   .header.is-hidden { transform: translateY(-100%); }
-  /* filters-section vive en sticky top:72px, hay que sumar ese offset al transform
-     para que salga totalmente del viewport (si no, queda visible la parte baja). */
-  .filters-section.is-hidden { transform: translateY(calc(-100% - 72px)); }
+  .search-bar.is-hidden { transform: translateY(calc(-100% - 72px)); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .header, .filters-section { transition: none; }
-  .header.is-hidden, .filters-section.is-hidden { transform: none; }
+  .header, .search-bar { transition: none; }
+  .header.is-hidden, .search-bar.is-hidden { transform: none; }
 }
 /* Hint card de sede seleccionada (consistente con Stellantis y Hyundai) */
 .loc-info-card { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; margin:8px 0 4px; background: linear-gradient(135deg, #1A1A1A 0%, #2A2419 100%); border:1px solid #3A3320; border-left:3px solid var(--color-accent,#FBC645); border-radius:8px; font-size:12px; color:#E2E8F0; line-height:1.4; }
@@ -1646,7 +1792,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span><b id="heroTotalCars">232</b> autos certificados</span><span class="leg-sep">·</span>
         <span>desde <b id="heroMinPrice">$179K</b></span>
       </div>
-      <button class="hero-cta" onclick="document.querySelector('.inventory-section').scrollIntoView({behavior:'smooth'})">
+      <button class="hero-cta" onclick="document.getElementById('inventoryGrid').scrollIntoView({behavior:'smooth'})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         Ver inventario
       </button>
@@ -1699,94 +1845,125 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ════ FILTERS ════ -->
 <!-- catalog-zone wrapper: limita el sticky de .filters-section al area de catalogo -->
 <div class="catalog-zone">
+<!-- ════ SEARCH BAR (sticky, slim) ════
+     Solo buscador + sort + toggle drawer mobile. Los filtros viven abajo en el sidebar. -->
+<section class="search-bar" aria-label="Buscar inventario">
+  <div class="container search-bar-inner">
+    <div class="filter-search">
+      <svg class="filter-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar marca, modelo o año..." oninput="onSearch(this.value)" id="searchInput" aria-label="Buscar inventario" autocomplete="off">
+    </div>
+    <button type="button" class="filters-toggle-mobile" id="filtersToggle" onclick="toggleFilterDrawer(true)" aria-label="Abrir filtros" aria-controls="filterSidebar" aria-expanded="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+      <span>Filtros</span>
+      <span class="filters-toggle-badge" id="filtersBadge" hidden>0</span>
+    </button>
+    <select class="sort-select" onchange="onSortChange(this.value)" aria-label="Ordenar resultados" id="sortSelect">
+      <option value="featured">Destacados</option>
+      <option value="price-asc">Precio: menor a mayor</option>
+      <option value="price-desc">Precio: mayor a menor</option>
+      <option value="year-desc">Año: más nuevos</option>
+      <option value="year-asc">Año: más antiguos</option>
+    </select>
+  </div>
+</section>
+
+<!-- ════ CATALOG ZONE: sidebar de filtros + grid de inventario ════ -->
 <section class="filters-section">
-  <div class="container">
-    <!-- Type icon chips -->
-    <div class="type-chips" role="group" aria-label="Filtrar por tipo de vehiculo">
-      <button type="button" class="type-chip active" data-type="all" onclick="filterByTypeChip('all')" aria-pressed="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
-        <span>Todos</span>
-      </button>
-      <button type="button" class="type-chip" data-type="suv" onclick="filterByTypeChip('suv')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3v-6l2-5h9l4 5h2a2 2 0 012 2v4h-2M16 17H9M14 6v5M5 11h14"/></svg>
-        <span>SUV</span>
-      </button>
-      <button type="button" class="type-chip" data-type="sedan" onclick="filterByTypeChip('sedan')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3v-6l2-5h9l4 5h1a2 2 0 012 2v4h-2M15 17H9M3 11h15M9 11V6"/></svg>
-        <span>Sedán</span>
-      </button>
-      <button type="button" class="type-chip" data-type="pickup" onclick="filterByTypeChip('pickup')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3V6a1 1 0 011-1h9v12M15 17h-6M15 17h6v-6h-8M13 11h5l3 5"/></svg>
-        <span>Pick-up</span>
-      </button>
-      <button type="button" class="type-chip" data-type="hatchback" onclick="filterByTypeChip('hatchback')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3v-6l2-4 3-3h5l3 4 3 2h1v7h-2M15 17H9M3 11h16"/></svg>
-        <span>Hatchback</span>
-      </button>
-      <button type="button" class="type-chip" data-type="minivan" onclick="filterByTypeChip('minivan')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3V8a2 2 0 012-2h13l3 5v6h-2M15 17H9M5 11h16M11 6v5"/></svg>
-        <span>Minivan</span>
-      </button>
-    </div>
-    <!-- Filtro de sucursal: chips horizontales scrollables. Patrón unificado con landing-hyundai y landing-stellantis. -->
-    <div class="loc-chips type-chips" role="group" aria-label="Filtrar por sucursal">
-      <button type="button" class="loc-chip type-chip active" data-loc="all" onclick="filterByLocChip('all')" aria-pressed="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-        <span>Todas las sedes</span>
-      </button>
-      <button type="button" class="loc-chip type-chip" data-loc="Lopez Mateos" onclick="filterByLocChip('Lopez Mateos')" aria-pressed="false" title="Seminuevos Plasencia · Av. López Mateos Sur 2600, Zapopan">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>López Mateos</span>
-      </button>
-      <button type="button" class="loc-chip type-chip" data-loc="Bugambilias" onclick="filterByLocChip('Bugambilias')" aria-pressed="false" title="Seminuevos Plasencia · Av. López Mateos Sur 8550, Bugámbilias, Zapopan">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>Bugámbilias</span>
-      </button>
-      <button type="button" class="loc-chip type-chip" data-loc="Mazda Plasencia" onclick="filterByLocChip('Mazda Plasencia')" aria-pressed="false" title="Mazda Plasencia">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>Mazda Plasencia</span>
-      </button>
-      <button type="button" class="loc-chip type-chip" data-loc="Mazda Galerias" onclick="filterByLocChip('Mazda Galerias')" aria-pressed="false" title="Mazda Galerías">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>Mazda Galerías</span>
-      </button>
-      <button type="button" class="loc-chip type-chip" data-loc="Mazda Americas" onclick="filterByLocChip('Mazda Americas')" aria-pressed="false" title="Mazda Américas">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>Mazda Américas</span>
-      </button>
-      <button type="button" class="loc-chip type-chip" data-loc="Mazda Acueducto" onclick="filterByLocChip('Mazda Acueducto')" aria-pressed="false" title="Mazda Acueducto">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>Mazda Acueducto</span>
-      </button>
-      <button type="button" class="loc-chip type-chip" data-loc="Mazda Gonzalez Gallo" onclick="filterByLocChip('Mazda Gonzalez Gallo')" aria-pressed="false" title="Mazda González Gallo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>Mazda Gzz Gallo</span>
-      </button>
-      <button type="button" class="loc-chip type-chip" data-loc="Mazda Santa Anita" onclick="filterByLocChip('Mazda Santa Anita')" aria-pressed="false" title="Mazda Santa Anita">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>Mazda Santa Anita</span>
-      </button>
-    </div>
-    <!-- Hint de sede seleccionada -->
-    <div id="locInfo" class="loc-info-card" style="display:none;" role="region" aria-live="polite"></div>
-    <div class="filter-bar">
-      <div class="filter-bar-inner">
-        <div class="filter-search">
-          <svg class="filter-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" placeholder="Buscar marca, modelo o año..." oninput="onSearch(this.value)" id="searchInput" aria-label="Buscar inventario" autocomplete="off">
+  <div class="container catalog-grid">
+
+    <!-- SIDEBAR: en mobile es drawer off-canvas, en desktop columna fija de 288px -->
+    <aside class="filter-sidebar" id="filterSidebar" aria-label="Filtros del catálogo">
+      <div class="filter-sidebar-head">
+        <h2 class="filter-sidebar-title">Filtros</h2>
+        <button class="filter-sidebar-close" onclick="toggleFilterDrawer(false)" aria-label="Cerrar filtros">✕</button>
+      </div>
+
+      <!-- Pills activas siempre visibles arriba del sidebar -->
+      <div class="filter-active-pills" id="activePills"></div>
+
+      <!-- Group 1: Tipo de vehículo (chips visuales, primer grupo) -->
+      <div class="filter-group">
+        <h3 class="filter-group-title">Tipo de vehículo</h3>
+        <div class="type-chips" role="group" aria-label="Filtrar por tipo de vehículo">
+          <button type="button" class="type-chip active" data-type="all" onclick="filterByTypeChip('all')" aria-pressed="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+            <span>Todos</span>
+          </button>
+          <button type="button" class="type-chip" data-type="suv" onclick="filterByTypeChip('suv')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3v-6l2-5h9l4 5h2a2 2 0 012 2v4h-2M16 17H9M14 6v5M5 11h14"/></svg>
+            <span>SUV</span>
+          </button>
+          <button type="button" class="type-chip" data-type="sedan" onclick="filterByTypeChip('sedan')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3v-6l2-5h9l4 5h1a2 2 0 012 2v4h-2M15 17H9M3 11h15M9 11V6"/></svg>
+            <span>Sedán</span>
+          </button>
+          <button type="button" class="type-chip" data-type="pickup" onclick="filterByTypeChip('pickup')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3V6a1 1 0 011-1h9v12M15 17h-6M15 17h6v-6h-8M13 11h5l3 5"/></svg>
+            <span>Pick-up</span>
+          </button>
+          <button type="button" class="type-chip" data-type="hatchback" onclick="filterByTypeChip('hatchback')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3v-6l2-4 3-3h5l3 4 3 2h1v7h-2M15 17H9M3 11h16"/></svg>
+            <span>Hatchback</span>
+          </button>
+          <button type="button" class="type-chip" data-type="minivan" onclick="filterByTypeChip('minivan')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3V8a2 2 0 012-2h13l3 5v6h-2M15 17H9M5 11h16M11 6v5"/></svg>
+            <span>Minivan</span>
+          </button>
         </div>
-        <div class="filter-dropdown-wrap" style="display:none;">
-          <select onchange="filterByType(this.value)" id="filterType" class="filter-select">
-            <option value="all">Tipo</option>
-            <option value="suv">SUV</option>
-            <option value="sedan">Sedan</option>
-            <option value="pickup">Pick-up</option>
-            <option value="hatchback">Hatchback</option>
-          </select>
+      </div>
+
+      <!-- Group 2: Sede (chips verticales, segundo grupo) -->
+      <details class="filter-group" open>
+        <summary>Sede</summary>
+        <div class="loc-chips" role="group" aria-label="Filtrar por sucursal">
+          <button type="button" class="loc-chip type-chip active" data-loc="all" onclick="filterByLocChip('all')" aria-pressed="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+            <span>Todas las sedes</span>
+          </button>
+          <button type="button" class="loc-chip type-chip" data-loc="Lopez Mateos" onclick="filterByLocChip('Lopez Mateos')" aria-pressed="false" title="Seminuevos Plasencia · Av. López Mateos Sur 2600, Zapopan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>López Mateos</span>
+          </button>
+          <button type="button" class="loc-chip type-chip" data-loc="Bugambilias" onclick="filterByLocChip('Bugambilias')" aria-pressed="false" title="Seminuevos Plasencia · Av. López Mateos Sur 8550, Bugámbilias, Zapopan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Bugámbilias</span>
+          </button>
+          <button type="button" class="loc-chip type-chip" data-loc="Mazda Plasencia" onclick="filterByLocChip('Mazda Plasencia')" aria-pressed="false" title="Mazda Plasencia">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Mazda Plasencia</span>
+          </button>
+          <button type="button" class="loc-chip type-chip" data-loc="Mazda Galerias" onclick="filterByLocChip('Mazda Galerias')" aria-pressed="false" title="Mazda Galerías">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Mazda Galerías</span>
+          </button>
+          <button type="button" class="loc-chip type-chip" data-loc="Mazda Americas" onclick="filterByLocChip('Mazda Americas')" aria-pressed="false" title="Mazda Américas">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Mazda Américas</span>
+          </button>
+          <button type="button" class="loc-chip type-chip" data-loc="Mazda Acueducto" onclick="filterByLocChip('Mazda Acueducto')" aria-pressed="false" title="Mazda Acueducto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Mazda Acueducto</span>
+          </button>
+          <button type="button" class="loc-chip type-chip" data-loc="Mazda Gonzalez Gallo" onclick="filterByLocChip('Mazda Gonzalez Gallo')" aria-pressed="false" title="Mazda González Gallo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Mazda Gzz Gallo</span>
+          </button>
+          <button type="button" class="loc-chip type-chip" data-loc="Mazda Santa Anita" onclick="filterByLocChip('Mazda Santa Anita')" aria-pressed="false" title="Mazda Santa Anita">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Mazda Santa Anita</span>
+          </button>
         </div>
+        <!-- Hint de sede seleccionada -->
+        <div id="locInfo" class="loc-info-card" style="display:none;" role="region" aria-live="polite"></div>
+      </details>
+
+      <!-- Group 3: Marca (accordion + select) -->
+      <details class="filter-group">
+        <summary>Marca</summary>
         <div class="filter-dropdown-wrap">
-          <select onchange="filterByBrandSelect(this.value)" id="filterBrand" class="filter-select">
-            <option value="all">Marca</option>
+          <select onchange="filterByBrandSelect(this.value)" id="filterBrand" class="filter-select" aria-label="Marca">
+            <option value="all">Todas las marcas</option>
             <option value="Hyundai">Hyundai</option>
             <option value="Ford">Ford</option>
             <option value="Nissan">Nissan</option>
@@ -1798,9 +1975,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <option value="_other">Otras</option>
           </select>
         </div>
+      </details>
+
+      <!-- Group 4: Precio -->
+      <details class="filter-group">
+        <summary>Precio</summary>
         <div class="filter-dropdown-wrap">
-          <select onchange="filterByPriceSelect(this.value)" id="filterPrice" class="filter-select">
-            <option value="all">Precio</option>
+          <select onchange="filterByPriceSelect(this.value)" id="filterPrice" class="filter-select" aria-label="Precio">
+            <option value="all">Cualquier precio</option>
             <option value="0-200">Hasta $200K</option>
             <option value="200-350">$200K - $350K</option>
             <option value="350-500">$350K - $500K</option>
@@ -1808,53 +1990,72 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <option value="750+">$750K+</option>
           </select>
         </div>
+      </details>
+
+      <!-- Group 5: Año -->
+      <details class="filter-group">
+        <summary>Año</summary>
         <div class="filter-dropdown-wrap">
-          <select onchange="filterByYearSelect(this.value)" id="filterYear" class="filter-select">
-            <option value="all">Año</option>
+          <select onchange="filterByYearSelect(this.value)" id="filterYear" class="filter-select" aria-label="Año">
+            <option value="all">Cualquier año</option>
             <!-- Opciones se pueblan dinamicamente desde vehicles[] al cargar catalogo -->
           </select>
         </div>
-        <!-- Dropdown de ubicación: oculto, reemplazado por chips. Se conserva para compat con activePills/clearAllFilters. -->
-        <div class="filter-dropdown-wrap" style="display:none;">
-          <select onchange="filterByLocSelect(this.value)" id="filterLoc" class="filter-select">
-            <option value="all">Ubicación</option>
-            <option value="Lopez Mateos">López Mateos</option>
-            <option value="Bugambilias">Bugambilias</option>
-            <option value="Mazda Plasencia">Mazda Plasencia</option>
-            <option value="Mazda Galerias">Mazda Galerías</option>
-            <option value="Mazda Americas">Mazda Américas</option>
-            <option value="Mazda Acueducto">Mazda Acueducto</option>
-            <option value="Mazda Gonzalez Gallo">Mazda González Gallo</option>
-            <option value="Mazda Santa Anita">Mazda Santa Anita</option>
-          </select>
-        </div>
-        <button onclick="clearAllFilters()" class="filter-clear" id="filterClearBtn" style="display:none;">✕ Limpiar</button>
+      </details>
+
+      <!-- Select de ubicación oculto: se conserva para compat con activePills/clearAllFilters/updateFilterUI -->
+      <select onchange="filterByLocSelect(this.value)" id="filterLoc" class="filter-select" aria-hidden="true" tabindex="-1" style="display:none;">
+        <option value="all">Ubicación</option>
+        <option value="Lopez Mateos">López Mateos</option>
+        <option value="Bugambilias">Bugambilias</option>
+        <option value="Mazda Plasencia">Mazda Plasencia</option>
+        <option value="Mazda Galerias">Mazda Galerías</option>
+        <option value="Mazda Americas">Mazda Américas</option>
+        <option value="Mazda Acueducto">Mazda Acueducto</option>
+        <option value="Mazda Gonzalez Gallo">Mazda González Gallo</option>
+        <option value="Mazda Santa Anita">Mazda Santa Anita</option>
+      </select>
+      <!-- Select de tipo oculto: idem -->
+      <select onchange="filterByType(this.value)" id="filterType" class="filter-select" aria-hidden="true" tabindex="-1" style="display:none;">
+        <option value="all">Tipo</option>
+        <option value="suv">SUV</option>
+        <option value="sedan">Sedan</option>
+        <option value="pickup">Pick-up</option>
+        <option value="hatchback">Hatchback</option>
+        <option value="minivan">Minivan</option>
+      </select>
+
+      <!-- Limpiar todo (siempre visible, deshabilitado si no hay filtros) -->
+      <button onclick="clearAllFilters()" class="filter-clear" id="filterClearBtn" style="display:none;">✕ Limpiar todos los filtros</button>
+
+      <!-- Footer del drawer (solo aparece en mobile) -->
+      <div class="filter-sidebar-foot">
+        <button type="button" class="filter-apply-mobile" onclick="toggleFilterDrawer(false)">Ver <span id="carCountMobile">0</span> autos</button>
       </div>
-      <div class="filter-active-pills" id="activePills"></div>
-      <div class="filter-count" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <span><strong id="carCount">0</strong> autos</span>
+    </aside>
+
+    <!-- MAIN: contador + inventory grid -->
+    <main class="catalog-main">
+      <div class="catalog-headline">
+        <span class="catalog-count"><strong id="carCount">0</strong> autos</span>
         <a href="#" onclick="event.preventDefault();document.getElementById('mapModal').style.display='flex'" aria-label="Ver mapa con las 8 ubicaciones en Guadalajara" style="display:inline-flex;align-items:center;gap:4px;color:var(--ink-500,#718096);text-decoration:none;font-weight:600;font-size:12px;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
           8 sedes GDL
         </a>
       </div>
-    </div>
-  </div>
-</section>
+      <div class="section-head" style="text-align:left;margin-bottom:16px;">
+        <span class="section-eyebrow">Inventario certificado</span>
+        <h2 class="section-title" style="font-size:clamp(22px,2.6vw,30px);">Encuentra el tuyo, sin sorpresas</h2>
+        <p class="section-disclaimer" style="margin-left:0;max-width:none;">Actualizado al día desde las 8 sucursales en Guadalajara. Filtra, compara y abre la ficha de cualquier auto — sin dejar tus datos hasta que ya elegiste.</p>
+      </div>
+      <div class="inventory-grid" id="inventoryGrid">
+        <!-- JS rendered -->
+      </div>
+    </main>
+  </div><!-- /.container.catalog-grid -->
+</section><!-- /.filters-section -->
 
-<!-- ════ INVENTORY GRID ════ -->
-<section class="inventory-section">
-  <div class="container">
-    <div class="section-head">
-      <span class="section-eyebrow">Inventario certificado</span>
-      <h2 class="section-title">Encuentra el tuyo, sin sorpresas</h2>
-      <p class="section-disclaimer">Actualizado al día desde las 8 sucursales en Guadalajara. Filtra, compara y abre la ficha de cualquier auto — sin dejar tus datos hasta que ya elegiste.</p>
-    </div>
-    <div class="inventory-grid" id="inventoryGrid">
-      <!-- JS rendered -->
-    </div>
-  </div>
-</section>
+<div class="filter-drawer-overlay" id="filterDrawerOverlay" onclick="toggleFilterDrawer(false)" hidden></div>
 </div><!-- /.catalog-zone -->
 
 <!-- ════ REVIEWS (Google) ════ -->
@@ -2140,7 +2341,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4l-2.4-1.1c-.3-.1-.7 0-.9.2l-.9 1.1c-1.5-.8-2.7-2-3.5-3.5l1.1-.9c.3-.2.4-.6.2-.9L9.6 6.5c-.2-.4-.6-.5-1-.4l-2.2.7c-.4.1-.7.5-.6.9.6 4.6 4.3 8.3 8.9 8.9.4.1.8-.1.9-.6l.7-2.2c.1-.4-.1-.8-.5-1z"/></svg>
           Escribir a mi asesor por WhatsApp
         </a>
-        <button onclick="closeModal(); setTimeout(function(){ var inv=document.querySelector('.inventory-section'); if(inv) inv.scrollIntoView({behavior:'smooth'}); }, 200);" class="btn-buscar-otro" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:420px;margin:0 auto 10px;padding:14px;min-height:52px;background:transparent;color:var(--ink-700,#334155);border:1.5px solid var(--ink-300,#CBD5E1);border-radius:var(--radius-md,12px);font-family:var(--font-body);font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s;">
+        <button onclick="closeModal(); setTimeout(function(){ var inv=document.getElementById('inventoryGrid'); if(inv) inv.scrollIntoView({behavior:'smooth'}); }, 200);" class="btn-buscar-otro" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:420px;margin:0 auto 10px;padding:14px;min-height:52px;background:transparent;color:var(--ink-700,#334155);border:1.5px solid var(--ink-300,#CBD5E1);border-radius:var(--radius-md,12px);font-family:var(--font-body);font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           Buscar otro auto
         </button>
@@ -2873,50 +3074,46 @@ function goToFormStep(step) {
 
 
 
-// ── Hide-on-scroll header + filtros (mobile) ──
-// Recupera viewport ocultando header/filtros al scroll-down. Solo aplica is-hidden
-// cuando ambos estan en su posicion sticky pegada (si filters esta aun en flujo
-// natural por debajo del sticky-top, ocultarlo lo traeria al viewport en lugar de
-// sacarlo). Reaparece con cualquier scroll-up. Solo aplica <=768px.
+// ── Hide-on-scroll header + search-bar (mobile) ──
+// Recupera viewport ocultando header/search-bar al scroll-down. Reaparecen con scroll-up.
+// Solo aplica <=768px. Refactor v2: ahora afecta .search-bar (slim, ~56px) en vez del
+// filter-bar grande, porque los filtros viven en sidebar/drawer fuera del flujo sticky.
 (function initHideOnScroll(){
   const header = document.querySelector('.header');
-  const filters = document.querySelector('.filters-section');
-  if (!header || !filters) return;
+  const searchBar = document.querySelector('.search-bar');
+  if (!header || !searchBar) return;
   const mq = window.matchMedia('(max-width: 768px)');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const HIDE_THRESHOLD = 5;
   const REVEAL_THRESHOLD = 5;
   const MIN_SCROLL_BEFORE_HIDE = 200;
-  const FILTERS_STICKY_TOP = 72;
+  const STICKY_TOP = 72;
   const STICKY_TOLERANCE = 2;
   let lastY = window.scrollY;
   let ticking = false;
-  function isFiltersPinned(){
-    // filters esta sticky-pegado cuando su getBoundingClientRect().top ~= sticky top.
-    // Hay que medir SIN el is-hidden aplicado porque transform afecta el rect.
-    const wasHidden = filters.classList.contains('is-hidden');
-    if (wasHidden) filters.classList.remove('is-hidden');
-    const top = filters.getBoundingClientRect().top;
-    if (wasHidden) filters.classList.add('is-hidden');
-    return top <= FILTERS_STICKY_TOP + STICKY_TOLERANCE;
+  function isSearchPinned(){
+    const wasHidden = searchBar.classList.contains('is-hidden');
+    if (wasHidden) searchBar.classList.remove('is-hidden');
+    const top = searchBar.getBoundingClientRect().top;
+    if (wasHidden) searchBar.classList.add('is-hidden');
+    return top <= STICKY_TOP + STICKY_TOLERANCE;
   }
   function update(){
     const y = Math.max(0, window.scrollY);
     const diff = y - lastY;
     if (!mq.matches || reducedMotion.matches) {
       header.classList.remove('is-hidden');
-      filters.classList.remove('is-hidden');
+      searchBar.classList.remove('is-hidden');
     } else if (y < MIN_SCROLL_BEFORE_HIDE) {
       header.classList.remove('is-hidden');
-      filters.classList.remove('is-hidden');
+      searchBar.classList.remove('is-hidden');
     } else if (diff > HIDE_THRESHOLD) {
       header.classList.add('is-hidden');
-      // Solo ocultar filtros si ya estan pegados (si no, el transform los traeria al viewport)
-      if (isFiltersPinned()) filters.classList.add('is-hidden');
-      else filters.classList.remove('is-hidden');
+      if (isSearchPinned()) searchBar.classList.add('is-hidden');
+      else searchBar.classList.remove('is-hidden');
     } else if (diff < -REVEAL_THRESHOLD) {
       header.classList.remove('is-hidden');
-      filters.classList.remove('is-hidden');
+      searchBar.classList.remove('is-hidden');
     }
     lastY = y;
     ticking = false;
@@ -2924,9 +3121,8 @@ function goToFormStep(step) {
   window.addEventListener('scroll', function(){
     if (!ticking) { requestAnimationFrame(update); ticking = true; }
   }, { passive: true });
-  // Reset al cambiar viewport (rotacion / resize)
   if (mq.addEventListener) mq.addEventListener('change', function(){
-    if (!mq.matches) { header.classList.remove('is-hidden'); filters.classList.remove('is-hidden'); }
+    if (!mq.matches) { header.classList.remove('is-hidden'); searchBar.classList.remove('is-hidden'); }
   });
 })();
 
@@ -3828,6 +4024,86 @@ function generateRegistrationPDF() {
 }
 
 // renderCards('all') se llama desde el fetch de catalogo-piloto.json al cargar
+
+// ════════════════════════════════════════════════════════════════════════════
+// NEW SIDEBAR + DRAWER UX  (refactor v2: search-bar sticky + sidebar/drawer)
+// ════════════════════════════════════════════════════════════════════════════
+
+function toggleFilterDrawer(open) {
+  const sidebar = document.getElementById('filterSidebar');
+  const overlay = document.getElementById('filterDrawerOverlay');
+  const toggle = document.getElementById('filtersToggle');
+  if (!sidebar) return;
+  sidebar.classList.toggle('is-open', open);
+  if (overlay) overlay.hidden = !open;
+  if (toggle) toggle.setAttribute('aria-expanded', String(open));
+  document.body.classList.toggle('is-drawer-open', open);
+  if (open) {
+    try { (window.dataLayer = window.dataLayer || []).push({ event: 'filter_drawer_open', viewport: window.innerWidth <= 1023 ? 'mobile' : 'desktop' }); } catch(e) {}
+  }
+}
+
+function updateFiltersBadge() {
+  try {
+    const actives = (typeof getActiveFilters === 'function') ? getActiveFilters() : [];
+    const badge = document.getElementById('filtersBadge');
+    if (badge) { badge.textContent = actives.length; badge.hidden = actives.length === 0; }
+  } catch (e) {}
+}
+
+function syncCarCountMobile() {
+  const a = document.getElementById('carCount');
+  const b = document.getElementById('carCountMobile');
+  if (a && b) b.textContent = a.textContent;
+}
+
+// Observers — sincronizan badge y carCountMobile sin tocar updateFilterUI ni renderCards
+(function() {
+  function attach() {
+    const pills = document.getElementById('activePills');
+    const count = document.getElementById('carCount');
+    if (pills) new MutationObserver(updateFiltersBadge).observe(pills, {childList: true, subtree: true, characterData: true});
+    if (count) new MutationObserver(syncCarCountMobile).observe(count, {childList: true, characterData: true, subtree: true});
+    updateFiltersBadge(); syncCarCountMobile();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', attach);
+  else attach();
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') toggleFilterDrawer(false); });
+})();
+
+// Sort DOM-level (sin tocar renderCards). 'featured' = orden natural del catálogo.
+let currentSort = 'featured';
+function onSortChange(value) {
+  currentSort = value;
+  sortInventoryDom();
+  try { (window.dataLayer = window.dataLayer || []).push({ event: 'filter_sort', sort_value: value }); } catch(e) {}
+}
+function _priceFromCard(c) { const e=c.querySelector('.v-card-price'); return e ? (parseInt(e.textContent.replace(/[^0-9]/g,''),10)||0) : 0; }
+function _yearFromCard(c) { const t=(c.querySelector('.v-card-title')||{}).textContent||''; const m=t.match(/(19|20)\d{2}/); return m ? parseInt(m[0],10) : 0; }
+function sortInventoryDom() {
+  const grid = document.getElementById('inventoryGrid');
+  if (!grid || currentSort === 'featured') return;
+  const cards = Array.from(grid.children).filter(c => c.classList && c.classList.contains('v-card'));
+  let cmp;
+  if (currentSort === 'price-asc')  cmp = (a,b)=>_priceFromCard(a)-_priceFromCard(b);
+  else if (currentSort === 'price-desc') cmp = (a,b)=>_priceFromCard(b)-_priceFromCard(a);
+  else if (currentSort === 'year-desc')  cmp = (a,b)=>_yearFromCard(b)-_yearFromCard(a);
+  else if (currentSort === 'year-asc')   cmp = (a,b)=>_yearFromCard(a)-_yearFromCard(b);
+  if (cmp) cards.sort(cmp).forEach(c => grid.appendChild(c));
+}
+(function() {
+  function watch() {
+    const grid = document.getElementById('inventoryGrid');
+    if (!grid) return;
+    let scheduled = false;
+    new MutationObserver(() => {
+      if (scheduled) return; scheduled = true;
+      requestAnimationFrame(() => { scheduled = false; sortInventoryDom(); });
+    }).observe(grid, {childList: true});
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch);
+  else watch();
+})();
 
 </script>
 
