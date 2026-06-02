@@ -3509,6 +3509,16 @@ function submitForm() {
     if (typeof closeModal === 'function') setTimeout(closeModal, 2500);
     return;
   }
+  // Guard: id_auto Maxipublica obligatorio para atribución VIN. Si no llegó del feed
+  // (caso raro: JSON publicado incompleto, race condition entre fetch y render), bloquear
+  // el submit y forzar reload para que cargue el catalogo bien. Sin auto_id_origen, el
+  // lead queda sin atribución posible (tendría que ir por heurístico inverso).
+  if (!currentCar.id) {
+    try { dataLayer.push({ event: 'form_submit_no_auto_id', error: 'currentCar_id_missing', item_name: currentCar.name + ' ' + currentCar.year, ...getTrackingContext() }); } catch (e) {}
+    var ge2 = document.getElementById('formGlobalError');
+    if (ge2) { ge2.textContent = 'No se pudo identificar el auto. Recarga la página y vuelve a intentarlo.'; ge2.classList.add('show'); }
+    return;
+  }
   clearValidation();
   const fields = ['fName','fLastName1','fLastName2','fPhone','fEmail'];
   let firstError = null;
