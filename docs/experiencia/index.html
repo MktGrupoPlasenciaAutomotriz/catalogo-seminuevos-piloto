@@ -11,7 +11,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Tu experiencia con Plasencia Seminuevos</title>
+<title>Tu experiencia con Grupo Plasencia</title>
 <link rel="icon" href="../favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -345,7 +345,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="row">
     <div class="brand">
       <span class="gold-dot"></span>
-      <span>Plasencia Seminuevos</span>
+      <span id="brandHeader">Grupo Plasencia</span>
     </div>
     <div class="progress-counter" id="progressCounter">&nbsp;</div>
   </div>
@@ -361,7 +361,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </main>
 
 <div class="institutional-footer">
-  Plasencia Seminuevos &middot; Tu opinión la lee directo el Director.
+  <span id="brandFooter">Grupo Plasencia</span> &middot; Tu opinión la lee directo el Director.
 </div>
 
 <script>
@@ -374,6 +374,14 @@ const TOKEN = params.get('t') || params.get('token') || '';
 let surveyData = null;
 let answers = {};
 let stepIndex = 0;
+// Brand display name dinámico — se setea desde el backend al validar token.
+// Default = Grupo Plasencia (genérico). Una vez que llega surveyData, se actualiza
+// al display name específico de la marca del lead (ej. "Plasencia Seminuevos",
+// "Hyundai Plasencia", "Stellantis Plasencia", "GAC Plasencia").
+let BRAND_DISPLAY = 'Grupo Plasencia';
+// Marcas del grupo para sub-pregunta Q4c v3 (cross-channel intra-grupo). Se popula
+// desde surveyData.marcas_grupo (el backend excluye la marca del lead actual).
+let MARCAS_GRUPO = ['Seminuevos','Hyundai','Stellantis','Mazda','GAC'];
 
 // ── Tracking context (mismo patron que landing Seminuevos canonica) ──
 // UTM, click IDs, ga_client_id (de cookie _ga), folio del lead.
@@ -392,7 +400,7 @@ function getTrackingContext() {
   return {
     ga_client_id: gaClientId,
     folio: surveyData?.folio || '',
-    marca: 'seminuevos',
+    marca: surveyData?.marca || 'seminuevos',
     sucursal: surveyData?.sucursal || '',
     vendedor_asignado: surveyData?.vendedor_nombre || '',
     etapa_origen: surveyData?.etapa_al_enviar || '',
@@ -427,7 +435,7 @@ function spaSetStep(stepId, titleSuffix) {
 const FLOW = [
   { id: 'welcome',   render: renderWelcome },
   { id: 'q1',        render: () => renderRadio('q1',
-      '¿Recuerdas haber registrado tu interés en un auto con Plasencia Seminuevos?', [
+      `¿Recuerdas haber registrado tu interés en un auto con ${BRAND_DISPLAY}?`, [
         { v: 'si',          label: 'Sí, lo recuerdo' },
         { v: 'no_recuerdo', label: 'No recuerdo bien' },
         { v: 'no_fui_yo',   label: 'No fui yo, alguien usó mi información' },
@@ -435,7 +443,7 @@ const FLOW = [
     next: () => answers.q1 === 'no_fui_yo' ? 'cierre_fraude' : 'q2'
   },
   { id: 'q2',        render: () => renderRadio('q2',
-      '¿Alguien del equipo de Plasencia te contactó después de tu registro?', [
+      `¿Alguien del equipo de ${BRAND_DISPLAY} te contactó después de tu registro?`, [
         { v: 'varias_veces',   label: 'Sí, varias veces' },
         { v: 'una_vez',        label: 'Sí, una vez' },
         { v: 'no_contactado',  label: 'No me han contactado' },
@@ -454,16 +462,17 @@ const FLOW = [
     next: () => 'q4'
   },
   { id: 'q4',        render: () => renderRadio('q4',
-      '¿Visitaste alguna sucursal de Plasencia Seminuevos?', [
+      `¿Visitaste alguna sucursal de ${BRAND_DISPLAY}?`, [
         { v: 'si_fui',        label: 'Sí, fui a la sucursal' },
         { v: 'quise_ir',      label: 'Quise ir pero no se concretó' },
         { v: 'no_fui',        label: 'No fui a la sucursal' },
       ]),
     next: () => 'q4b'
   },
-  // q4b/q4c/q4d — validación de compra real (detección de cartera robada)
+  // q4b/q4c/q4d — validación de compra real (detección de cartera robada).
+  // Q4c v3 (jun-2026): expandida con cross-channel intra-grupo.
   { id: 'q4b',       render: () => renderRadio('q4b',
-      'Más allá de tu interés inicial, ¿finalmente compraste algún auto seminuevo en estos meses?', [
+      'Más allá de tu interés inicial, ¿finalmente compraste algún auto en estos meses?', [
         { v: 'si',              label: 'Sí, compré un auto' },
         { v: 'sigo_buscando',   label: 'Sigo buscando, aún no compro' },
         { v: 'no',              label: 'No, ya no voy a comprar' },
@@ -472,12 +481,24 @@ const FLOW = [
   },
   { id: 'q4c',       render: () => renderRadio('q4c',
       '¿Dónde lo compraste?', [
-        { v: 'en_plasencia',     label: 'En Plasencia Seminuevos' },
-        { v: 'en_otra_agencia',  label: 'En otra agencia' },
-        { v: 'a_un_particular',  label: 'A un particular' },
-        { v: 'prefiero_no_decir', label: 'Prefiero no decir' },
+        { v: 'en_misma_agencia',      label: `En ${BRAND_DISPLAY} (la misma agencia donde inicié)` },
+        { v: 'en_otra_agencia_grupo', label: 'En otra agencia del Grupo Plasencia (otra marca del grupo)' },
+        { v: 'en_otra_cadena',        label: 'En una agencia de otra marca o cadena' },
+        { v: 'a_un_particular',       label: 'A un particular' },
+        { v: 'prefiero_no_decir',     label: 'Prefiero no decir' },
       ]),
-    next: () => answers.q4c === 'en_plasencia' ? 'q4d' : postQ4Logic()
+    next: () => {
+      if (answers.q4c === 'en_misma_agencia') return 'q4d';
+      if (answers.q4c === 'en_otra_agencia_grupo') return 'q4c_grupo';
+      return postQ4Logic();
+    }
+  },
+  // Q4c v3 sub-pregunta: si compró en otra marca del grupo, captura cuál.
+  { id: 'q4c_grupo', render: () => renderRadio('q4c_grupo_marca',
+      '¿En cuál marca del Grupo Plasencia compraste?',
+      MARCAS_GRUPO.map(m => ({ v: m.toLowerCase(), label: m }))
+    ),
+    next: () => postQ4Logic()
   },
   { id: 'q4d',       render: renderQ4d, next: () => postQ4Logic() },
   { id: 'q5',        render: () => renderScale('q5',
@@ -545,6 +566,20 @@ async function init() {
       return showSuccess('Ya respondiste esta encuesta', 'Gracias por haber compartido tu experiencia. Si quieres agregar algo, contáctanos por WhatsApp.');
     }
     surveyData = data;
+    // Multimarca: actualiza brand display y marcas_grupo desde lo que devolvió el backend.
+    if (data.brand_display_name) {
+      BRAND_DISPLAY = data.brand_display_name;
+      try {
+        const hdr = document.getElementById('brandHeader');
+        const ftr = document.getElementById('brandFooter');
+        if (hdr) hdr.textContent = BRAND_DISPLAY;
+        if (ftr) ftr.textContent = BRAND_DISPLAY;
+        document.title = `Tu experiencia con ${BRAND_DISPLAY}`;
+      } catch (e) {}
+    }
+    if (Array.isArray(data.marcas_grupo) && data.marcas_grupo.length) {
+      MARCAS_GRUPO = data.marcas_grupo;
+    }
 
     // RECOVERY: si hay respuestas pendientes de un submit fallido previo,
     // ofrece al cliente recuperarlas en lugar de empezar de cero.
@@ -608,6 +643,7 @@ function goto(stepId) {
     q4: 'P4 — Visita a sucursal',
     q4b: 'P5 — Compraste auto',
     q4c: 'P6 — Donde compraste',
+    q4c_grupo: 'P6b — Marca del grupo',
     q4d: 'P7 — Modelo y sucursal',
     q5: 'P8 — Atencion vendedor',
     q6: 'P9 — Seguimiento',
@@ -632,7 +668,7 @@ function renderWelcome() {
   $('#app').innerHTML = `
     <div class="card step">
       <h1>Hola ${escapeHtml(d.primer_nombre)} 👋</h1>
-      <p>Hace tiempo registraste interés en un auto en Plasencia Seminuevos. Queremos saber cómo te trataron y qué podemos mejorar.</p>
+      <p>Hace tiempo registraste interés en un auto en ${BRAND_DISPLAY}. Queremos saber cómo te trataron y qué podemos mejorar.</p>
       <div class="lead-context">
         ${d.auto_interes ? `<div class="row"><span>🚗</span><div><strong>${escapeHtml(d.auto_interes)}</strong></div></div>` : ''}
         ${d.sucursal ? `<div class="row"><span>📍</span><div>Sucursal <strong>${escapeHtml(d.sucursal)}</strong></div></div>` : ''}
@@ -896,7 +932,7 @@ function renderCierreFraude() {
       <div class="icon">🛡️</div>
       <h2>Gracias por avisarnos</h2>
       <p>Vamos a revisar el registro. Si quieres compartir más detalles, escríbenos:</p>
-      <a class="btn btn-wa" href="https://wa.me/${DIRECTOR_WA}?text=${encodeURIComponent('Hola, alguien usó mi información para registrar interés en un auto en Plasencia Seminuevos (folio ' + (surveyData?.folio || '') + ').')}" target="_blank" rel="noopener">
+      <a class="btn btn-wa" href="https://wa.me/${DIRECTOR_WA}?text=${encodeURIComponent('Hola, alguien usó mi información para registrar interés en un auto en ' + BRAND_DISPLAY + ' (folio ' + (surveyData?.folio || '') + ').')}" target="_blank" rel="noopener">
         💬 Reportar al Director de Marketing por WhatsApp
       </a>
     </div>
