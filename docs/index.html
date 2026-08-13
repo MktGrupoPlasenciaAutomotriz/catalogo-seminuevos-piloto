@@ -1953,6 +1953,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
             <span>Mazda Santa Anita</span>
           </button>
+          <button type="button" class="loc-chip type-chip" data-loc="GWM González Gallo" onclick="filterByLocChip('GWM González Gallo')" aria-pressed="false" title="GWM González Gallo · Calz. Jesús González Gallo 2565, El Rosario">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>GWM Gzz Gallo</span>
+          </button>
         </div>
         <!-- Hint de sede seleccionada -->
         <div id="locInfo" class="loc-info-card" style="display:none;" role="region" aria-live="polite"></div>
@@ -2014,6 +2018,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <option value="Mazda Acueducto">Mazda Acueducto</option>
         <option value="Mazda Gonzalez Gallo">Mazda González Gallo</option>
         <option value="Mazda Santa Anita">Mazda Santa Anita</option>
+        <option value="GWM González Gallo">GWM González Gallo</option>
       </select>
       <!-- Select de tipo oculto: idem -->
       <select onchange="filterByType(this.value)" id="filterType" class="filter-select" aria-hidden="true" tabindex="-1" style="display:none;">
@@ -2683,7 +2688,10 @@ var SEDE_INFO = {
   'Mazda Americas': { nombre: 'Mazda Américas', direccion: 'Av. Américas 918, Chapultepec Country, Guadalajara, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3732.387930461078!2d-103.37285170000001!3d20.694466!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ae3b06d01933%3A0x3ca15de8be3778cc!2sMazda%20Am%C3%A9ricas!5e0!3m2!1ses-419!2smx!4v1776699052902!5m2!1ses-419!2smx' },
   'Mazda Acueducto': { nombre: 'Mazda Acueducto', direccion: 'Av. Acueducto 5455, Puerta de Hierro, Zapopan, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3731.807178173183!2d-103.4137913!3d20.7180532!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428af057bba4985%3A0x4e900d059c07986!2sMazda%20Acueducto!5e0!3m2!1ses-419!2smx!4v1776699232884!5m2!1ses-419!2smx' },
   'Mazda Gonzalez Gallo': { nombre: 'Mazda González Gallo', direccion: 'Calz. González Gallo 1530, El Rosario, Guadalajara, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.52952875121!2d-103.3347312!3d20.648025!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428b368c6b6b9c7%3A0x1f67a9333a44d129!2sMazda%20Gonzalez%20Gallo!5e0!3m2!1ses-419!2smx!4v1776699292662!5m2!1ses-419!2smx' },
-  'Mazda Santa Anita': { nombre: 'Mazda Santa Anita', direccion: 'Av. López Mateos Sur 4115, Los Gavilanes, Tlajomulco, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3735.4123650126653!2d-103.45514999999999!3d20.5712109!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ab56fd729c75%3A0xc711bd9bafce9610!2sMazda%20Santa%20Anita!5e0!3m2!1ses-419!2smx!4v1776699317532!5m2!1ses-419!2smx' }
+  'Mazda Santa Anita': { nombre: 'Mazda Santa Anita', direccion: 'Av. López Mateos Sur 4115, Los Gavilanes, Tlajomulco, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3735.4123650126653!2d-103.45514999999999!3d20.5712109!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ab56fd729c75%3A0xc711bd9bafce9610!2sMazda%20Santa%20Anita!5e0!3m2!1ses-419!2smx!4v1776699317532!5m2!1ses-419!2smx' },
+  // GWM González Gallo (Fase 4, agosto 2026) — sucursal virtual con inventario
+  // compartido con Bugámbilias. Piso físico propio (Calz. Jesús González Gallo 2565).
+  'GWM González Gallo': { nombre: 'GWM González Gallo', direccion: 'Calz. Jesús González Gallo 2565, El Rosario, 44890 Guadalajara, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.8221493983315!2d-103.3265925!3d20.6361049!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428b3000f9d5c0d%3A0xb85edca3318708cc!2sGWM%20Gonz%C3%A1lez%20Gallo!5e0!3m2!1ses!2smx!4v1786654205004!5m2!1ses!2smx' }
 };
 
 function renderLocInfo(val) {
@@ -2770,10 +2778,20 @@ function populateFiltersFromInventory() {
     brandSel.value = currentBrandFilter || 'all';
   }
 
-  // ── Ubicacion ── solo sedes con al menos un auto
+  // ── Ubicacion ── solo sedes con al menos un auto.
+  // Incluye sucursales virtuales (sucursales_disponibles[]) para que aparezcan
+  // en el dropdown aunque no sean loc primario de ningun auto (ej. GWM Gzz Gallo
+  // comparte inventario con Bugambilias, no tiene loc primario propio).
   const locSel = document.getElementById('filterLoc');
   if (locSel) {
-    const locs = Array.from(new Set(vehicles.map(v => v.loc).filter(Boolean))).sort();
+    const locSet = new Set();
+    vehicles.forEach(v => {
+      if (v.loc) locSet.add(v.loc);
+      if (Array.isArray(v.sucursales_disponibles)) {
+        v.sucursales_disponibles.forEach(s => { if (s) locSet.add(s); });
+      }
+    });
+    const locs = Array.from(locSet).sort();
     const opts = ['<option value="all">Ubicación</option>'];
     locs.forEach(l => opts.push('<option value="' + l + '">' + l + '</option>'));
     locSel.innerHTML = opts.join('');
@@ -2847,7 +2865,15 @@ function _priceLabel(p){return p;}
 function _countWithoutFilter(skipKey) {
   var arr = vehicles;
   if (skipKey !== 'tipo' && currentFilter !== 'all') arr = arr.filter(function(v){return _norm(v.type) === _norm(currentFilter);});
-  if (skipKey !== 'sede' && currentLocFilter !== 'all') arr = arr.filter(function(v){return normLoc(v.loc) === normLoc(currentLocFilter);});
+  if (skipKey !== 'sede' && currentLocFilter !== 'all') arr = arr.filter(function(v){
+    // Sucursales virtuales (ej. GWM Gonzalez Gallo comparte inventario con Bug):
+    // matchea si el filtro esta en sucursales_disponibles[] O es el loc primario.
+    var wanted = normLoc(currentLocFilter);
+    if (Array.isArray(v.sucursales_disponibles)) {
+      return v.sucursales_disponibles.some(function(s){ return normLoc(s) === wanted; });
+    }
+    return normLoc(v.loc) === wanted;
+  });
   if (skipKey !== 'marca' && currentBrandFilter !== 'all') {
     if (currentBrandFilter === '_other') arr = arr.filter(function(v){return !TOP_BRANDS.includes(v.brand);});
     else arr = arr.filter(function(v){return v.brand === currentBrandFilter;});
@@ -2936,7 +2962,13 @@ function renderCards(filter) {
   // Filtro de ubicación — normalizado para resilir a diferencias de acentos
   // entre el JSON del catalogo y los chips HTML (ver normLoc arriba).
   if (currentLocFilter !== 'all') {
-    filtered = filtered.filter(v => normLoc(v.loc) === normLoc(currentLocFilter));
+    var wantedLoc = normLoc(currentLocFilter);
+    filtered = filtered.filter(v => {
+      if (Array.isArray(v.sucursales_disponibles)) {
+        return v.sucursales_disponibles.some(s => normLoc(s) === wantedLoc);
+      }
+      return normLoc(v.loc) === wantedLoc;
+    });
   }
 
   // Filtro de marca
@@ -3637,6 +3669,11 @@ const SUCURSAL_MAPS = {
     name: 'Mazda Santa Anita',
     addr: 'Av. López Mateos Sur 4115, Los Gavilanes, Tlajomulco',
     src: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3735.4123650126653!2d-103.45514999999999!3d20.5712109!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ab56fd729c75%3A0xc711bd9bafce9610!2sMazda%20Santa%20Anita!5e0!3m2!1ses-419!2smx!4v1776699317532!5m2!1ses-419!2smx'
+  },
+  'GWM GONZALEZ GALLO': {
+    name: 'GWM González Gallo',
+    addr: 'Calz. Jesús González Gallo 2565, El Rosario, 44890 Guadalajara',
+    src: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.8221493983315!2d-103.3265925!3d20.6361049!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428b3000f9d5c0d%3A0xb85edca3318708cc!2sGWM%20Gonz%C3%A1lez%20Gallo!5e0!3m2!1ses!2smx!4v1786654205004!5m2!1ses!2smx'
   }
 };
 
@@ -3775,7 +3812,21 @@ function submitForm() {
     km: currentCar.km || 0,
     precio: currentCar.price,
     badge: (currentCar.badge || '').toUpperCase(),
-    sucursal: (currentCar.loc || '').toUpperCase(),
+    // Sucursal enviada al CRM: preserva la sucursal que el usuario ELIGIO al
+    // filtrar (currentLocFilter). Esto es crítico para sucursales virtuales
+    // con inventario compartido: si el usuario esta en GWM Gzz Gallo y hace
+    // lead sobre un auto que fisicamente esta en Bugambilias, el payload debe
+    // decir "GWM GONZALEZ GALLO" para rutear a su canal Vambe propio.
+    // Fallback: v.loc si no hay filtro activo o el filtro no esta en las
+    // sucursales disponibles del auto (usuario cambio filtro despues de abrir modal).
+    sucursal: (function(){
+      var chosenLoc = currentCar.loc || '';
+      if (currentLocFilter && currentLocFilter !== 'all' && Array.isArray(currentCar.sucursales_disponibles)) {
+        var match = currentCar.sucursales_disponibles.find(function(s){ return normLoc(s) === normLoc(currentLocFilter); });
+        if (match) chosenLoc = match;
+      }
+      return chosenLoc.toUpperCase();
+    })(),
     fecha_cita: '',
     hora_cita: '',
     auto_a_cuenta: '',

@@ -37,6 +37,35 @@ SUCURSAL_OVERRIDES = {
     4054: "Bugambilias",
 }
 
+# Sucursales virtuales que comparten inventario físico con otra sucursal.
+# La sucursal virtual NO tiene stock propio en Maxipublica — se ofrece el
+# stock de la sucursal fuente como si estuviera disponible también ahí, con
+# canal de venta (pipeline Vambe + WhatsApp) distinto.
+#
+# Regla de negocio 2026-08-13:
+#   GWM González Gallo comparte inventario con Bugambilias (agencia_id 4054).
+#
+# El campo `sucursales_disponibles` en cada auto será un array que incluye
+# la loc primaria + cualquier sucursal virtual que apunte a esa agencia.
+# La landing usa este array para (1) filtrar por sucursal y (2) permitir al
+# usuario elegir la sucursal preferida al agendar cita.
+SUCURSAL_VIRTUAL_ALIASES = {
+    4054: ["GWM González Gallo"],  # Bugambilias → también disponibles como GWM González Gallo
+}
+
+
+def get_sucursales_disponibles(row):
+    """Retorna array de sucursales donde el auto puede ofrecerse.
+    Primera entrada = sucursal fisica primaria (loc). Resto = sucursales
+    virtuales que comparten el stock (canal de venta alterno).
+    """
+    aid = row.get("agencia_id")
+    primary = SUCURSAL_OVERRIDES.get(aid) or row.get("agencia_nombre") or ""
+    if not primary:
+        return []
+    aliases = SUCURSAL_VIRTUAL_ALIASES.get(aid, [])
+    return [primary] + aliases
+
 
 def load_env():
     env = {}
@@ -156,8 +185,11 @@ def transform(row):
         # Solo se incluye si la seccion tiene items.
         "equipamiento": equipamiento,
 
-        # Sucursal y agencia
+        # Sucursal y agencia. `loc` = sucursal fisica primaria (siempre 1 valor).
+        # `sucursales_disponibles` = array [loc, ...alias virtuales] para casos
+        # como GWM Gonzalez Gallo (inventario compartido con Bugambilias).
         "loc": get_loc(row, extra),
+        "sucursales_disponibles": get_sucursales_disponibles(row),
         "agencia_id": row.get("agencia_id"),
 
         # Imagenes
