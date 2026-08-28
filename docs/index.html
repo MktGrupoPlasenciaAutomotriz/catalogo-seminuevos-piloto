@@ -3886,8 +3886,20 @@ function submitForm() {
   // (renombrado a generate_lead_server post 2026-05-13). Para deduplicación
   // nativa Pixel↔CAPI Meta, ambos usan el mismo event_id = `{folio}_Lead`
   // (convención del proyecto, ver 03-tech).
+  // ── CUTOVER 2026-08-28 · generate_lead pasa a ser SERVER-SIDE ──────────
+  // El evento del dataLayer se renombra a 'generate_lead_client'. El trigger
+  // 61 de GTM (CE - generate_lead) ya no lo matchea, asi que dejan de disparar:
+  //   tag 253 · GA4 Event - generate_lead (v3)  -> lo emite ahora el worker,
+  //             enriquecido con session_id, user_data hasheado, ip, user agent
+  //             y click IDs. Un solo evento, sin duplicar el Key Event que
+  //             Google Ads usa como conversion.
+  //   tag 252 · Meta Pixel Event - Lead         -> cubierto por CAPI, que el
+  //             worker ya manda con el MISMO event_id ({folio}_Lead), asi que
+  //             Meta lo sigue recibiendo deduplicado y con mejor data.
+  // El push se conserva completo: sirve para debug y para cualquier consumidor
+  // futuro del dataLayer. Solo cambia la llave `event`.
   dataLayer.push({
-    event: 'generate_lead',
+    event: 'generate_lead_client',
     event_id: folio + '_Lead',    // dedup key Pixel↔CAPI Meta
     folio: folio,
     currency: 'MXN',
