@@ -47,6 +47,15 @@ jobs:
       - name: Sync textos marketing del HTML con inventario real
         run: python3 sync_landing_marketing.py
 
+      # Paridad canonica (Chucho, 28-ago-2026): el catalogo publicado debe ser
+      # IDENTICO a lo que Maxipublica manda PARA LAS SUCURSALES DEL PILOTO.
+      # Corre DESPUES del sync: si aqui hay deriva ya no es lag, es un defecto.
+      # --warn no truena el job todavia; el commit del export ocurre despues y
+      # una falla aqui dejaria el sitio a medias. Se endurece cuando lleve
+      # algunas corridas limpias.
+      - name: Auditoria de paridad del catalogo
+        run: python3 auditoria_catalogo.py --warn
+
       - name: Commit y push catalogo-piloto.json + index.html
         run: |
           git config user.name "github-actions[bot]"
