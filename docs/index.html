@@ -2520,6 +2520,26 @@ function getGaClientId() {
   return parts.length >= 4 ? parts.slice(-2).join('.') : '';
 }
 
+// GA4 session_id desde la cookie `_ga_<STREAM_ID>`.
+// SIN ESTO, los eventos server-side via Measurement Protocol NO se unen a la
+// sesion del browser: GA4 abre una sesion nueva sin fuente y la atribuye a
+// (direct) → "Unassigned". Diagnosticado 2026-08-27: 119 generate_lead_server,
+// 15 purchase y 10 schedule_appointment cayeron todos en Unassigned mientras el
+// evento client-side si atribuia a Paid Search.
+// Formato: `_ga_W90CJDW2PT=GS2.1.s1756300000$o5$g1$t1756300123$j60$l0$h0`
+// El session_id es el numero despues de `s` en el 3er segmento.
+var GA4_STREAM_SUFFIX = 'W90CJDW2PT'; // de G-W90CJDW2PT (Seminuevos)
+function getGaSessionId() {
+  try {
+    var raw = getCookie('_ga_' + GA4_STREAM_SUFFIX);
+    if (!raw) return '';
+    var parts = raw.split('.');
+    if (parts.length < 3) return '';
+    var m = parts[2].split('$')[0];        // "s1756300000" → sin el resto
+    return /^s?\d+$/.test(m) ? m.replace(/^s/, '') : '';
+  } catch (e) { return ''; }
+}
+
 // Tracking context unico: TODOS los eventos del funnel deben llevar estos
 // identifiers para que GTM/GA4/Pixel tengan visibilidad cross-platform de
 // quien esta en cada paso (no solo en generate_lead). Spread con
@@ -2544,6 +2564,7 @@ function getTrackingContext() {
     utm_term:          sessionStorage.getItem('utm_term')     || '',
     // GA4 cross-device (browser ↔ server-side)
     ga_client_id:      getGaClientId(),
+    ga_session_id:     getGaSessionId(),
     // Browser identifiers (para debugging GTM Preview + cualquier tag que los necesite)
     client_ip_address: sessionStorage.getItem('client_ip') || '',
     client_user_agent: navigator.userAgent || ''
@@ -3853,6 +3874,7 @@ function submitForm() {
     fbp: getCookie('_fbp'),
     fbc: getCookie('_fbc'),
     ga_client_id: getGaClientId(),
+    ga_session_id: getGaSessionId(),
     client_ip_address: sessionStorage.getItem('client_ip') || '',
     client_user_agent: navigator.userAgent || ''
   };
