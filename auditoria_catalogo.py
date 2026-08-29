@@ -36,9 +36,23 @@ WORKER_DIR = os.path.expanduser("~/Documents/Grupo Plasencia/crm-worker")
 
 
 def d1(sql):
-    r = subprocess.run(["npx", "wrangler", "d1", "execute", D1, "--remote", "--json",
-                        "--command", sql], capture_output=True, text=True, cwd=WORKER_DIR)
-    return json.loads(r.stdout[r.stdout.index("["):])[0]["results"]
+    """Consulta D1 via wrangler. Devuelve None si no hay acceso (p.ej. en CI).
+
+    En el runner de GitHub no existe el checkout del worker ni las credenciales
+    de wrangler. Antes esto reventaba con FileNotFoundError, tumbaba el paso y
+    -por el orden de los pasos- SALTABA EL COMMIT: el catalogo dejo de
+    publicarse 3 corridas seguidas. La auditoria nunca debe poder impedir que
+    el catalogo se publique.
+    """
+    if not os.path.isdir(WORKER_DIR):
+        return None
+    try:
+        r = subprocess.run(["npx", "wrangler", "d1", "execute", D1, "--remote", "--json",
+                            "--command", sql], capture_output=True, text=True,
+                           cwd=WORKER_DIR, timeout=180)
+        return json.loads(r.stdout[r.stdout.index("["):])[0]["results"]
+    except Exception:
+        return None
 
 
 def get(url, binary=False):
@@ -50,9 +64,20 @@ def main():
     solo_warn = "--warn" in sys.argv
     print("=== Auditoria de paridad del catalogo ===")
 
-    piloto = {str(x["agencia_id"]) for x in
-              d1("SELECT DISTINCT agencia_id FROM inventario_seminuevos "
-                 "WHERE piloto_otero=1 AND activo=1")}
+    # El sitio publicado es la referencia que SIEMPRE esta disponible.
+    web = {str(a["id"]): str(a.get("vin") or "").strip() for a in get(SITIO)}
+
+    # Alcance del piloto: de D1 si hay acceso; si no, se deriva del propio
+    # export, que es justamente el resultado de filtrar piloto_otero=1.
+    filas = d1("SELECT DISTINCT agencia_id FROM inventario_seminuevos "
+               "WHERE piloto_otero=1 AND activo=1")
+    hay_d1 = filas is not None
+    if hay_d1:
+        piloto = {str(x["agencia_id"]) for x in filas}
+    else:
+        piloto = {str(a.get("agencia_id")) for a in get(SITIO) if a.get("agencia_id")}
+        print("  [sin acceso a D1 — se audita feed -> sitio; el alcance del")
+        print("   piloto se deriva del catalogo publicado]")
     print(f"  sucursales del piloto: {len(piloto)}")
 
     # ── Maxipublica, acotado a nuestras sucursales ──
@@ -65,16 +90,17 @@ def main():
             feed[(it.findtext("vehicle_id") or "").strip()] = (it.findtext("vin") or "").strip()
 
     # ── D1 y sitio ──
-    d1r = {str(x["id_auto"]): (x["v"] or "") for x in
-           d1("SELECT id_auto, COALESCE(NULLIF(TRIM(vin),''),'') v FROM inventario_seminuevos "
-              "WHERE piloto_otero=1 AND activo=1")}
-    web = {str(a["id"]): str(a.get("vin") or "").strip() for a in get(SITIO)}
+    filas = d1("SELECT id_auto, COALESCE(NULLIF(TRIM(vin),''),'') v "
+               "FROM inventario_seminuevos WHERE piloto_otero=1 AND activo=1")
+    d1r = {str(x["id_auto"]): (x["v"] or "") for x in filas} if filas else None
 
-    print(f"  feed (piloto) {len(feed)}  ·  D1 {len(d1r)}  ·  sitio {len(web)}"
-          f"   [feed completo: {feed_total}]")
+    print(f"  feed (piloto) {len(feed)}  ·  D1 {len(d1r) if d1r else 'n/d'}"
+          f"  ·  sitio {len(web)}   [feed completo: {feed_total}]")
 
+    tramos = ([("feed -> D1", feed, d1r), ("D1 -> sitio", d1r, web)] if d1r
+              else [("feed -> sitio", feed, web)])
     fallos = 0
-    for etiqueta, a, b in (("feed -> D1", feed, d1r), ("D1 -> sitio", d1r, web)):
+    for etiqueta, a, b in tramos:
         A, B = set(a), set(b)
         falta, sobra = A - B, B - A
         dif = [i for i in (A & B) if a[i].upper() != b[i].upper()]

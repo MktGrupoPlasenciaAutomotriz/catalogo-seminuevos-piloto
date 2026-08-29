@@ -47,14 +47,6 @@ jobs:
       - name: Sync textos marketing del HTML con inventario real
         run: python3 sync_landing_marketing.py
 
-      # Paridad canonica (Chucho, 28-ago-2026): el catalogo publicado debe ser
-      # IDENTICO a lo que Maxipublica manda PARA LAS SUCURSALES DEL PILOTO.
-      # Corre DESPUES del sync: si aqui hay deriva ya no es lag, es un defecto.
-      # --warn no truena el job todavia; el commit del export ocurre despues y
-      # una falla aqui dejaria el sitio a medias. Se endurece cuando lleve
-      # algunas corridas limpias.
-      - name: Auditoria de paridad del catalogo
-        run: python3 auditoria_catalogo.py --warn
 
       - name: Commit y push catalogo-piloto.json + index.html
         run: |
@@ -64,6 +56,20 @@ jobs:
           git diff --cached --quiet && echo "Sin cambios en landing" || git commit -m "sync: catalogo + marketing $(date -u +%Y-%m-%dT%H:%MZ)"
           git push
 
+
+      # Paridad canonica (Chucho, 28-ago-2026): el catalogo publicado debe ser
+      # IDENTICO a lo que Maxipublica manda PARA LAS SUCURSALES DEL PILOTO.
+      #
+      # VA DESPUES DEL COMMIT, a proposito. En su primera version corria antes
+      # y el 29-ago tumbo el sync 3 corridas seguidas: el script reventaba en el
+      # runner y el paso de commit se saltaba, asi que el catalogo dejo de
+      # publicarse. Una auditoria nunca debe poder impedir que se publique lo
+      # que ya se sincronizo — solo debe reportar.
+      #
+      # Doble red: continue-on-error ademas de --warn.
+      - name: Auditoria de paridad del catalogo
+        continue-on-error: true
+        run: python3 auditoria_catalogo.py --warn
       - name: Subir resumen como artifact (debug)
         if: always()
         uses: actions/upload-artifact@v4
