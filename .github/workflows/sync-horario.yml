@@ -5,7 +5,13 @@ on:
     # Cron horario: minuto 4 de cada hora (UTC). El feed XML de Maxipublica
     # se actualiza cada hora, el offset de 4 min es deliberado para que el
     # feed ya tenga la version fresca cuando descargamos.
-    - cron: '4 * * * *'
+    # Dos ventanas por hora en vez de una. GitHub Actions retrasa y se salta
+    # corridas programadas: medido el 29-ago sobre 29 corridas, promedio real
+    # 2.7 h con un cron declarado de 1 h. Duplicar las ventanas no arregla el
+    # scheduler pero duplica las oportunidades de que alguna caiga.
+    # La proteccion de fondo es runWorkflowWatchdog en el Worker, cuyo cron de
+    # Cloudflare SI es puntual — pero requiere el secreto GITHUB_TOKEN.
+    - cron: '4,34 * * * *'
   workflow_dispatch:  # Permite correrlo manualmente desde la pestaña Actions
 
 concurrency:
