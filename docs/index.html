@@ -2670,6 +2670,164 @@ function _norm(s) {
   return (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 }
 
+// ══════════════════════════════════════════════════════════════════════
+// BUSQUEDA TOLERANTE — alias + distancia de edicion
+// ══════════════════════════════════════════════════════════════════════
+// Antes era includes() sobre el string crudo: "vw", "mercedez", "cx5" o
+// "hiunday" devolvian cero autos aunque el inventario los tuviera. Eso es fuga
+// de demanda pura — el usuario escribe como habla, no como esta en el feed.
+//
+// Dos mecanismos que se complementan, porque resuelven cosas distintas:
+//
+//   ALIAS       para abreviaturas y apodos. Ninguna distancia de edicion va a
+//               llevar "vw" hasta "volkswagen" (distancia 8). Tiene que ser
+//               una tabla explicita.
+//   LEVENSHTEIN para faltas de ortografia. "mercedez", "hiunday", "chebrolet"
+//               estan a 1-2 ediciones de la marca real.
+//
+// Ambos operan sobre texto normalizado: sin acentos, sin guiones, sin
+// puntuacion. Asi "cx5" encuentra "CX-5" y "sedan" encuentra "Sedán".
+function _sNorm(s) {
+  return (s || '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+// Como la gente escribe las marcas en Mexico. Solo abreviaturas y apodos:
+// las faltas de ortografia las cubre la distancia de edicion, no esta tabla.
+var SEARCH_ALIASES = {
+  vw: 'volkswagen', wv: 'volkswagen', volks: 'volkswagen', vocho: 'volkswagen',
+  chevy: 'chevrolet', chevi: 'chevrolet', chev: 'chevrolet',
+  mercedes: 'mercedes benz', benz: 'mercedes benz', merc: 'mercedes benz', mb: 'mercedes benz',
+  mitsu: 'mitsubishi', mitsubichi: 'mitsubishi',
+  jip: 'jeep', yip: 'jeep', yeep: 'jeep',
+  bmv: 'bmw', bemeube: 'bmw',
+  aoudi: 'audi',
+  gwm: 'gwm great wall', granwall: 'gwm great wall', greatwall: 'gwm great wall',
+  bmw: 'bmw', beemer: 'bmw',
+  vocho2: 'volkswagen',
+  camioneta: 'suv', camionetas: 'suv', troca: 'pickup', trocas: 'pickup',
+  pickup: 'pickup', pick: 'pickup',
+  sedan: 'sedan', coupe: 'coupe', hatch: 'hatchback',
+  electrico: 'electrico', hibrido: 'hibrido'
+};
+
+// Distancia de Levenshtein con corte temprano: si ya se paso del maximo
+// tolerado, no tiene caso terminar de calcular.
+function _lev(a, b, max) {
+  if (a === b) return 0;
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  var prev = [], cur = [], i, j;
+  for (j = 0; j <= b.length; j++) prev[j] = j;
+  for (i = 1; i <= a.length; i++) {
+    cur[0] = i;
+    var mejorFila = cur[0];
+    for (j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1,
+                        prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (cur[j] < mejorFila) mejorFila = cur[j];
+    }
+    if (mejorFila > max) return max + 1;
+    for (j = 0; j <= b.length; j++) prev[j] = cur[j];
+  }
+  return prev[b.length];
+}
+
+// Cuanto error se tolera segun el largo. En palabras cortas una edicion ya
+// cambia el significado ("kia" vs "mia"), asi que se es estricto.
+//
+// La primera letra casi nunca se equivoca al teclear: quien escribe "hunday"
+// acierta la h. Cuando coincide, se permite una edicion mas — asi
+// "hunday"(6) alcanza "hyundai"(7), que esta a distancia 2. Sin ese ancla,
+// subir la tolerancia global mezclaria marcas distintas del mismo largo.
+function _tolerancia(t, h) {
+  var max = t.length <= 3 ? 0 : t.length <= 6 ? 1 : 2;
+  if (h && t.length >= 5 && t[0] === h[0]) max = Math.min(max + 1, 2);
+  return max;
+}
+
+// Texto buscable de un auto, en DOS capas separadas a proposito.
+//
+// La sucursal NO puede vivir junto a la marca. Las agencias se llaman "Mazda
+// Acueducto", "GWM Gonzalez Gallo": con todo en un solo saco, buscar "mazda"
+// devolvia 145 autos de 22 marcas distintas — cualquier coche estacionado en
+// una agencia Mazda. GWM era peor por el inventario compartido entre
+// sucursales virtuales.
+//
+// Identidad manda. La ubicacion solo entra si la identidad no encontro nada
+// (ver filtrarPorBusqueda), para que "acueducto" siga sirviendo sin que
+// "mazda" se contamine.
+function _heno(v) {
+  if (v._heno) return v._heno;
+  v._heno = _sNorm([v.brand, v.name, v.year, v.color, v.type, v.trans, v.fuel].join(' '));
+  v._henoTok = v._heno.split(' ').filter(Boolean);
+  v._henoJunto = v._heno.replace(/ /g, '');
+  v._sede = _sNorm([v.loc, (v.sucursales_disponibles || []).join(' ')].join(' '));
+  return v._heno;
+}
+
+// Si la consulta ES exactamente una marca del catalogo, solo esa marca.
+// Sin esto, "mini" tambien traia minivans de Toyota porque "mini" es prefijo
+// de "minivan". Quien teclea el nombre completo de una marca no esta pidiendo
+// una coincidencia parcial en otro campo.
+function _marcaExacta(lista, q) {
+  var n = _sNorm(q);
+  if (!n) return null;
+  var hit = null;
+  for (var i = 0; i < lista.length; i++) {
+    if (_sNorm(lista[i].brand) === n) { hit = lista[i].brand; break; }
+  }
+  return hit;
+}
+
+// Dos pasadas: primero identidad del auto; si nadie coincide, se reintenta
+// permitiendo el nombre de la sucursal. Asi "mazda" trae Mazdas y "acueducto"
+// —que no es marca ni modelo— sigue trayendo los autos de esa agencia.
+function filtrarPorBusqueda(lista, query) {
+  var exacta = _marcaExacta(lista, query);
+  if (exacta) return lista.filter(function (v) { return v.brand === exacta; });
+  var r = lista.filter(function (v) { return matchBusqueda(v, query, false); });
+  if (r.length) return r;
+  return lista.filter(function (v) { return matchBusqueda(v, query, true); });
+}
+
+// Un token del usuario contra un auto. Se prueba de lo barato a lo caro.
+function _matchTok(v, tok) {
+  _heno(v);
+  if (v._henoJunto.indexOf(tok) !== -1) return true;          // substring: "cx5" en "mazdacx5"
+  var ali = SEARCH_ALIASES[tok];                               // alias: "vw" -> "volkswagen"
+  if (ali && v._heno.indexOf(_sNorm(ali).split(' ')[0]) !== -1) return true;
+  if (ali && _sNorm(ali).split(' ').some(function (a) { return v._henoJunto.indexOf(a) !== -1; })) return true;
+  return v._henoTok.some(function (h) {                        // ortografia
+    var max = _tolerancia(tok, h);
+    return max > 0 && Math.abs(h.length - tok.length) <= max && _lev(tok, h, max) <= max;
+  });
+}
+
+// Todos los tokens deben coincidir: "mazda suv" trae Mazda SUV, no todo Mazda.
+//
+// Antes se prueba la consulta COMPLETA sin separadores. "cx-5" se partia en
+// "cx" + "5", y ese "5" suelto matcheaba el 2015 de cualquier CX-30: devolvia
+// 29 autos donde "cx5" devolvia 23. Probando "cx5" de una pieza, el modelo
+// exacto gana y el desglose queda como respaldo.
+//
+// Y un token de 1-2 caracteres solo cuenta si ARRANCA una palabra del auto.
+// Como substring suelto seria ruido: casi todo contiene "a" o "5".
+function matchBusqueda(v, query, incluirSede) {
+  var q = _sNorm(query);
+  if (!q) return true;
+  _heno(v);
+  if (incluirSede && v._sede.replace(/ /g, '').indexOf(q.replace(/ /g, '')) !== -1) return true;
+  var junto = q.replace(/ /g, '');
+  if (junto.length >= 3 && v._henoJunto.indexOf(junto) !== -1) return true;
+  return q.split(' ').filter(Boolean).every(function (t) {
+    if (t.length <= 2) {
+      return v._henoTok.some(function (h) { return h.indexOf(t) === 0; })
+             || !!SEARCH_ALIASES[t] && _matchTok(v, t);
+    }
+    return _matchTok(v, t);
+  });
+}
+
 function badgeClass(b) {
   if (b && b.startsWith('Bono')) return 'bono';
   if (b === 'Destacado') return 'good';
@@ -3019,15 +3177,11 @@ function renderCards(filter) {
     else { const yNum = parseInt(y, 10); if (!isNaN(yNum)) filtered = filtered.filter(v => (v.year || 0) === yNum); }
   }
 
-  // Filtro de búsqueda
+  // Filtro de busqueda — tolerante a abreviaturas y faltas de ortografia.
+  // Ver filtrarPorBusqueda(): alias para "vw", distancia de edicion para
+  // "mercedez", y la sucursal como segunda pasada para no contaminar marcas.
   if (searchQuery) {
-    const q = searchQuery.toLowerCase();
-    filtered = filtered.filter(v =>
-      (v.name || '').toLowerCase().includes(q) ||
-      String(v.year).includes(q) ||
-      (v.color || '').toLowerCase().includes(q) ||
-      (v.brand || '').toLowerCase().includes(q)
-    );
+    filtered = filtrarPorBusqueda(filtered, searchQuery);
   }
 
   const showing = Math.min(visibleCount, filtered.length);
