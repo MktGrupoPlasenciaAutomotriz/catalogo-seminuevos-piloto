@@ -189,6 +189,15 @@ def transform(row):
         # `sucursales_disponibles` = array [loc, ...alias virtuales] para casos
         # como GWM Gonzalez Gallo (inventario compartido con Bugambilias).
         "loc": get_loc(row, extra),
+
+        # UBICACION REAL. Hasta el 2-sep-2026 la ficha solo decia la sucursal
+        # ("Mazda Americas") y nunca la ciudad. Con inventario repartido en 6
+        # ciudades — Zapopan, Venustiano Carranza, Tlalpan, Tepic, Puerto
+        # Vallarta y Guadalajara — el comprador no podia saber si el auto estaba
+        # a 20 minutos o a 5 horas. El feed manda ciudad y estado al 100%; el
+        # parser no los leia (ver fix del mismo dia en parser_xml_maxipublica).
+        "ciudad": row.get("ciudad") or extra.get("CIUDAD") or "",
+        "estado": row.get("estado") or extra.get("ESTADO") or "",
         "sucursales_disponibles": get_sucursales_disponibles(row),
         "agencia_id": row.get("agencia_id"),
 
