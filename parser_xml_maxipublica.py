@@ -244,13 +244,29 @@ def parse_listing(listing):
     price_raw = (listing.findtext("price") or "").strip()
     precio = parse_price(price_raw)
 
-    mileage_raw = (listing.findtext("mileage") or "").strip()
+    # KILOMETRAJE. <mileage> es un nodo ANIDADO, no texto plano:
+    #   <mileage><unit>KM</unit><value>94000</value></mileage>
+    # Hasta el 2-sep-2026 esto se leia con findtext("mileage"), que sobre un nodo
+    # con hijos devuelve el texto del propio nodo — o sea vacio SIEMPRE. Resultado:
+    # odometro_km quedo en NULL en los 700 vehiculos desde el primer sync, y ni el
+    # sitio ni el feed de Merchant Center podian mostrar los kilometros. El dato
+    # siempre estuvo en la fuente, al 100%.
     odometro = None
-    if mileage_raw:
-        try:
-            odometro = int(re.sub(r"[^\d]", "", mileage_raw))
-        except ValueError:
-            odometro = None
+    odometro_unidad = ""
+    mnode = listing.find("mileage")
+    if mnode is not None:
+        val = (mnode.findtext("value") or "").strip()
+        odometro_unidad = (mnode.findtext("unit") or "").strip().upper()
+        if val:
+            try:
+                odometro = int(re.sub(r"[^\d]", "", val))
+            except ValueError:
+                odometro = None
+        # El feed puede venir en millas; se normaliza a km porque toda la UI y el
+        # feed de Google asumen km.
+        if odometro is not None and odometro_unidad.startswith("MI"):
+            odometro = int(round(odometro * 1.609344))
+            odometro_unidad = "KM"
 
     transmission = (listing.findtext("transmission") or "").strip().upper()
     fuel = (listing.findtext("fuel_type") or "").strip().upper()
@@ -271,11 +287,34 @@ def parse_listing(listing):
 
     dealer_id_raw = (listing.findtext("dealer_id") or "").strip()
     agencia_id, agencia_nombre = parse_dealer(dealer_id_raw)
+    # dealer_phone cubre 93%; phone_number cubre 100%. Se usa el segundo como
+    # respaldo para no dejar sucursales sin telefono en la ficha.
     dealer_phone = (listing.findtext("dealer_phone") or "").strip()
+    if not dealer_phone:
+        dealer_phone = (listing.findtext("phone_number") or "").strip()
 
     lat = (listing.findtext("latitude") or "").strip()
     lng = (listing.findtext("longitude") or "").strip()
     coords = f"{lat},{lng}" if (lat and lng) else ""
+
+    # DIRECCION DE LA SUCURSAL. <address> trae <component name="..."> y el parser
+    # nunca la leyo — ciudad y estado quedaron en NULL desde siempre, aunque el
+    # feed los manda al 100%. Importa por dos razones: el comprador necesita saber
+    # DONDE esta el auto, y Google exige dealership_address para anuncios de
+    # vehiculos.
+    addr = {}
+    anode = listing.find("address")
+    if anode is not None:
+        for comp in anode.findall("component"):
+            nm = (comp.get("name") or "").strip()
+            tx = (comp.text or "").strip()
+            if nm and tx:
+                addr[nm] = tx
+    direccion_calle = addr.get("addr1", "")
+    ciudad = addr.get("city", "")
+    estado = addr.get("region") or addr.get("province") or ""
+    codigo_postal = addr.get("postal_code", "")
+    pais = addr.get("country", "MX")
 
     images = all_image_urls(listing)
     thumbnail = images[0] if images else ""
@@ -309,6 +348,7 @@ def parse_listing(listing):
         "TRIM": "",  # NO existe estructurado en el feed XML — se omite por decision explicita.
         "PRECIO": precio,
         "ODOMETRO_KM": odometro,
+        "ODOMETRO_UNIDAD": odometro_unidad,
         "CONDICION": condition,
         "COLOR_EXT": color_ext,
         "TRANSMISION": TRANS_MAP.get(transmission, transmission.title() if transmission else ""),
@@ -320,6 +360,11 @@ def parse_listing(listing):
         "AGENCIA_TELEFONO": dealer_phone,
         "URL_DETALLE": url_detalle,
         "COORDENADAS_GPS": coords,
+        "DIRECCION_CALLE": direccion_calle,
+        "CIUDAD": ciudad,
+        "ESTADO": estado,
+        "CODIGO_POSTAL": codigo_postal,
+        "PAIS": pais,
         "THUMBNAIL": thumbnail,
         "IMAGENES_URLS": images,
         "TOTAL_IMAGENES": len(images),
