@@ -2617,6 +2617,38 @@ fetch('catalogo-piloto.json')
     if (stepsEl) stepsEl.textContent = n;
     if (typeof populateFiltersFromInventory === 'function') populateFiltersFromInventory();
     renderCards('all');
+
+    // ── ENLACE PROFUNDO A UN VEHICULO ────────────────────────────────────
+    // Hasta el 2-sep-2026 la SPA NO abria un auto al cargar: el handler de
+    // popstate solo CERRABA el modal, asi que `#vehiculo-<id>` funcionaba para
+    // atras/adelante dentro de la sesion pero un enlace pegado en frio caia en
+    // el catalogo generico. Eso rompe cualquier link compartido y bloquea el
+    // feed de Merchant Center, donde cada auto necesita su propia pagina.
+    //
+    // Se aceptan las dos formas:
+    //   ?vehiculo=<id>   preferida — el parametro SI viaja al servidor, asi que
+    //                    Google la trata como URL distinta. Es la que usa el feed.
+    //   #vehiculo-<id>   compatibilidad con los enlaces ya compartidos.
+    try {
+      var _qs = new URLSearchParams(window.location.search);
+      var _deep = _qs.get('vehiculo') || '';
+      if (!_deep) {
+        var _m = (window.location.hash || '').match(/^#vehiculo-(.+)$/);
+        if (_m) _deep = _m[1];
+      }
+      if (_deep) {
+        // Los ids del catalogo son numericos; se comparan como texto para no
+        // depender del tipo con el que venga el JSON.
+        var _hit = vehicles.find(function (v) { return String(v.id) === String(_deep); });
+        if (_hit) {
+          openModal(_hit.id);
+        } else {
+          // El auto ya se vendio o salio del catalogo. No se deja al usuario en
+          // una pagina muda: se queda el listado y se avisa.
+          dataLayer.push({ event: 'deep_link_vehiculo_no_encontrado', item_id: String(_deep) });
+        }
+      }
+    } catch (e) {}
   })
   .catch(err => {
     console.error('Error cargando catalogo:', err);
