@@ -2289,14 +2289,37 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <span>Acepto recibir ofertas y comunicaciones de Seminuevos Plasencia.</span>
           </label>
 
-          <button class="btn-conversion" onclick="submitForm()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            Que mi asesor me escriba
+          <button class="btn-conversion" id="btnContinuarCita" type="button" onclick="goToCitaStep(2)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Continuar: elegir día y hora
           </button>
           <p class="form-privacy">Tus datos solo se usan para contactarte. Protegidos conforme a ley (LFPDPPP).</p>
           </div>
 
-          <!-- STEPS 3-5 ELIMINADOS (versión lite) -->
+          <!-- STEP 2: CITA · día y hora con el horario real de la sucursal del auto.
+               Fuente de horarios: crm-worker /api/lead/seminuevos/horarios (feed de
+               sucursales del grupo) con respaldo inline (CITA_CFG). Eventos dataLayer:
+               form_step_complete · calendar_day_selected · calendar_time_selected.
+               La conversion es server-side: generate_lead / Lead enriquecidos con la cita. -->
+          <div class="form-step" id="formStepCita">
+            <div class="cita-head">
+              <h4 class="cita-title">¿Cuándo quieres verlo?</h4>
+              <p class="cita-sub" id="citaSedeInfo"></p>
+            </div>
+            <div class="cita-label">Día</div>
+            <div class="cita-days" id="citaDays" role="radiogroup" aria-label="Elige el día"></div>
+            <div class="cita-label" id="citaTimesLabel" hidden>Hora</div>
+            <div class="cita-times" id="citaTimes" role="radiogroup" aria-label="Elige la hora"></div>
+            <div class="cita-summary" id="citaSummary" hidden></div>
+            <div class="form-error-msg" id="cita-error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Elige un día y una hora, o pide que tu asesor te proponga.</div>
+            <button class="btn-conversion" id="btnConfirmCita" type="button" onclick="submitForm()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              Confirmar mi cita
+            </button>
+            <button type="button" class="btn-cita-skip" onclick="submitForm({ sinCita: true })">Prefiero que mi asesor me proponga día y hora</button>
+            <button type="button" class="btn-cita-back" onclick="goToCitaStep(1)">Volver a mis datos</button>
+            <p class="form-privacy">Tu asesor confirma la cita por WhatsApp en menos de 2 horas. Si el horario cambia, te avisa.</p>
+          </div>
         </div>
       </div>
 
@@ -2359,7 +2382,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ════ JAVASCRIPT ════ -->
 <script>
-const WEBHOOK_URL = 'https://crm-plasencia.grupo-plasencia-automotriz.workers.dev/api/lead/seminuevos';
+// ── MODO QA ── ?qa=1 o localhost: apunta al worker de PREVIEW, el lead entra
+// como TEST/QA (fuera del kanban, Vambe y reportes) y los eventos server-side
+// salen etiquetados (Meta test_event_code, GA4 debug_mode). Nunca toca prod.
+var QA_MODE = /[?&]qa=1(&|$)/.test(window.location.search) || /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
+var CRM_BASE = QA_MODE
+  ? 'https://crm-plasencia-preview.grupo-plasencia-automotriz.workers.dev'
+  : 'https://crm-plasencia.grupo-plasencia-automotriz.workers.dev';
+const WEBHOOK_URL = CRM_BASE + '/api/lead/seminuevos';
+if (QA_MODE) {
+  document.addEventListener('DOMContentLoaded', function () {
+    var b = document.createElement('div');
+    b.id = 'qaBanner';
+    b.setAttribute('role', 'status');
+    b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#C8102E;color:#fff;font:700 12px/1.2 Inter,sans-serif;text-align:center;padding:6px 10px;letter-spacing:.3px;';
+    b.textContent = 'MODO QA · worker preview · los registros entran como TEST/QA · eventos etiquetados';
+    document.body.appendChild(b);
+  });
+}
 var searchDebounce = null;
 
 // Resiliencia de submit: single-path con fallback + retry queue + dedup por FOLIO.
@@ -2642,6 +2682,8 @@ fetch('catalogo-piloto.json')
         var _hit = vehicles.find(function (v) { return String(v.id) === String(_deep); });
         if (_hit) {
           openModal(_hit.id);
+          var _cf = _qs.get('cita_fecha') || '', _ch = _qs.get('cita_hora') || '';
+          if (_cf) { try { applyPlasiPrefill(null, { fecha: _cf, hora: _ch }, 'plasi'); } catch (e) {} }
         } else {
           // El auto ya se vendio o salio del catalogo. No se deja al usuario en
           // una pagina muda: se queda el listado y se avisa.
@@ -2699,7 +2741,7 @@ function fmt(n) { return '$' + n.toLocaleString('es-MX'); }
 // filtros y lookups donde el dato del feed puede venir con acentos
 // ("Sedán", "Mazda Galerías") y los selectores HTML / dicts vienen sin.
 function _norm(s) {
-  return (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  return (s || '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -2888,7 +2930,7 @@ function filterByLocSelect(val) { currentLocFilter = val; visibleCount = ITEMS_P
 // Americas=30, Galerias=27, GonzalezGallo=13 todos invisibles).
 function normLoc(s) {
   if (!s) return '';
-  return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 }
 // Datos de las 8 sucursales del piloto Seminuevos. Direcciones via Google Maps query (no inventamos coords).
 var SEDE_INFO = {
@@ -3307,8 +3349,178 @@ let currentFormStep = 1;
 const FORM_STEP_HEADS = {
   1: { title: 'Solicita información', sub: 'Te contactamos por WhatsApp en menos de 2 horas.' }
 };
-function goToFormStep(step) {
-  // Con 1 step, no hay navegación — función inerte.
+// ═══════════════════════════════════════════════════════════════════
+// CITA · paso 2 del formulario: dia + hora con el horario real de la sucursal
+// ═══════════════════════════════════════════════════════════════════
+// Horarios: se cargan de crm-worker /api/lead/seminuevos/horarios (feed de
+// sucursales del grupo). Si el fetch falla, CITA_CFG inline es el respaldo y
+// es la misma tabla. Minutos desde medianoche, dia 0=domingo..6=sabado.
+var _HD = function (lv, sab, dom) { return { 1: lv, 2: lv, 3: lv, 4: lv, 5: lv, 6: sab, 0: dom }; };
+var CITA_CFG = {
+  tz: 'America/Mexico_City', slot_min: 60, anticipacion_min: 120, dias_adelante: 7,
+  sedes: {
+    'Lopez Mateos':         { fuente: 'landing', dias: _HD([540, 1080], [540, 840], null) },
+    'Bugambilias':          { fuente: 'landing', dias: _HD([570, 1170], [570, 1140], [660, 1080]) },
+    'Mazda Plasencia':      { fuente: 'google',  dias: _HD([540, 1200], [540, 1140], [660, 1080]) },
+    'Mazda Galerias':       { fuente: 'asumido', dias: _HD([540, 1200], [540, 1140], [660, 1080]) },
+    'Mazda Americas':       { fuente: 'google',  dias: _HD([540, 1200], [540, 1140], [660, 1080]) },
+    'Mazda Acueducto':      { fuente: 'google',  dias: _HD([540, 1200], [540, 1140], [660, 1080]) },
+    'Mazda Gonzalez Gallo': { fuente: 'google',  dias: _HD([540, 1170], [540, 1140], [660, 1080]) },
+    'Mazda Santa Anita':    { fuente: 'google',  dias: _HD([540, 1200], [540, 1140], [660, 1140]) },
+    'GWM Gonzalez Gallo':   { fuente: 'google',  dias: _HD([540, 1200], [660, 1080], [660, 1080]) }
+  }
+};
+(function loadCitaCfg() {
+  try {
+    fetch(CRM_BASE + '/api/lead/seminuevos/horarios').then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j && j.sedes) CITA_CFG = Object.assign({}, CITA_CFG, j); }).catch(function () {});
+  } catch (e) {}
+})();
+var citaSel = { fecha: '', hora: '', dayLabel: '', timeLabel: '', dayOfWeek: '', daysAhead: null, origen: '' };
+var citaPrefill = null; // {fecha, hora} que llega de Plasi o del enlace ?cita_fecha=&cita_hora=
+var DIAS_ES = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+var DIAS_ABR = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+var MESES_ES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+function normSede(x) { return String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim(); }
+function sedeHorario(loc) { var k = normSede(loc), sedes = CITA_CFG.sedes || {}; for (var n in sedes) { if (normSede(n) === k) return sedes[n]; } return null; }
+// "Ahora" en hora de Mexico (UTC-6 fijo; Mexico no cambia horario desde 2022).
+function mxNow() { return new Date(Date.now() - 6 * 3600 * 1000); }
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+function fmtHora(min) { var h = Math.floor(min / 60), m = min % 60; return (h % 12 || 12) + ':' + pad2(m) + (h >= 12 ? ' pm' : ' am'); }
+function horarioTexto(h) {
+  var d = h.dias || {}; var r = function (x) { return x ? fmtHora(x[0]) + ' a ' + fmtHora(x[1]) : 'cerrado'; };
+  var lv = [1, 2, 3, 4, 5].every(function (i) { return JSON.stringify(d[i]) === JSON.stringify(d[1]); }) ? 'Lun a Vie ' + r(d[1]) : [1, 2, 3, 4, 5].map(function (i) { return DIAS_ABR[i] + ' ' + r(d[i]); }).join(' · ');
+  return lv + ' · Sáb ' + r(d[6]) + ' · Dom ' + r(d[0]);
+}
+function citaSlots(rango, daysAhead) {
+  var out = [], step = CITA_CFG.slot_min || 60, now = mxNow(), nowMin = now.getUTCHours() * 60 + now.getUTCMinutes();
+  var minStart = daysAhead === 0 ? nowMin + (CITA_CFG.anticipacion_min || 120) : -1;
+  for (var m = rango[0]; m + step <= rango[1]; m += step) { if (m >= minStart) out.push(m); }
+  return out;
+}
+function citaDaysFor(loc) {
+  var h = sedeHorario(loc); if (!h) return null;
+  var days = [], base = mxNow(); base.setUTCHours(0, 0, 0, 0);
+  for (var i = 0; i <= (CITA_CFG.dias_adelante || 7); i++) {
+    var d = new Date(base); d.setUTCDate(d.getUTCDate() + i);
+    var dow = d.getUTCDay(), rango = h.dias[dow]; if (!rango) continue;
+    var slots = citaSlots(rango, i); if (!slots.length) continue;
+    days.push({ fecha: d.getUTCFullYear() + '-' + pad2(d.getUTCMonth() + 1) + '-' + pad2(d.getUTCDate()), dow: dow, i: i, slots: slots,
+      label: i === 0 ? 'Hoy' : (i === 1 ? 'Mañana' : DIAS_ABR[dow]), sub: d.getUTCDate() + ' ' + MESES_ES[d.getUTCMonth()].slice(0, 3),
+      long: DIAS_ES[dow].charAt(0).toUpperCase() + DIAS_ES[dow].slice(1) + ' ' + d.getUTCDate() + ' de ' + MESES_ES[d.getUTCMonth()] });
+    if (days.length >= (CITA_CFG.dias_adelante || 7)) break;
+  }
+  return days;
+}
+function vehiculoCtx() { return currentCar ? { item_id: currentCar.id || '', vin: currentCar.vin || '', item_name: currentCar.name + ' ' + currentCar.year, item_price: currentCar.price, vehicle_brand: currentCar.brand || '', vehicle_year: currentCar.year, sede: currentCar.loc || '' } : {}; }
+function buildCitaDays() {
+  var loc = currentCar ? currentCar.loc : '';
+  var info = document.getElementById('citaSedeInfo'), wrap = document.getElementById('citaDays'), times = document.getElementById('citaTimes');
+  var h = sedeHorario(loc), days = citaDaysFor(loc);
+  wrap.innerHTML = ''; times.innerHTML = ''; document.getElementById('citaTimesLabel').hidden = true; document.getElementById('citaSummary').hidden = true;
+  if (!h || !days || !days.length) {
+    info.textContent = 'Por ahora no tenemos el horario de ' + (loc || 'esta sucursal') + ' en línea. Tu asesor te propone día y hora por WhatsApp.';
+    wrap.innerHTML = '<div class="cita-empty">Toca "Prefiero que mi asesor me proponga día y hora" para terminar tu registro.</div>';
+    return;
+  }
+  info.innerHTML = 'Horario de <b>' + loc + '</b>: ' + horarioTexto(h);
+  days.forEach(function (day) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'cita-chip'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false'); b.setAttribute('data-fecha', day.fecha);
+    b.innerHTML = '<b>' + day.label + '</b><span>' + day.sub + '</span>';
+    b.addEventListener('click', function () { selectCitaDay(day, b); });
+    wrap.appendChild(b);
+  });
+  // Prefill que llego de Plasi o del enlace: se aplica solo si el dia/hora existen.
+  if (citaPrefill && citaPrefill.fecha) {
+    var hit = days.filter(function (d) { return d.fecha === citaPrefill.fecha; })[0];
+    if (hit) {
+      var btn = wrap.querySelector('[data-fecha="' + hit.fecha + '"]'); selectCitaDay(hit, btn);
+      if (citaPrefill.hora) { var hm = citaPrefill.hora.split(':'); var min = parseInt(hm[0], 10) * 60 + parseInt(hm[1] || '0', 10); if (hit.slots.indexOf(min) >= 0) selectCitaTime(min, hit, times.querySelector('[data-min="' + min + '"]')); }
+    }
+    citaPrefill = null;
+  }
+}
+function selectCitaDay(day, btn) {
+  citaSel.fecha = day.fecha; citaSel.hora = ''; citaSel.timeLabel = ''; citaSel.dayLabel = day.long; citaSel.dayOfWeek = DIAS_ES[day.dow]; citaSel.daysAhead = day.i;
+  document.querySelectorAll('#citaDays .cita-chip').forEach(function (c) { var on = c === btn; c.classList.toggle('is-on', on); c.setAttribute('aria-checked', on ? 'true' : 'false'); });
+  var times = document.getElementById('citaTimes'); times.innerHTML = ''; document.getElementById('citaTimesLabel').hidden = false; document.getElementById('citaSummary').hidden = true;
+  document.getElementById('cita-error').classList.remove('show');
+  day.slots.forEach(function (min) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'cita-chip cita-time'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false'); b.setAttribute('data-min', String(min));
+    b.textContent = fmtHora(min);
+    b.addEventListener('click', function () { selectCitaTime(min, day, b); });
+    times.appendChild(b);
+  });
+  try { dataLayer.push(Object.assign({ event: 'calendar_day_selected', appointment_date: day.fecha, day_of_week: DIAS_ES[day.dow], days_ahead: day.i, qa: QA_MODE ? 'true' : 'false' }, vehiculoCtx(), getTrackingContext())); } catch (e) {}
+  try { times.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+}
+function selectCitaTime(min, day, btn) {
+  citaSel.hora = pad2(Math.floor(min / 60)) + ':' + pad2(min % 60); citaSel.timeLabel = fmtHora(min);
+  document.querySelectorAll('#citaTimes .cita-chip').forEach(function (c) { var on = c === btn; c.classList.toggle('is-on', on); c.setAttribute('aria-checked', on ? 'true' : 'false'); });
+  var sum = document.getElementById('citaSummary'); sum.hidden = false;
+  sum.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><div><b>' + citaSel.dayLabel + ' · ' + citaSel.timeLabel + '</b><span>' + (currentCar ? currentCar.loc : '') + ' · tu asesor lo confirma por WhatsApp</span></div>';
+  document.getElementById('cita-error').classList.remove('show');
+  try { dataLayer.push(Object.assign({ event: 'calendar_time_selected', appointment_date: day.fecha, appointment_time: citaSel.hora, time_slot: citaSel.timeLabel, day_of_week: DIAS_ES[day.dow], days_ahead: day.i, qa: QA_MODE ? 'true' : 'false' }, vehiculoCtx(), getTrackingContext())); } catch (e) {}
+  try { document.getElementById('btnConfirmCita').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+}
+function contactFieldsValid() {
+  var v = function (id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  return v('fName') && v('fLastName1') && v('fLastName2') && /^[0-9]{10}$/.test(v('fPhone')) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('fEmail')) && document.getElementById('fPrivacy').checked;
+}
+function validateContactStep() {
+  clearValidation();
+  var fields = ['fName', 'fLastName1', 'fLastName2', 'fPhone', 'fEmail'], firstError = null;
+  fields.forEach(function (id) {
+    var el = document.getElementById(id), val = el.value.trim(), ok;
+    if (id === 'fPhone') ok = /^[0-9]{10}$/.test(val); else if (id === 'fEmail') ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val); else ok = val.length > 0;
+    if (!ok) { showFieldError(id); if (!firstError) firstError = el; }
+  });
+  var priv = document.getElementById('fPrivacy');
+  if (!priv.checked) { showFieldError('fPrivacy'); if (!firstError) firstError = priv; }
+  if (firstError) { document.getElementById('formGlobalError').classList.add('show'); firstError.scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; }
+  document.getElementById('formGlobalError').classList.remove('show');
+  return true;
+}
+function setFormHead(step) {
+  var t = document.getElementById('formSectionTitle'), sub = document.getElementById('formSectionSub');
+  if (!t) return;
+  if (step === 2) { t.textContent = 'Elige cuándo verlo'; sub.textContent = 'Solo días y horas en que la sucursal está abierta. Tu asesor confirma por WhatsApp.'; }
+  else { t.textContent = 'Tu asesor te escribe en menos de 2 horas'; sub.textContent = 'Por WhatsApp, directo con tu asesor. Sin intermediarios.'; }
+}
+function goToCitaStep(n) {
+  var s1 = document.getElementById('formStep2'), s2 = document.getElementById('formStepCita');
+  if (!s1 || !s2) return;
+  if (n === 2) {
+    if (!validateContactStep()) return;
+    s1.classList.remove('active'); s2.classList.add('active'); setFormHead(2); buildCitaDays();
+    try { dataLayer.push(Object.assign({ event: 'form_step_complete', step_number: 1, step_name: 'datos_contacto', vehiculo: currentCar ? currentCar.name + ' ' + currentCar.year : '', qa: QA_MODE ? 'true' : 'false' }, vehiculoCtx(), getTrackingContext())); } catch (e) {}
+    try { document.getElementById('formSectionTitle').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+  } else {
+    s2.classList.remove('active'); s1.classList.add('active'); setFormHead(1);
+  }
+}
+function resetCita() {
+  citaSel = { fecha: '', hora: '', dayLabel: '', timeLabel: '', dayOfWeek: '', daysAhead: null, origen: '' };
+  var w = document.getElementById('citaDays'), t = document.getElementById('citaTimes'), e = document.getElementById('cita-error');
+  if (w) w.innerHTML = ''; if (t) t.innerHTML = ''; if (e) e.classList.remove('show');
+}
+// openModal llama goToFormStep(1) al abrir cada auto: regresa al paso 1 y limpia la cita.
+function goToFormStep(step) { goToCitaStep(1); resetCita(); }
+// Prellenado desde Plasi (chat) o desde un enlace con ?cita_fecha=&cita_hora=.
+// Llena los datos que ya se conocen; si el paso 1 queda completo salta al paso 2
+// y preselecciona dia y hora si existen en el horario de la sucursal.
+function applyPlasiPrefill(cliente, cita, origen) {
+  cliente = cliente || {}; cita = cita || {};
+  var f = function (id, v) { var el = document.getElementById(id); if (el && !el.value && v) { el.value = String(v).toUpperCase(); try { validateField(el); } catch (e) {} } };
+  var parts = String(cliente.nombre || '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 3) { f('fName', parts.slice(0, parts.length - 2).join(' ')); f('fLastName1', parts[parts.length - 2]); f('fLastName2', parts[parts.length - 1]); }
+  else if (parts.length === 2) { f('fName', parts[0]); f('fLastName1', parts[1]); }
+  else if (parts.length === 1) { f('fName', parts[0]); }
+  var tel = String(cliente.telefono || '').replace(/\D/g, '').slice(-10); if (tel.length === 10) { var ph = document.getElementById('fPhone'); if (ph && !ph.value) ph.value = tel; }
+  if (cliente.email) f('fEmail', cliente.email);
+  if (cita.fecha) { citaPrefill = { fecha: cita.fecha, hora: cita.hora || '' }; citaSel.origen = origen || 'plasi'; }
+  if (contactFieldsValid()) { goToCitaStep(2); }
+  else if (citaPrefill) { /* se aplica cuando la persona toque Continuar */ }
 }
 
 
@@ -3913,8 +4125,7 @@ let submitting = false;
 function resetSubmitState() {
   submitting = false;
   window._submitCompleted = false;
-  const b = document.querySelector('.btn-conversion');
-  if (b) { b.disabled = false; b.style.opacity = ''; b.style.cursor = ''; }
+  document.querySelectorAll('.btn-conversion').forEach(function (b) { b.disabled = false; b.style.opacity = ''; b.style.cursor = ''; });
 }
 
 // Scroll al primer campo con error (UX: user-centric — sube al problema)
@@ -3939,7 +4150,8 @@ function scrollToFirstError() {
   }
 }
 
-function submitForm() {
+function submitForm(opts) {
+  opts = opts || {};
   if (submitting) return;
   // Guard: si currentCar se perdió (cierre de modal accidental, navegación SPA, etc.) no crashear silencioso
   if (!currentCar) {
@@ -3959,6 +4171,15 @@ function submitForm() {
     if (ge2) { ge2.textContent = 'No se pudo identificar el auto. Recarga la página y vuelve a intentarlo.'; ge2.classList.add('show'); }
     return;
   }
+  // Paso cita: si esta activo y no eligio dia y hora, pedirlo (o usar
+  // "prefiero que mi asesor me proponga", que manda sinCita).
+  var citaStepEl = document.getElementById('formStepCita');
+  if (citaStepEl && citaStepEl.classList.contains('active') && !opts.sinCita && !(citaSel.fecha && citaSel.hora)) {
+    var ce = document.getElementById('cita-error'); if (ce) ce.classList.add('show');
+    var cd = document.getElementById('citaDays'); if (cd) cd.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  if (opts.sinCita) { citaSel.fecha = ''; citaSel.hora = ''; citaSel.dayLabel = ''; citaSel.timeLabel = ''; }
   clearValidation();
   const fields = ['fName','fLastName1','fLastName2','fPhone','fEmail'];
   let firstError = null;
@@ -3983,14 +4204,14 @@ function submitForm() {
   }
 
   if (firstError) {
+    goToCitaStep(1);
     document.getElementById('formGlobalError').classList.add('show');
     firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
 
   submitting = true;
-  const submitBtn = document.querySelector('.btn-conversion');
-  if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '0.6'; submitBtn.style.cursor = 'wait'; }
+  document.querySelectorAll('.btn-conversion').forEach(function (b) { b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'wait'; });
 
   const nombre = document.getElementById('fName').value.trim().toUpperCase();
   const ap1 = document.getElementById('fLastName1').value.trim().toUpperCase();
@@ -4034,8 +4255,13 @@ function submitForm() {
       }
       return chosenLoc.toUpperCase();
     })(),
-    fecha_cita: '',
-    hora_cita: '',
+    // Cita elegida en el paso 2 (o vacia si pidio que el asesor proponga).
+    fecha_cita: citaSel.fecha || '',
+    hora_cita: citaSel.hora || '',
+    appointment_date: citaSel.fecha || '',
+    appointment_time: citaSel.hora || '',
+    cita_origen: citaSel.fecha ? (citaSel.origen || 'cliente') : '',
+    qa: QA_MODE ? 'true' : 'false',
     auto_a_cuenta: '',
     busca_financiamiento: '',
     comprueba_ingresos: '',
@@ -4086,6 +4312,11 @@ function submitForm() {
   // futuro del dataLayer. Solo cambia la llave `event`.
   dataLayer.push({
     event: 'generate_lead_client',
+    appointment_date: citaSel.fecha || '',
+    appointment_time: citaSel.hora || '',
+    appointment_requested: citaSel.fecha ? 'true' : 'false',
+    appointment_source: citaSel.fecha ? (citaSel.origen || 'cliente') : '',
+    qa: QA_MODE ? 'true' : 'false',
     event_id: folio + '_Lead',    // dedup key Pixel↔CAPI Meta
     folio: folio,
     currency: 'MXN',
@@ -4112,8 +4343,8 @@ function submitForm() {
   lastAppointment = {
     ...payload,
     agencia: `${BRAND_CONFIG.agencia} ${currentCar.loc || ''}`.trim(),
-    dateLabel: '',
-    timeLabel: ''
+    dateLabel: citaSel.dayLabel || '',
+    timeLabel: citaSel.timeLabel || ''
   };
 
   document.getElementById('detailState').style.display = 'none';
@@ -4125,7 +4356,8 @@ function submitForm() {
   document.getElementById('confirmDetails').innerHTML = `
     <p><span>Vehículo</span> <strong>${currentCar.name} ${currentCar.year}</strong></p>
     <p><span>Precio</span> <strong>${fmt(currentCar.price)}</strong></p>
-    <p><span>Sucursal</span> <strong>${currentCar.loc}</strong></p>
+    <p><span>Sucursal</span> <strong>${payload.sucursal ? payload.sucursal : currentCar.loc}</strong></p>
+    <p><span>Cita</span> <strong>${citaSel.fecha && citaSel.hora ? (citaSel.dayLabel + ' · ' + citaSel.timeLabel + ' (por confirmar)') : 'Tu asesor te propone día y hora'}</strong></p>
     <p><span>Cliente</span> <strong>${name}</strong></p>
     <p><span>Teléfono</span> <strong>+52 ${phone}</strong></p>
     <p><span>Email</span> <strong>${email}</strong></p>
@@ -4423,6 +4655,341 @@ function sortInventoryDom() {
     </div>
   </div>
 </div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PLASI · asistente IA de Seminuevos Plasencia (widget de chat)
+     Backend: crm-worker POST /api/lead/plasi-seminuevos
+     Acciones que ejecuta: ver_auto (abre ficha) · agendar (abre el
+     formulario del auto y lo prellena) · catalogo · humano (WhatsApp).
+     Doc: grupo-plasencia-docs/03-tech/Plasi-Seminuevos.md
+     ═══════════════════════════════════════════════════════════════════ -->
+<style>
+  #plasiRoot { --plasi-z: 9000; --plasi-navy: #0F172A; --plasi-cyan: #17B7E0; --plasi-gold: var(--color-accent, #FBC645); font-family: var(--font-body, 'Inter', sans-serif); }
+  .plasi-fab { position: fixed; right: 16px; bottom: 16px; z-index: var(--plasi-z); display: flex; align-items: center; gap: 10px; padding: 0 18px 0 6px; height: 56px; border: none; border-radius: 999px; background: var(--plasi-navy); color: #fff; cursor: pointer; box-shadow: 0 12px 28px -8px rgba(15,23,42,0.45); font-family: inherit; font-size: 14px; font-weight: 700; letter-spacing: 0.1px; transition: transform 160ms var(--ease, ease), box-shadow 160ms; }
+  .plasi-fab:hover { transform: translateY(-2px); box-shadow: 0 16px 32px -10px rgba(15,23,42,0.5); }
+  .plasi-fab:focus-visible { outline: 3px solid var(--plasi-gold); outline-offset: 2px; }
+  .plasi-fab .plasi-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--plasi-cyan), #0B62BD); display: grid; place-items: center; font-family: var(--font-display, 'Montserrat', sans-serif); font-weight: 800; font-size: 15px; color: #fff; flex: 0 0 44px; }
+  .plasi-fab .plasi-fab-txt { display: flex; flex-direction: column; line-height: 1.1; text-align: left; }
+  .plasi-fab .plasi-fab-txt small { font-weight: 500; font-size: 11px; opacity: 0.75; }
+  .plasi-fab .plasi-badge { position: absolute; top: -4px; right: -2px; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--color-conversion, #C8102E); color: #fff; font-size: 11px; font-weight: 800; display: none; align-items: center; justify-content: center; border: 2px solid #fff; }
+  .plasi-fab .plasi-badge.is-on { display: flex; }
+  body.plasi-open .plasi-fab { display: none; }
+  @media (max-width: 640px) {
+    .plasi-fab { right: 12px; bottom: 12px; height: 52px; padding-right: 14px; }
+    body.has-sticky-cta .plasi-fab { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+    .plasi-fab .plasi-fab-txt small { display: none; }
+  }
+
+  .plasi-panel { position: fixed; right: 16px; bottom: 16px; z-index: var(--plasi-z); width: min(400px, calc(100vw - 32px)); height: min(640px, calc(100vh - 32px)); display: none; flex-direction: column; background: #fff; border-radius: 18px; box-shadow: 0 32px 64px -16px rgba(15,23,42,0.35), 0 0 0 1px rgba(15,23,42,0.06); overflow: hidden; }
+  .plasi-panel.is-open { display: flex; animation: plasiIn 220ms var(--ease, ease); }
+  @keyframes plasiIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+  @media (max-width: 640px) {
+    .plasi-panel { right: 0; bottom: 0; left: 0; width: 100%; height: min(92svh, 100vh); border-radius: 18px 18px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  }
+  @media (prefers-reduced-motion: reduce) { .plasi-panel.is-open { animation: none; } .plasi-fab:hover { transform: none; } }
+
+  .plasi-head { display: flex; align-items: center; gap: 12px; padding: 14px 14px 12px; background: var(--plasi-navy); color: #fff; }
+  .plasi-head .plasi-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--plasi-cyan), #0B62BD); display: grid; place-items: center; font-family: var(--font-display, 'Montserrat', sans-serif); font-weight: 800; font-size: 14px; flex: 0 0 40px; }
+  .plasi-head-txt { flex: 1; min-width: 0; line-height: 1.2; }
+  .plasi-head-txt strong { display: block; font-size: 15px; font-weight: 800; }
+  .plasi-head-txt span { display: block; font-size: 11.5px; opacity: 0.75; margin-top: 2px; }
+  .plasi-close { width: 40px; height: 40px; border: none; background: rgba(255,255,255,0.08); color: #fff; border-radius: 10px; cursor: pointer; display: grid; place-items: center; font-size: 22px; line-height: 1; }
+  .plasi-close:hover { background: rgba(255,255,255,0.16); }
+  .plasi-close:focus-visible { outline: 2px solid var(--plasi-gold); }
+
+  .plasi-msgs { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 14px 8px; background: var(--ink-50, #F7F9FC); display: flex; flex-direction: column; gap: 10px; }
+  .plasi-msg { max-width: 86%; padding: 10px 13px; border-radius: 14px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
+  .plasi-msg.is-bot { align-self: flex-start; background: #fff; color: var(--ink-800, #1A202C); border: 1px solid var(--ink-200, #E2E8F0); border-top-left-radius: 4px; box-shadow: var(--shadow-sm); }
+  .plasi-msg.is-user { align-self: flex-end; background: var(--plasi-navy); color: #fff; border-top-right-radius: 4px; }
+  .plasi-msg.is-sys { align-self: center; background: transparent; color: var(--ink-500, #64748B); font-size: 12px; text-align: center; padding: 2px 8px; }
+  .plasi-msg a { color: #0B62BD; font-weight: 600; }
+  .plasi-typing { align-self: flex-start; display: flex; gap: 4px; padding: 12px 14px; background: #fff; border: 1px solid var(--ink-200, #E2E8F0); border-radius: 14px; border-top-left-radius: 4px; }
+  .plasi-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-400, #94A3B8); animation: plasiDot 1s infinite ease-in-out; }
+  .plasi-typing i:nth-child(2) { animation-delay: 0.15s; } .plasi-typing i:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes plasiDot { 0%, 80%, 100% { transform: translateY(0); opacity: 0.5; } 40% { transform: translateY(-4px); opacity: 1; } }
+
+  .plasi-cars { display: flex; flex-direction: column; gap: 8px; align-self: stretch; }
+  .plasi-car { display: flex; gap: 10px; align-items: center; padding: 8px; background: #fff; border: 1px solid var(--ink-200, #E2E8F0); border-radius: 12px; cursor: pointer; text-align: left; font-family: inherit; width: 100%; transition: border-color 120ms, box-shadow 120ms; }
+  .plasi-car:hover { border-color: var(--plasi-cyan); box-shadow: var(--shadow-sm); }
+  .plasi-car img { width: 72px; height: 54px; object-fit: cover; border-radius: 8px; background: var(--ink-100, #EEF2F8); flex: 0 0 72px; }
+  .plasi-car .plasi-car-t { flex: 1; min-width: 0; }
+  .plasi-car .plasi-car-t b { display: block; font-size: 13px; color: var(--ink-900, #0F172A); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .plasi-car .plasi-car-t span { display: block; font-size: 12px; color: var(--ink-500, #64748B); margin-top: 2px; }
+  .plasi-car .plasi-car-p { font-size: 13px; font-weight: 800; color: var(--ink-900, #0F172A); white-space: nowrap; }
+
+  .plasi-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 14px 8px; background: var(--ink-50, #F7F9FC); }
+  .plasi-chip { border: 1px solid var(--ink-300, #CBD5E0); background: #fff; color: var(--ink-700, #2D3748); border-radius: 999px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: inherit; min-height: 36px; }
+  .plasi-chip:hover { border-color: var(--plasi-cyan); color: #0B62BD; }
+  .plasi-chip:focus-visible { outline: 2px solid var(--plasi-gold); }
+
+  .plasi-form { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--ink-200, #E2E8F0); background: #fff; }
+  .plasi-input { flex: 1; min-height: 44px; max-height: 120px; resize: none; border: 1.5px solid var(--ink-300, #CBD5E0); border-radius: 12px; padding: 11px 12px; font: inherit; font-size: 16px; line-height: 1.35; color: var(--ink-900, #0F172A); outline: none; }
+  .plasi-input:focus { border-color: var(--plasi-cyan); box-shadow: 0 0 0 3px rgba(23,183,224,0.18); }
+  .plasi-send { width: 46px; height: 44px; border: none; border-radius: 12px; background: var(--plasi-navy); color: #fff; cursor: pointer; display: grid; place-items: center; flex: 0 0 46px; }
+  .plasi-send:disabled { opacity: 0.45; cursor: not-allowed; }
+  .plasi-send svg { width: 20px; height: 20px; }
+  .plasi-foot { padding: 6px 14px 10px; font-size: 11px; color: var(--ink-500, #64748B); background: #fff; text-align: center; }
+  .plasi-foot a { color: #0B62BD; font-weight: 600; }
+  .plasi-toast { position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); z-index: calc(var(--plasi-z) + 1); background: var(--plasi-navy); color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; transition: opacity 200ms; max-width: calc(100vw - 32px); text-align: center; }
+  .plasi-toast.is-on { opacity: 1; }
+
+  /* ── Paso 2 del formulario: cita ── */
+  .cita-head { margin: 4px 0 14px; }
+  .cita-title { font-family: var(--font-display, 'Montserrat', sans-serif); font-size: 18px; font-weight: 800; color: var(--ink-900, #0F172A); margin: 0 0 4px; }
+  .cita-sub { font-size: 13px; color: var(--ink-600, #475569); line-height: 1.4; margin: 0; }
+  .cita-label { font-size: 11px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-500, #64748B); margin: 12px 0 8px; }
+  .cita-days { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 6px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .cita-days::-webkit-scrollbar { display: none; }
+  .cita-chip { flex: 0 0 auto; min-width: 74px; min-height: 56px; padding: 8px 12px; border: 1.5px solid var(--ink-300, #CBD5E0); background: #fff; border-radius: 14px; cursor: pointer; font-family: var(--font-body, 'Inter', sans-serif); color: var(--ink-800, #1A202C); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; scroll-snap-align: start; transition: border-color 120ms, background 120ms, transform 120ms; }
+  .cita-chip b { font-size: 14px; font-weight: 800; }
+  .cita-chip span { font-size: 12px; color: var(--ink-500, #64748B); }
+  .cita-chip:hover { border-color: var(--color-cyan, #17B7E0); }
+  .cita-chip:focus-visible { outline: 3px solid var(--color-accent, #FBC645); outline-offset: 2px; }
+  .cita-chip.is-on { background: var(--ink-900, #0F172A); border-color: var(--ink-900, #0F172A); color: #fff; }
+  .cita-chip.is-on span { color: rgba(255,255,255,.75); }
+  .cita-times { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .cita-chip.cita-time { min-height: 46px; min-width: 0; font-size: 14px; font-weight: 700; border-radius: 12px; }
+  @media (min-width: 560px) { .cita-times { grid-template-columns: repeat(4, 1fr); } }
+  .cita-summary[hidden], .cita-label[hidden] { display: none; }
+  .cita-summary { display: flex; align-items: center; gap: 10px; margin: 14px 0 4px; padding: 12px 14px; background: #EFFBF4; border: 1px solid #A7E3C3; border-radius: 12px; color: var(--ink-900, #0F172A); }
+  .cita-summary svg { width: 22px; height: 22px; color: var(--color-success-dark, #276749); flex: 0 0 22px; }
+  .cita-summary b { display: block; font-size: 14px; }
+  .cita-summary span { display: block; font-size: 12px; color: var(--ink-600, #475569); margin-top: 2px; }
+  .cita-empty { font-size: 13px; color: var(--ink-600, #475569); padding: 10px 12px; background: var(--ink-50, #F7F9FC); border-radius: 10px; }
+  .btn-cita-skip, .btn-cita-back { display: block; width: 100%; margin: 8px auto 0; background: transparent; border: none; cursor: pointer; font-family: var(--font-body, 'Inter', sans-serif); min-height: 44px; }
+  .btn-cita-skip { color: #0B62BD; font-size: 14px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+  .btn-cita-back { color: var(--ink-500, #64748B); font-size: 13px; font-weight: 600; }
+  #formStepCita .btn-conversion { margin-top: 14px; }
+</style>
+
+<div id="plasiRoot">
+  <button class="plasi-fab" id="plasiFab" type="button" aria-haspopup="dialog" aria-controls="plasiPanel" aria-expanded="false">
+    <span class="plasi-avatar" aria-hidden="true">P</span>
+    <span class="plasi-fab-txt">Pregúntale a Plasi<small>Te muestra opciones y agenda tu cita</small></span>
+    <span class="plasi-badge" id="plasiBadge" aria-hidden="true">1</span>
+  </button>
+
+  <section class="plasi-panel" id="plasiPanel" role="dialog" aria-modal="false" aria-labelledby="plasiTitle" aria-hidden="true">
+    <header class="plasi-head">
+      <span class="plasi-avatar" aria-hidden="true">P</span>
+      <div class="plasi-head-txt">
+        <strong id="plasiTitle">Plasi · Seminuevos Plasencia</strong>
+        <span>Asistente de IA · te responde al momento</span>
+      </div>
+      <button class="plasi-close" id="plasiClose" type="button" aria-label="Cerrar chat">×</button>
+    </header>
+    <div class="plasi-msgs" id="plasiMsgs" role="log" aria-live="polite" aria-relevant="additions"></div>
+    <div class="plasi-chips" id="plasiChips"></div>
+    <form class="plasi-form" id="plasiForm" autocomplete="off">
+      <label for="plasiInput" class="sr-only" style="position:absolute;left:-9999px;">Escribe tu mensaje</label>
+      <textarea class="plasi-input" id="plasiInput" rows="1" placeholder="Escribe qué auto buscas…" maxlength="1200" enterkeyhint="send"></textarea>
+      <button class="plasi-send" id="plasiSend" type="submit" aria-label="Enviar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </form>
+    <div class="plasi-foot">Plasi es un asistente de IA. ¿Prefieres una persona? <a id="plasiWaLink" href="https://wa.me/523321016742?text=Hola%2C%20quiero%20hablar%20con%20un%20asesor%20de%20Seminuevos%20Plasencia" target="_blank" rel="noopener">Escríbenos por WhatsApp</a></div>
+  </section>
+  <div class="plasi-toast" id="plasiToast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+(function () {
+  var API = (window.CRM_BASE || 'https://crm-plasencia.grupo-plasencia-automotriz.workers.dev') + '/api/lead/plasi/seminuevos';
+  var WA_PLASI = '523321016742';
+  var root = document.getElementById('plasiRoot');
+  if (!root) return;
+  var fab = document.getElementById('plasiFab'), panel = document.getElementById('plasiPanel'), closeBtn = document.getElementById('plasiClose');
+  var msgs = document.getElementById('plasiMsgs'), chips = document.getElementById('plasiChips'), form = document.getElementById('plasiForm');
+  var input = document.getElementById('plasiInput'), sendBtn = document.getElementById('plasiSend'), badge = document.getElementById('plasiBadge'), toast = document.getElementById('plasiToast');
+
+  // ── estado ──
+  var history = [];          // [{role, content}] lo que ve el modelo
+  var visitor = { nombre: '', telefono: '', email: '' };
+  var busy = false, opened = false, greeted = false;
+  var sid = (function () {
+    try {
+      var s = sessionStorage.getItem('plasi_sid');
+      if (!s) { s = 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); sessionStorage.setItem('plasi_sid', s); }
+      return s;
+    } catch (e) { return 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); }
+  })();
+  try {
+    var saved = JSON.parse(sessionStorage.getItem('plasi_hist') || 'null');
+    if (saved && Array.isArray(saved.history)) { history = saved.history.slice(-14); visitor = saved.visitor || visitor; greeted = !!saved.greeted; }
+  } catch (e) {}
+  function persist() { try { sessionStorage.setItem('plasi_hist', JSON.stringify({ history: history.slice(-14), visitor: visitor, greeted: greeted })); } catch (e) {} }
+  function track(ev, extra) { try { window.dataLayer = window.dataLayer || []; dataLayer.push(Object.assign({ event: ev, plasi_session: sid }, extra || {}, (typeof getTrackingContext === 'function' ? getTrackingContext() : {}))); } catch (e) {} }
+
+  // ── helpers de catalogo (usa `vehicles` global de la SPA) ──
+  function findCar(id) { if (!id || typeof vehicles === 'undefined') return null; return vehicles.find(function (v) { return String(v.id) === String(id); }) || null; }
+  function money(n) { var x = Number(n); return isFinite(x) && x > 0 ? '$' + x.toLocaleString('es-MX') : ''; }
+  function pageCtx() {
+    var c = (typeof currentCar !== 'undefined' && currentCar) ? currentCar : null;
+    var modalOpen = false; try { modalOpen = document.getElementById('vehicleModal').classList.contains('open'); } catch (e) {}
+    return {
+      auto_id: (c && modalOpen) ? String(c.id) : '',
+      auto_nombre: (c && modalOpen) ? (c.name + ' ' + (c.year || '')).trim() : '',
+      auto_precio: (c && modalOpen) ? c.price : '',
+      auto_sucursal: (c && modalOpen) ? (c.loc || '') : '',
+      sucursal_filtro: (typeof currentLocFilter !== 'undefined' && currentLocFilter && currentLocFilter !== 'all') ? currentLocFilter : ''
+    };
+  }
+  function utmCtx() { var o = {}; ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'gclid', 'fbclid'].forEach(function (k) { try { var v = sessionStorage.getItem(k); if (v) o[k] = v; } catch (e) {} }); return o; }
+
+  // ── render ──
+  function scrollBottom() { msgs.scrollTop = msgs.scrollHeight; }
+  function addMsg(role, text) {
+    var el = document.createElement('div');
+    el.className = 'plasi-msg ' + (role === 'user' ? 'is-user' : role === 'sys' ? 'is-sys' : 'is-bot');
+    el.textContent = String(text || '').replace(/\*\*/g, '');
+    msgs.appendChild(el); scrollBottom(); return el;
+  }
+  function addCars(ids) {
+    var cars = (ids || []).map(findCar).filter(Boolean).slice(0, 3);
+    if (!cars.length) return;
+    var wrap = document.createElement('div'); wrap.className = 'plasi-cars';
+    cars.forEach(function (c) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'plasi-car'; b.setAttribute('data-id', String(c.id));
+      b.innerHTML = '<img alt="" loading="lazy"><div class="plasi-car-t"><b></b><span></span></div><div class="plasi-car-p"></div>';
+      b.querySelector('img').src = c.img || ''; b.querySelector('b').textContent = (c.name + ' ' + (c.year || '')).trim();
+      var km = Number(c.km) > 0 ? Number(c.km).toLocaleString('es-MX') + ' km · ' : '';
+      b.querySelector('span').textContent = km + (c.loc || ''); b.querySelector('.plasi-car-p').textContent = money(c.price);
+      b.addEventListener('click', function () { doAction('ver_auto', String(c.id), null); });
+      wrap.appendChild(b);
+    });
+    msgs.appendChild(wrap); scrollBottom();
+  }
+  function setChips(list) {
+    chips.innerHTML = '';
+    (list || []).slice(0, 3).forEach(function (t) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'plasi-chip'; b.textContent = t;
+      b.addEventListener('click', function () { send(t); });
+      chips.appendChild(b);
+    });
+  }
+  var typingEl = null;
+  function typing(on) {
+    if (on && !typingEl) { typingEl = document.createElement('div'); typingEl.className = 'plasi-typing'; typingEl.innerHTML = '<i></i><i></i><i></i>'; msgs.appendChild(typingEl); scrollBottom(); }
+    if (!on && typingEl) { typingEl.remove(); typingEl = null; }
+  }
+  var toastT = null;
+  function showToast(t) { toast.textContent = t; toast.classList.add('is-on'); clearTimeout(toastT); toastT = setTimeout(function () { toast.classList.remove('is-on'); }, 3200); }
+  function setBusy(b) { busy = b; sendBtn.disabled = b; input.disabled = b; }
+
+  // ── abrir / cerrar ──
+  function open() {
+    opened = true; panel.classList.add('is-open'); panel.setAttribute('aria-hidden', 'false'); fab.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('plasi-open'); badge.classList.remove('is-on');
+    if (!greeted) {
+      var c = pageCtx();
+      var hi = c.auto_id
+        ? 'Hola, soy Plasi, la asistente de IA de Seminuevos Plasencia. Veo que estás viendo el ' + c.auto_nombre + '. ¿Quieres que te ayude a agendar tu cita para verlo, o buscamos algo parecido?'
+        : 'Hola, soy Plasi, la asistente de IA de Seminuevos Plasencia. Dime qué auto buscas o para qué lo necesitas y te muestro opciones reales del inventario de hoy.';
+      addMsg('bot', hi); history.push({ role: 'assistant', content: hi }); greeted = true; persist();
+      setChips(c.auto_id ? ['Quiero agendar cita para este auto', 'Muéstrame opciones parecidas', 'Quiero hablar con un asesor'] : ['Busco una SUV para la familia', 'Algo económico para la ciudad', 'Quiero hablar con un asesor']);
+    } else if (!msgs.children.length) {
+      history.forEach(function (m) { addMsg(m.role === 'user' ? 'user' : 'bot', m.content); });
+    }
+    track('plasi_open', pageCtx().auto_id ? { item_id: pageCtx().auto_id } : {});
+    setTimeout(function () { input.focus({ preventScroll: true }); }, 250);
+  }
+  function close() {
+    opened = false; panel.classList.remove('is-open'); panel.setAttribute('aria-hidden', 'true'); fab.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('plasi-open'); fab.focus({ preventScroll: true });
+  }
+  fab.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && opened) close(); });
+
+  // ── acciones que Plasi pide ejecutar ──
+  function scrollToForm() {
+    var t = document.getElementById('formSectionTitle'), ov = document.getElementById('vehicleModal');
+    if (t && ov) { var y = t.getBoundingClientRect().top - ov.getBoundingClientRect().top + ov.scrollTop - 12; try { ov.scrollTo({ top: y, behavior: 'smooth' }); } catch (e) { ov.scrollTop = y; } }
+    else if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    var first = ['fName', 'fLastName1', 'fLastName2', 'fPhone', 'fEmail'].map(function (id) { return document.getElementById(id); }).filter(function (el) { return el && !el.value; })[0];
+    if (first) setTimeout(function () { first.focus({ preventScroll: true }); }, 500);
+  }
+  function prefill(cl) {
+    if (!cl) return;
+    var parts = String(cl.nombre || '').trim().split(/\s+/).filter(Boolean);
+    var f = function (id, v) { var el = document.getElementById(id); if (el && !el.value && v) { el.value = String(v).toUpperCase(); if (typeof validateField === 'function') try { validateField(el); } catch (e) {} } };
+    if (parts.length >= 3) { f('fName', parts.slice(0, parts.length - 2).join(' ')); f('fLastName1', parts[parts.length - 2]); f('fLastName2', parts[parts.length - 1]); }
+    else if (parts.length === 2) { f('fName', parts[0]); f('fLastName1', parts[1]); }
+    else if (parts.length === 1) { f('fName', parts[0]); }
+    var tel = String(cl.telefono || '').replace(/\D/g, '').slice(-10); if (tel.length === 10) { var p = document.getElementById('fPhone'); if (p && !p.value) { p.value = tel; } }
+    var em = document.getElementById('fEmail'); if (em && !em.value && cl.email) em.value = String(cl.email).toUpperCase();
+  }
+  function doAction(action, autoId, res) {
+    var car = findCar(autoId);
+    track('plasi_action', { plasi_action: action, item_id: autoId || '' });
+    if (action === 'ver_auto' || action === 'agendar') {
+      if (!car) { addMsg('sys', 'Ese auto ya no está en el catálogo. Pídeme otra opción.'); return; }
+      close();
+      if (typeof openModal === 'function') openModal(car.id);
+      if (action === 'agendar') {
+        setTimeout(function () {
+          if (typeof applyPlasiPrefill === 'function') applyPlasiPrefill(res && res.cliente, res && res.cita, 'plasi'); else prefill(res && res.cliente);
+          scrollToForm();
+        }, 600);
+        showToast('Llena el formulario y tu asesor te escribe en menos de 2 horas');
+      } else {
+        showToast('Aquí está la ficha. Vuelve a abrirme cuando quieras');
+      }
+      badge.textContent = '1'; badge.classList.add('is-on');
+      return;
+    }
+    if (action === 'catalogo') {
+      close();
+      var g = document.getElementById('inventoryGrid'); if (g) g.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    if (action === 'humano') {
+      var url = (res && res.handoff && res.handoff.whatsapp_url) || ('https://wa.me/' + WA_PLASI + '?text=' + encodeURIComponent('Hola, quiero hablar con un asesor de Seminuevos Plasencia.'));
+      if (res && res.handoff && res.handoff.needs_contact) return; // Plasi ya pidió nombre y teléfono
+      var el = document.createElement('div'); el.className = 'plasi-msg is-bot';
+      el.innerHTML = (res && res.handoff && res.handoff.notified ? 'Listo, ya avisé al equipo con tus datos. ' : '') + 'Si prefieres seguir por WhatsApp con una persona: <a href="' + url + '" target="_blank" rel="noopener">abrir WhatsApp</a>.';
+      msgs.appendChild(el); scrollBottom();
+      setChips(['Mientras, muéstrame opciones', 'Gracias']);
+    }
+  }
+
+  // ── enviar ──
+  function send(text) {
+    text = String(text || '').trim(); if (!text || busy) return;
+    addMsg('user', text); history.push({ role: 'user', content: text }); persist();
+    input.value = ''; input.style.height = ''; setChips([]); setBusy(true); typing(true);
+    track('plasi_message_sent');
+    var body = { session_id: sid, history: history.slice(-14), page: pageCtx(), visitor: visitor, utm: utmCtx() };
+    fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json().then(function (j) { j.__status = r.status; return j; }); })
+      .then(function (j) {
+        typing(false);
+        var reply = j.response || 'Se me fue la señal un segundo. ¿Me lo repites?';
+        addMsg('bot', reply); history.push({ role: 'assistant', content: reply }); persist();
+        if (j.cliente) { visitor = { nombre: j.cliente.nombre || visitor.nombre, telefono: j.cliente.telefono || visitor.telefono, email: j.cliente.email || visitor.email }; persist(); }
+        var ids = (j.auto_ids && j.auto_ids.length) ? j.auto_ids : (j.auto_id ? [j.auto_id] : []);
+        if (j.action !== 'ver_auto' && j.action !== 'agendar') addCars(ids);
+        setChips(j.suggestions || []);
+        if (j.action) setTimeout(function () { doAction(j.action, j.auto_id, j); }, j.action === 'humano' ? 0 : 900);
+        if (j.__status === 429) setChips(['Abrir WhatsApp']);
+      })
+      .catch(function () {
+        typing(false);
+        var el = document.createElement('div'); el.className = 'plasi-msg is-bot';
+        el.innerHTML = 'No pude conectar. Intenta de nuevo o <a href="https://wa.me/' + WA_PLASI + '" target="_blank" rel="noopener">escríbenos por WhatsApp</a>.';
+        msgs.appendChild(el); scrollBottom();
+      })
+      .finally(function () { setBusy(false); if (opened) input.focus({ preventScroll: true }); });
+  }
+  form.addEventListener('submit', function (e) { e.preventDefault(); send(input.value); });
+  input.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.keyCode === 13) && !e.shiftKey) { e.preventDefault(); send(input.value); } });
+  input.addEventListener('input', function () { input.style.height = ''; input.style.height = Math.min(120, input.scrollHeight) + 'px'; });
+
+  // Enlace WhatsApp del pie: si Plasi ya sabe el nombre, lo incluye.
+  document.getElementById('plasiWaLink').addEventListener('click', function () { track('plasi_wa_click'); });
+})();
+</script>
 
 </body>
 </html>
