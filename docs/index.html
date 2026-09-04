@@ -3525,6 +3525,8 @@ function goToFormStep(step) { goToCitaStep(1); resetCita(); }
 // y preselecciona dia y hora si existen en el horario de la sucursal.
 function applyPlasiPrefill(cliente, cita, origen) {
   cliente = cliente || {}; cita = cita || {};
+  // Marca el formulario como asistido por Plasi: el lead sale con canal 'plasi_form'.
+  try { window.__plasiAssistedAuto = currentCar ? String(currentCar.id) : ''; } catch (e) {}
   var f = function (id, v) { var el = document.getElementById(id); if (el && !el.value && v) { el.value = String(v).toUpperCase(); try { validateField(el); } catch (e) {} } };
   var parts = String(cliente.nombre || '').trim().split(/\s+/).filter(Boolean);
   if (parts.length >= 3) { f('fName', parts.slice(0, parts.length - 2).join(' ')); f('fLastName1', parts[parts.length - 2]); f('fLastName2', parts[parts.length - 1]); }
@@ -4234,6 +4236,10 @@ function buildLeadPayload(o) {
     client_user_agent: navigator.userAgent || ''
   };
 }
+// Canal de captura del formulario: '' (la persona navego sola) o 'plasi_form' (Plasi abrio/prelleno el formulario de este auto).
+function leadCanalForm() {
+  try { return (window.__plasiAssistedAuto && currentCar && String(window.__plasiAssistedAuto) === String(currentCar.id)) ? 'plasi_form' : ''; } catch (e) { return ''; }
+}
 function chosenSucursalFor(car) {
   // Preserva la sucursal que el usuario ELIGIO al filtrar (sucursales virtuales con
   // inventario compartido); fallback la del auto.
@@ -4352,6 +4358,7 @@ function submitForm(opts) {
     folio, car: currentCar, nombre, ap1, ap2, phone, email,
     sucursal: chosenSucursalFor(currentCar), cita: citaSel,
     privacy: document.getElementById('fPrivacy').checked, marketing: document.getElementById('fMarketing').checked,
+    canal: leadCanalForm(),
   });
 
   sendToWebhook(payload);
@@ -4373,7 +4380,7 @@ function submitForm(opts) {
   //             Meta lo sigue recibiendo deduplicado y con mejor data.
   // El push se conserva completo: sirve para debug y para cualquier consumidor
   // futuro del dataLayer. Solo cambia la llave `event`.
-  pushGenerateLeadClient({ folio, car: currentCar, cita: citaSel, marketing: document.getElementById('fMarketing').checked, canal: '' });
+  pushGenerateLeadClient({ folio, car: currentCar, cita: citaSel, marketing: document.getElementById('fMarketing').checked, canal: leadCanalForm() });
   window._submitCompleted = true;
 
   lastAppointment = {
@@ -5048,7 +5055,7 @@ function sortInventoryDom() {
       + '<div class="plasi-contacto-btns"><button type="button" class="plasi-btn-pri">Confirmar</button><button type="button" class="plasi-btn-sec">Editar en el formulario</button></div>';
     var bs = el.querySelectorAll('.plasi-contacto-row b');
     bs[0].textContent = c.nombre; bs[1].textContent = '+52 ' + tel.replace(/(\d{2})(\d{4})(\d{4})/, '$1 $2 $3');
-    bs[2].textContent = car.name + ' ' + car.year; bs[3].textContent = c.sucursal || car.loc || 'López Mateos';
+    bs[2].textContent = String(car.name || '').replace(/^(\S+)\s+\1\b/i, '$1') + ' ' + car.year; bs[3].textContent = c.sucursal || car.loc || 'López Mateos';
     if (c.nota && bs[4]) bs[4].textContent = c.nota;
     msgs.appendChild(el); scrollBottom(); setChips([]);
     el.querySelector('.plasi-btn-sec').addEventListener('click', function () {
