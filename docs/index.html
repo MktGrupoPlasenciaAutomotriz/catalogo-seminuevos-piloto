@@ -4164,6 +4164,119 @@ function scrollToFirstError() {
   }
 }
 
+// ── Contrato de lead (UNICO): lo usan el formulario y el widget de Plasi ──
+// o = { folio, car, nombre, ap1, ap2, phone, email, sucursal, cita:{fecha,hora,origen}, privacy, marketing, canal, notas }
+function buildLeadPayload(o) {
+  var car = o.car, cita = o.cita || {}, nombre = o.nombre, ap1 = o.ap1, ap2 = o.ap2, phone = o.phone, email = o.email, folio = o.folio;
+  return {
+    folio,
+    fecha_registro: new Date().toISOString(),
+    vendedor_digital: ASESOR_ASIGNADO.nombre.toUpperCase(),
+    nombre,
+    apellido_paterno: ap1,
+    apellido_materno: ap2,
+    telefono: '+52' + phone,
+    email,
+    tipo_persona: '',
+    // auto_id_origen: id_auto Maxipublica del listing visto. Migration 0035.
+    // vin_auto_visto: VIN del listing (cuando Maxipublica lo expone). Atribución VIN-perfecta.
+    auto_id_origen: car.id || null,
+    vin_auto_visto: car.vin || '',
+    vehiculo: `${car.name} ${car.year}`.toUpperCase(),
+    anio: car.year,
+    km: car.km || 0,
+    precio: car.price,
+    badge: (car.badge || '').toUpperCase(),
+    // Sucursal enviada al CRM: preserva la sucursal que el usuario ELIGIO al
+    // filtrar (currentLocFilter). Esto es crítico para sucursales virtuales
+    // con inventario compartido: si el usuario esta en GWM Gzz Gallo y hace
+    // lead sobre un auto que fisicamente esta en Bugambilias, el payload debe
+    // decir "GWM GONZALEZ GALLO" para rutear a su canal Vambe propio.
+    // Fallback: v.loc si no hay filtro activo o el filtro no esta en las
+    // sucursales disponibles del auto (usuario cambio filtro despues de abrir modal).
+    sucursal: String(o.sucursal || car.loc || 'LOPEZ MATEOS').toUpperCase(),
+    // Cita elegida en el paso 2 (o vacia si pidio que el asesor proponga).
+    fecha_cita: cita.fecha || '',
+    hora_cita: cita.hora || '',
+    appointment_date: cita.fecha || '',
+    appointment_time: cita.hora || '',
+    cita_origen: cita.fecha ? (cita.origen || 'cliente') : '',
+    qa: QA_MODE ? 'true' : 'false',
+    auto_a_cuenta: '',
+    busca_financiamiento: '',
+    comprueba_ingresos: '',
+    enganche_pct: '',
+    plazo_meses: '',
+    mensualidad: '',
+    acepta_aviso_privacidad: o.privacy ? 'true' : 'false',
+    acepta_marketing: o.marketing ? 'true' : 'false',
+    fuente: 'LANDING PAGE',
+    etapa: 'POR CONTACTAR',
+    // canal de captura: '' = formulario · 'plasi_chat' = capturado por Plasi en el chat (mismo contrato)
+    canal: o.canal || '',
+    notas: o.notas || '',
+    fbclid: sessionStorage.getItem('fbclid') || '',
+    gclid: sessionStorage.getItem('gclid') || '',
+    gbraid: sessionStorage.getItem('gbraid') || '',
+    wbraid: sessionStorage.getItem('wbraid') || '',
+    meta_ad_id: sessionStorage.getItem('meta_ad_id') || '',
+    meta_placement: sessionStorage.getItem('meta_placement') || '',
+    utm_source: sessionStorage.getItem('utm_source') || '',
+    utm_medium: sessionStorage.getItem('utm_medium') || '',
+    utm_campaign: sessionStorage.getItem('utm_campaign') || '',
+    utm_content: sessionStorage.getItem('utm_content') || '',
+    utm_term: sessionStorage.getItem('utm_term') || '',
+    fbp: getCookie('_fbp'),
+    fbc: getCookie('_fbc'),
+    ga_client_id: getGaClientId(),
+    ga_session_id: getGaSessionId(),
+    client_ip_address: sessionStorage.getItem('client_ip') || '',
+    client_user_agent: navigator.userAgent || ''
+  };
+}
+function chosenSucursalFor(car) {
+  // Preserva la sucursal que el usuario ELIGIO al filtrar (sucursales virtuales con
+  // inventario compartido); fallback la del auto.
+  var chosenLoc = car.loc || '';
+  if (currentLocFilter && currentLocFilter !== 'all' && Array.isArray(car.sucursales_disponibles)) {
+    var match = car.sucursales_disponibles.find(function(s){ return normLoc(s) === normLoc(currentLocFilter); });
+    if (match) chosenLoc = match;
+  }
+  return chosenLoc;
+}
+// generate_lead_client (dataLayer): lo emiten el formulario y el widget de Plasi con el mismo shape.
+function pushGenerateLeadClient(o) {
+  var car = o.car, cita = o.cita || {};
+  dataLayer.push({
+    event: 'generate_lead_client',
+    appointment_date: cita.fecha || '',
+    appointment_time: cita.hora || '',
+    appointment_requested: cita.fecha ? 'true' : 'false',
+    appointment_source: cita.fecha ? (cita.origen || 'cliente') : '',
+    qa: QA_MODE ? 'true' : 'false',
+    lead_channel: o.canal || 'form',
+    event_id: o.folio + '_Lead',    // dedup key Pixel↔CAPI Meta
+    folio: o.folio,
+    currency: 'MXN',
+    value: car.price,
+    // item_id (car.id) + vin → permite atribución VIN-perfecta en GA4.
+    // vin viene del feed XML Maxipublica (62% coverage global, >95% en 4 sucursales piloto).
+    item_id: car.id || '',
+    vin: car.vin || '',
+    item_name: car.name + ' ' + car.year,
+    item_price: car.price,
+    lead_value: car.price,
+    vehicle_brand: car.brand || '',
+    vehicle_year: car.year,
+    vehicle_version: car.version || '',
+    sede: (car.loc || ''),
+    tipo_persona: 'NO ESPECIFICADO',
+    cash_only: 'false',
+    accept_marketing: !!o.marketing,
+    // Click IDs + UTMs + cookies + browser + ga_client_id (consistente con resto del funnel)
+    ...getTrackingContext()
+  });
+}
 function submitForm(opts) {
   opts = opts || {};
   if (submitting) return;
@@ -4235,75 +4348,11 @@ function submitForm(opts) {
   const name = [nombre, ap1, ap2].join(' ');
 
   const folio = generateFolio('GP-SEM');
-  const payload = {
-    folio,
-    fecha_registro: new Date().toISOString(),
-    vendedor_digital: ASESOR_ASIGNADO.nombre.toUpperCase(),
-    nombre,
-    apellido_paterno: ap1,
-    apellido_materno: ap2,
-    telefono: '+52' + phone,
-    email,
-    tipo_persona: '',
-    // auto_id_origen: id_auto Maxipublica del listing visto. Migration 0035.
-    // vin_auto_visto: VIN del listing (cuando Maxipublica lo expone). Atribución VIN-perfecta.
-    auto_id_origen: currentCar.id || null,
-    vin_auto_visto: currentCar.vin || '',
-    vehiculo: `${currentCar.name} ${currentCar.year}`.toUpperCase(),
-    anio: currentCar.year,
-    km: currentCar.km || 0,
-    precio: currentCar.price,
-    badge: (currentCar.badge || '').toUpperCase(),
-    // Sucursal enviada al CRM: preserva la sucursal que el usuario ELIGIO al
-    // filtrar (currentLocFilter). Esto es crítico para sucursales virtuales
-    // con inventario compartido: si el usuario esta en GWM Gzz Gallo y hace
-    // lead sobre un auto que fisicamente esta en Bugambilias, el payload debe
-    // decir "GWM GONZALEZ GALLO" para rutear a su canal Vambe propio.
-    // Fallback: v.loc si no hay filtro activo o el filtro no esta en las
-    // sucursales disponibles del auto (usuario cambio filtro despues de abrir modal).
-    sucursal: (function(){
-      var chosenLoc = currentCar.loc || '';
-      if (currentLocFilter && currentLocFilter !== 'all' && Array.isArray(currentCar.sucursales_disponibles)) {
-        var match = currentCar.sucursales_disponibles.find(function(s){ return normLoc(s) === normLoc(currentLocFilter); });
-        if (match) chosenLoc = match;
-      }
-      return chosenLoc.toUpperCase();
-    })(),
-    // Cita elegida en el paso 2 (o vacia si pidio que el asesor proponga).
-    fecha_cita: citaSel.fecha || '',
-    hora_cita: citaSel.hora || '',
-    appointment_date: citaSel.fecha || '',
-    appointment_time: citaSel.hora || '',
-    cita_origen: citaSel.fecha ? (citaSel.origen || 'cliente') : '',
-    qa: QA_MODE ? 'true' : 'false',
-    auto_a_cuenta: '',
-    busca_financiamiento: '',
-    comprueba_ingresos: '',
-    enganche_pct: '',
-    plazo_meses: '',
-    mensualidad: '',
-    acepta_aviso_privacidad: document.getElementById('fPrivacy').checked ? 'true' : 'false',
-    acepta_marketing: document.getElementById('fMarketing').checked ? 'true' : 'false',
-    fuente: 'LANDING PAGE',
-    etapa: 'POR CONTACTAR',
-    fbclid: sessionStorage.getItem('fbclid') || '',
-    gclid: sessionStorage.getItem('gclid') || '',
-    gbraid: sessionStorage.getItem('gbraid') || '',
-    wbraid: sessionStorage.getItem('wbraid') || '',
-    meta_ad_id: sessionStorage.getItem('meta_ad_id') || '',
-    meta_placement: sessionStorage.getItem('meta_placement') || '',
-    utm_source: sessionStorage.getItem('utm_source') || '',
-    utm_medium: sessionStorage.getItem('utm_medium') || '',
-    utm_campaign: sessionStorage.getItem('utm_campaign') || '',
-    utm_content: sessionStorage.getItem('utm_content') || '',
-    utm_term: sessionStorage.getItem('utm_term') || '',
-    fbp: getCookie('_fbp'),
-    fbc: getCookie('_fbc'),
-    ga_client_id: getGaClientId(),
-    ga_session_id: getGaSessionId(),
-    client_ip_address: sessionStorage.getItem('client_ip') || '',
-    client_user_agent: navigator.userAgent || ''
-  };
+  const payload = buildLeadPayload({
+    folio, car: currentCar, nombre, ap1, ap2, phone, email,
+    sucursal: chosenSucursalFor(currentCar), cita: citaSel,
+    privacy: document.getElementById('fPrivacy').checked, marketing: document.getElementById('fMarketing').checked,
+  });
 
   sendToWebhook(payload);
   // generate_lead client-side: red de seguridad de medición + conversión
@@ -4324,34 +4373,7 @@ function submitForm(opts) {
   //             Meta lo sigue recibiendo deduplicado y con mejor data.
   // El push se conserva completo: sirve para debug y para cualquier consumidor
   // futuro del dataLayer. Solo cambia la llave `event`.
-  dataLayer.push({
-    event: 'generate_lead_client',
-    appointment_date: citaSel.fecha || '',
-    appointment_time: citaSel.hora || '',
-    appointment_requested: citaSel.fecha ? 'true' : 'false',
-    appointment_source: citaSel.fecha ? (citaSel.origen || 'cliente') : '',
-    qa: QA_MODE ? 'true' : 'false',
-    event_id: folio + '_Lead',    // dedup key Pixel↔CAPI Meta
-    folio: folio,
-    currency: 'MXN',
-    value: currentCar.price,
-    // item_id (currentCar.id) + vin → permite atribución VIN-perfecta en GA4.
-    // vin viene del feed XML Maxipublica (62% coverage global, >95% en 4 sucursales piloto).
-    item_id: currentCar.id || '',
-    vin: currentCar.vin || '',
-    item_name: currentCar.name + ' ' + currentCar.year,
-    item_price: currentCar.price,
-    lead_value: currentCar.price,
-    vehicle_brand: currentCar.brand || '',
-    vehicle_year: currentCar.year,
-    vehicle_version: currentCar.version || '',
-    sede: (currentCar.loc || ''),
-    tipo_persona: 'NO ESPECIFICADO',
-    cash_only: 'false',
-    accept_marketing: document.getElementById('fMarketing').checked,
-    // Click IDs + UTMs + cookies + browser + ga_client_id (consistente con resto del funnel)
-    ...getTrackingContext()
-  });
+  pushGenerateLeadClient({ folio, car: currentCar, cita: citaSel, marketing: document.getElementById('fMarketing').checked, canal: '' });
   window._submitCompleted = true;
 
   lastAppointment = {
@@ -4718,6 +4740,14 @@ function sortInventoryDom() {
   .plasi-msg { max-width: 86%; padding: 10px 13px; border-radius: 14px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
   .plasi-msg.is-bot { align-self: flex-start; background: #fff; color: var(--ink-800, #1A202C); border: 1px solid var(--ink-200, #E2E8F0); border-top-left-radius: 4px; box-shadow: var(--shadow-sm); }
   .plasi-msg.is-user { align-self: flex-end; background: var(--plasi-navy); color: #fff; border-top-right-radius: 4px; }
+  .plasi-contacto { width: 100%; max-width: 100%; }
+  .plasi-contacto-t { font-weight: 800; margin-bottom: 6px; }
+  .plasi-contacto-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 3px 0; border-bottom: 1px solid rgba(0,0,0,.06); }
+  .plasi-contacto-row span { color: #6b7280; } .plasi-contacto-row b { text-align: right; }
+  .plasi-contacto-legal { font-size: 11.5px; color: #6b7280; margin: 8px 0; }
+  .plasi-contacto-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .plasi-btn-pri, .plasi-btn-sec { font: inherit; font-weight: 700; font-size: 13px; padding: 8px 12px; border-radius: 10px; cursor: pointer; border: 1px solid #0f2a4a; }
+  .plasi-btn-pri { background: #0f2a4a; color: #fff; } .plasi-btn-sec { background: #fff; color: #0f2a4a; }
   .plasi-msg.is-agent { background: #FFF7E6; border-color: #F5C36B; }
   .plasi-agent-label { font-size: 10.5px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; color: #92400E; margin-bottom: 4px; }
   .plasi-msg.is-sys { align-self: center; background: transparent; color: var(--ink-500, #64748B); font-size: 12px; text-align: center; padding: 2px 8px; }
@@ -4981,12 +5011,70 @@ function sortInventoryDom() {
       var g = document.getElementById('inventoryGrid'); if (g) g.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
+    if (action === 'contacto') {
+      if (!res || !res.contacto) return; // incompleto: Plasi sigue pidiendo datos
+      renderContactoCard(res.contacto);
+      return;
+    }
     if (action === 'humano') {
       if (res && res.handoff && res.handoff.needs_contact) return; // Plasi ya pidió nombre y teléfono
       // Transferida a un agente de atención a clientes: Plasi se calla, el agente
       // contesta desde el CRM y el widget lo muestra aquí (sondeo cada 5 s).
       startTransfer();
     }
+  }
+
+  // ── lead de contacto capturado en el chat (sin cita) ──
+  // La persona confirma un resumen; el envio es el MISMO que el del formulario
+  // (buildLeadPayload + sendToWebhook + generate_lead_client), con canal 'plasi_chat'.
+  function splitNombre(full) {
+    var parts = String(full || '').trim().split(/\s+/).filter(Boolean);
+    if (parts.length >= 3) return { nombre: parts.slice(0, parts.length - 2).join(' '), ap1: parts[parts.length - 2], ap2: parts[parts.length - 1] };
+    if (parts.length === 2) return { nombre: parts[0], ap1: parts[1], ap2: '' };
+    return { nombre: parts[0] || '', ap1: '', ap2: '' };
+  }
+  function renderContactoCard(c) {
+    var car = findCar(c.auto_id);
+    if (!car) { addMsg('sys', 'Ese auto ya no está en el catálogo. Pídeme otra opción.'); return; }
+    var tel = String(c.telefono || '').replace(/\D/g, '').slice(-10);
+    var el = document.createElement('div'); el.className = 'plasi-msg is-bot plasi-contacto';
+    el.innerHTML = '<div class="plasi-contacto-t">Confirma tus datos</div>'
+      + '<div class="plasi-contacto-row"><span>Nombre</span><b></b></div>'
+      + '<div class="plasi-contacto-row"><span>WhatsApp</span><b></b></div>'
+      + '<div class="plasi-contacto-row"><span>Auto</span><b></b></div>'
+      + '<div class="plasi-contacto-row"><span>Sucursal</span><b></b></div>'
+      + (c.nota ? '<div class="plasi-contacto-row"><span>Nota</span><b></b></div>' : '')
+      + '<div class="plasi-contacto-legal">Al confirmar aceptas el <a href="#aviso" target="_blank" rel="noopener">aviso de privacidad</a>. Un asesor te escribe por WhatsApp en menos de 2 horas.</div>'
+      + '<div class="plasi-contacto-btns"><button type="button" class="plasi-btn-pri">Confirmar</button><button type="button" class="plasi-btn-sec">Editar en el formulario</button></div>';
+    var bs = el.querySelectorAll('.plasi-contacto-row b');
+    bs[0].textContent = c.nombre; bs[1].textContent = '+52 ' + tel.replace(/(\d{2})(\d{4})(\d{4})/, '$1 $2 $3');
+    bs[2].textContent = car.name + ' ' + car.year; bs[3].textContent = c.sucursal || car.loc || 'López Mateos';
+    if (c.nota && bs[4]) bs[4].textContent = c.nota;
+    msgs.appendChild(el); scrollBottom(); setChips([]);
+    el.querySelector('.plasi-btn-sec').addEventListener('click', function () {
+      close(); if (typeof openModal === 'function') openModal(car.id);
+      setTimeout(function () { if (typeof applyPlasiPrefill === 'function') applyPlasiPrefill({ nombre: c.nombre, telefono: tel, email: c.email }, null, 'plasi'); scrollToForm(); }, 600);
+    });
+    el.querySelector('.plasi-btn-pri').addEventListener('click', function () {
+      var btn = this; btn.disabled = true; btn.textContent = 'Enviando…';
+      var n = splitNombre(c.nombre);
+      var folio = generateFolio('GP-SEM');
+      var payload = buildLeadPayload({
+        folio: folio, car: car, nombre: n.nombre.toUpperCase(), ap1: n.ap1.toUpperCase(), ap2: n.ap2.toUpperCase(),
+        phone: tel, email: String(c.email || '').toUpperCase(), sucursal: c.sucursal || car.loc || 'LOPEZ MATEOS',
+        cita: { fecha: '', hora: '' }, privacy: true, marketing: false,
+        canal: 'plasi_chat', notas: ('Capturado por Plasi en el chat del sitio' + (c.nota ? '. ' + c.nota : '')).slice(0, 300),
+      });
+      sendToWebhook(payload);
+      try { pushGenerateLeadClient({ folio: folio, car: car, cita: {}, marketing: false, canal: 'plasi_chat' }); } catch (e) {}
+      window._submitCompleted = true;
+      track('plasi_action', { plasi_action: 'lead_contacto', plasi_target_id: String(car.id) });
+      el.querySelector('.plasi-contacto-btns').remove();
+      el.querySelector('.plasi-contacto-legal').textContent = 'Listo, folio ' + folio + '. Un asesor de ' + (c.sucursal || car.loc) + ' te escribe por WhatsApp en menos de 2 horas.';
+      addMsg('bot', 'Quedó registrado' + (n.nombre ? ', ' + n.nombre.split(' ')[0] : '') + '. Si quieres, mientras tanto te muestro más opciones o agendamos una visita.');
+      history.push({ role: 'assistant', content: 'Registro de contacto confirmado (folio ' + folio + ').' });
+      setChips(['Ver más opciones', 'Agendar visita', 'Gracias']);
+    });
   }
 
   // ── transferencia a agente humano ──
