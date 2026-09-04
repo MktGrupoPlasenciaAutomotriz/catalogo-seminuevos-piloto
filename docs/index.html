@@ -2934,24 +2934,36 @@ function normLoc(s) {
 }
 // Datos de las 8 sucursales del piloto Seminuevos. Direcciones via Google Maps query (no inventamos coords).
 var SEDE_INFO = {
-  'Lopez Mateos': { nombre: 'Seminuevos Plasencia · López Mateos', direccion: 'Av. López Mateos Sur 2600, Jardines del Sol, Zapopan, Jal.', horario: 'Lun a Vie 9:00-18:00 · Sáb 9:00-14:00', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.6418057207534!2d-103.4083277!3d20.643452099999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ac5c80179401%3A0x8ed321a0e1445e25!2sSeminuevos%20Plasencia!5e0!3m2!1ses!2smx!4v1774907986396!5m2!1ses!2smx' },
+  'Lopez Mateos': { nombre: 'Seminuevos Plasencia · López Mateos', direccion: 'Av. López Mateos Sur 2600, Jardines del Sol, 45050 Zapopan, Jal.', horario: 'Lun a Vie 9:00-18:00 · Sáb 9:00-14:00', telefono: '33 1270 3429', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.6418057207534!2d-103.4083277!3d20.643452099999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ac5c80179401%3A0x8ed321a0e1445e25!2sSeminuevos%20Plasencia!5e0!3m2!1ses!2smx!4v1774907986396!5m2!1ses!2smx' },
   'Bugambilias': { nombre: 'Seminuevos Plasencia · Bugámbilias', direccion: 'Av. López Mateos Sur 8550, Bugambilias, 45238 Zapopan, Jal.', horario: 'Lun a Vie 9:30-19:30 · Sáb 9:30-19:00 · Dom 11:00-18:00', telefono: '33 3251 7440', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3734.671918270622!2d-103.4359611!3d20.6014516!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ad00129909bf%3A0xe6b05b0dfc15a19a!2sSeminuevos%20Plasencia%20Bugambilias!5e0!3m2!1ses!2smx!4v1778861975691!5m2!1ses!2smx' },
-  'Mazda Plasencia': { nombre: 'Mazda Plasencia', direccion: 'Av. Mariano Otero 405, Jardines del Sol, Zapopan, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.6418057207534!2d-103.4083277!3d20.643452099999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ac5c80179401%3A0x8ed321a0e1445e25!2sSeminuevos%20Plasencia!5e0!3m2!1ses!2smx!4v1774907986396!5m2!1ses!2smx' },
-  'Mazda Galerias': { nombre: 'Mazda Galerías', direccion: 'Av. Ignacio Vallarta 6218, Jocotán, Zapopan, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3732.560604524112!2d-103.4445848!3d20.687447900000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428aecead611e77%3A0xfcc3e5cd1e74a385!2sMazda%20Galer%C3%ADas!5e0!3m2!1ses-419!2smx!4v1776699160287!5m2!1ses-419!2smx' },
-  'Mazda Americas': { nombre: 'Mazda Américas', direccion: 'Av. Américas 918, Chapultepec Country, Guadalajara, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3732.387930461078!2d-103.37285170000001!3d20.694466!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ae3b06d01933%3A0x3ca15de8be3778cc!2sMazda%20Am%C3%A9ricas!5e0!3m2!1ses-419!2smx!4v1776699052902!5m2!1ses-419!2smx' },
-  'Mazda Acueducto': { nombre: 'Mazda Acueducto', direccion: 'Av. Acueducto 5455, Puerta de Hierro, Zapopan, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3731.807178173183!2d-103.4137913!3d20.7180532!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428af057bba4985%3A0x4e900d059c07986!2sMazda%20Acueducto!5e0!3m2!1ses-419!2smx!4v1776699232884!5m2!1ses-419!2smx' },
-  'Mazda Gonzalez Gallo': { nombre: 'Mazda González Gallo', direccion: 'Calz. González Gallo 1530, El Rosario, Guadalajara, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.52952875121!2d-103.3347312!3d20.648025!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428b368c6b6b9c7%3A0x1f67a9333a44d129!2sMazda%20Gonzalez%20Gallo!5e0!3m2!1ses-419!2smx!4v1776699292662!5m2!1ses-419!2smx' },
-  'Mazda Santa Anita': { nombre: 'Mazda Santa Anita', direccion: 'Av. López Mateos Sur 4115, Los Gavilanes, Tlajomulco, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3735.4123650126653!2d-103.45514999999999!3d20.5712109!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ab56fd729c75%3A0xc711bd9bafce9610!2sMazda%20Santa%20Anita!5e0!3m2!1ses-419!2smx!4v1776699317532!5m2!1ses-419!2smx' },
+  'Mazda Plasencia': { nombre: 'Mazda Plasencia', direccion: 'Av. Mariano Otero 405, Jardines del Sol, Zapopan, Jal.', horario: 'Lun a Vie 9:00-20:00 · Sáb 9:00-19:00 · Dom 11:00-18:00', telefono: '33 3344 4499', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.6418057207534!2d-103.4083277!3d20.643452099999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ac5c80179401%3A0x8ed321a0e1445e25!2sSeminuevos%20Plasencia!5e0!3m2!1ses!2smx!4v1774907986396!5m2!1ses!2smx' },
+  'Mazda Galerias': { nombre: 'Mazda Galerías', direccion: 'Av. Ignacio Vallarta 6218, Jocotán, Zapopan, Jal.', horario: 'Lun a Vie 9:00-20:00 · Sáb 9:00-19:00 · Dom 11:00-18:00', telefono: '33 3040 5900', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3732.560604524112!2d-103.4445848!3d20.687447900000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428aecead611e77%3A0xfcc3e5cd1e74a385!2sMazda%20Galer%C3%ADas!5e0!3m2!1ses-419!2smx!4v1776699160287!5m2!1ses-419!2smx' },
+  'Mazda Americas': { nombre: 'Mazda Américas', direccion: 'Av. Américas 918, Chapultepec Country, Guadalajara, Jal.', horario: 'Lun a Vie 9:00-20:00 · Sáb 9:00-19:00 · Dom 11:00-18:00', telefono: '33 1818 3333', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3732.387930461078!2d-103.37285170000001!3d20.694466!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ae3b06d01933%3A0x3ca15de8be3778cc!2sMazda%20Am%C3%A9ricas!5e0!3m2!1ses-419!2smx!4v1776699052902!5m2!1ses-419!2smx' },
+  'Mazda Acueducto': { nombre: 'Mazda Acueducto', direccion: 'Av. Acueducto 5455, Puerta de Hierro, Zapopan, Jal.', horario: 'Lun a Vie 9:00-20:00 · Sáb 9:00-19:00 · Dom 11:00-18:00', telefono: '33 3044 4000', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3731.807178173183!2d-103.4137913!3d20.7180532!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428af057bba4985%3A0x4e900d059c07986!2sMazda%20Acueducto!5e0!3m2!1ses-419!2smx!4v1776699232884!5m2!1ses-419!2smx' },
+  'Mazda Gonzalez Gallo': { nombre: 'Mazda González Gallo', direccion: 'Calz. González Gallo 1530, El Rosario, Guadalajara, Jal.', horario: 'Lun a Vie 9:00-19:30 · Sáb 9:00-19:00 · Dom 11:00-18:00', telefono: '33 4305 5000', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.52952875121!2d-103.3347312!3d20.648025!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428b368c6b6b9c7%3A0x1f67a9333a44d129!2sMazda%20Gonzalez%20Gallo!5e0!3m2!1ses-419!2smx!4v1776699292662!5m2!1ses-419!2smx' },
+  'Mazda Santa Anita': { nombre: 'Mazda Santa Anita', direccion: 'Av. López Mateos Sur 4115, Los Gavilanes, Tlajomulco, Jal.', horario: 'Lun a Vie 9:00-20:00 · Sáb 9:00-19:00 · Dom 11:00-19:00', telefono: '33 4444 1000', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3735.4123650126653!2d-103.45514999999999!3d20.5712109!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ab56fd729c75%3A0xc711bd9bafce9610!2sMazda%20Santa%20Anita!5e0!3m2!1ses-419!2smx!4v1776699317532!5m2!1ses-419!2smx' },
   // GWM González Gallo (Fase 4, agosto 2026) — sucursal virtual con inventario
   // compartido con Bugámbilias. Piso físico propio (Calz. Jesús González Gallo 2565).
-  'GWM González Gallo': { nombre: 'GWM González Gallo', direccion: 'Calz. Jesús González Gallo 2565, El Rosario, 44890 Guadalajara, Jal.', horario: 'Lun a Sáb · Consulta horario en sucursal', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.8221493983315!2d-103.3265925!3d20.6361049!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428b3000f9d5c0d%3A0xb85edca3318708cc!2sGWM%20Gonz%C3%A1lez%20Gallo!5e0!3m2!1ses!2smx!4v1786654205004!5m2!1ses!2smx' }
+  'GWM González Gallo': { nombre: 'GWM González Gallo', direccion: 'Calz. Jesús González Gallo 2565, El Rosario, 44890 Guadalajara, Jal.', horario: 'Lun a Vie 9:00-20:00 · Sáb 11:00-18:00 · Dom 11:00-18:00', telefono: '33 2833 4411', embedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3733.8221493983315!2d-103.3265925!3d20.6361049!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428b3000f9d5c0d%3A0xb85edca3318708cc!2sGWM%20Gonz%C3%A1lez%20Gallo!5e0!3m2!1ses!2smx!4v1786654205004!5m2!1ses!2smx' }
 };
 
+// Tabla unica de sedes: la sirve el worker (/api/lead/seminuevos/sedes) y es la misma
+// que usan Plasi y el feed de tiendas. SEDE_INFO inline es el respaldo sin red.
+function sedeInfoFor(val) {
+  var base = SEDE_INFO[val] || null; if (!base) return null;
+  try {
+    var o = (typeof CITA_CFG !== 'undefined' && CITA_CFG.sedes) || {};
+    var k = Object.keys(o).find(function (n) { return normSede(n) === normSede(val); });
+    var ov = k ? o[k] : null;
+    if (ov && ov.direccion) return Object.assign({}, base, { direccion: ov.direccion, horario: ov.horario_texto || base.horario, telefono: ov.telefono || base.telefono });
+  } catch (e) {}
+  return base;
+}
 function renderLocInfo(val) {
   var el = document.getElementById('locInfo');
   if (!el) return;
   if (val === 'all' || !SEDE_INFO[val]) { el.style.display = 'none'; el.innerHTML = ''; return; }
-  var s = SEDE_INFO[val];
+  var s = sedeInfoFor(val);
   el.innerHTML =
     '<svg class="loc-info-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
     '<div class="loc-info-body">' +
@@ -2966,7 +2978,7 @@ function renderLocInfo(val) {
 }
 
 function openLocMapModal(val) {
-  var s = SEDE_INFO[val]; if (!s) return;
+  var s = sedeInfoFor(val); if (!s) return;
   document.getElementById('locMapTitle').textContent = s.nombre;
   document.getElementById('locMapAddr').textContent = s.direccion;
   document.getElementById('locMapIframe').src = s.embedUrl;
@@ -3372,7 +3384,7 @@ var CITA_CFG = {
 };
 (function loadCitaCfg() {
   try {
-    fetch(CRM_BASE + '/api/lead/seminuevos/horarios').then(function (r) { return r.ok ? r.json() : null; })
+    fetch(CRM_BASE + '/api/lead/seminuevos/sedes').then(function (r) { return r.ok ? r.json() : null; })
       .then(function (j) { if (j && j.sedes) CITA_CFG = Object.assign({}, CITA_CFG, j); }).catch(function () {});
   } catch (e) {}
 })();
@@ -4810,7 +4822,7 @@ function sortInventoryDom() {
   // ── estado ──
   var history = [];          // [{role, content}] lo que ve el modelo
   var visitor = { nombre: '', telefono: '', email: '' };
-  var busy = false, opened = false, greeted = false;
+  var busy = false, opened = false, greeted = false, turns = 0, openedAt = 0, lastAction = '', openCount = 0;
   var sid = (function () {
     try {
       var s = sessionStorage.getItem('plasi_sid');
@@ -4824,7 +4836,17 @@ function sortInventoryDom() {
   try { sessionStorage.removeItem('plasi_hist'); } catch (e) {}
   var lastCtxAutoId = '';
   function persist() {}
-  function track(ev, extra) { try { window.dataLayer = window.dataLayer || []; dataLayer.push(Object.assign({ event: ev, plasi_session: sid }, extra || {}, (typeof getTrackingContext === 'function' ? getTrackingContext() : {}))); } catch (e) {} }
+  // Todos los eventos del widget llevan el mismo enriquecimiento: sesion, turnos, accion,
+  // auto en pantalla (item_id, item_name, item_price, vin, sede) y contexto de tracking.
+  function track(ev, extra) {
+    try {
+      var c = pageCtx(); var car = findCar(c.auto_id);
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push(Object.assign({ event: ev, plasi_session: sid, plasi_turns: turns, plasi_action: lastAction || '', plasi_open_count: openCount,
+        item_id: c.auto_id || '', item_name: c.auto_nombre || '', item_price: c.auto_precio || '', vin: car ? (car.vin || '') : '', sede: c.auto_sucursal || c.sucursal_filtro || '', qa: QA_MODE ? 'true' : 'false' },
+        extra || {}, (typeof getTrackingContext === 'function' ? getTrackingContext() : {})));
+    } catch (e) {}
+  }
 
   // ── helpers de catalogo (usa `vehicles` global de la SPA) ──
   function findCar(id) { if (!id || typeof vehicles === 'undefined') return null; return vehicles.find(function (v) { return String(v.id) === String(id); }) || null; }
@@ -4900,10 +4922,12 @@ function sortInventoryDom() {
       addMsg('bot', re); history.push({ role: 'assistant', content: re }); lastCtxAutoId = c.auto_id;
       setChips(['Sí, agenda cita para este', 'Muéstrame parecidos', 'Quiero hablar con un asesor']);
     }
-    track('plasi_open', pageCtx().auto_id ? { item_id: pageCtx().auto_id } : {});
+    openCount++; openedAt = Date.now();
+    track('plasi_open', { plasi_context: pageCtx().auto_id ? 'ficha' : 'listado' });
     setTimeout(function () { input.focus({ preventScroll: true }); }, 250);
   }
   function close() {
+    if (opened) track('plasi_close', { plasi_duration_s: openedAt ? Math.round((Date.now() - openedAt) / 1000) : 0 });
     opened = false; panel.classList.remove('is-open'); panel.setAttribute('aria-hidden', 'true'); fab.setAttribute('aria-expanded', 'false');
     document.body.classList.remove('plasi-open'); fab.focus({ preventScroll: true });
   }
@@ -4931,7 +4955,8 @@ function sortInventoryDom() {
   }
   function doAction(action, autoId, res) {
     var car = findCar(autoId);
-    track('plasi_action', { plasi_action: action, item_id: autoId || '' });
+    lastAction = action;
+    track('plasi_action', { plasi_action: action, plasi_target_id: autoId || '' });
     if (action === 'ver_auto' || action === 'agendar') {
       if (!car) { addMsg('sys', 'Ese auto ya no está en el catálogo. Pídeme otra opción.'); return; }
       close();
@@ -4968,7 +4993,8 @@ function sortInventoryDom() {
     text = String(text || '').trim(); if (!text || busy) return;
     addMsg('user', text); history.push({ role: 'user', content: text }); persist();
     input.value = ''; input.style.height = ''; setChips([]); setBusy(true); typing(true);
-    track('plasi_message_sent');
+    turns++;
+    track('plasi_message_sent', { plasi_message_len: text.length });
     var pc = pageCtx(); lastCtxAutoId = pc.auto_id || lastCtxAutoId;
     var body = { session_id: sid, history: history.slice(-14), page: pc, visitor: visitor, utm: utmCtx() };
     fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
