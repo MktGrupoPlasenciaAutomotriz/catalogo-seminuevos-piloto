@@ -4169,7 +4169,9 @@ function scrollToFirstError() {
 // ── Contrato de lead (UNICO): lo usan el formulario y el widget de Plasi ──
 // o = { folio, car, nombre, ap1, ap2, phone, email, sucursal, cita:{fecha,hora,origen}, privacy, marketing, canal, notas }
 function buildLeadPayload(o) {
-  var car = o.car, cita = o.cita || {}, nombre = o.nombre, ap1 = o.ap1, ap2 = o.ap2, phone = o.phone, email = o.email, folio = o.folio;
+  // car puede ser null (ayuda humana sin auto elegido): el lead sale como 'SEMINUEVO POR DEFINIR' a Lopez Mateos.
+  var car = o.car || { id: null, vin: '', name: 'SEMINUEVO POR DEFINIR', year: '', km: 0, price: 0, badge: '', loc: '' };
+  var cita = o.cita || {}, nombre = o.nombre, ap1 = o.ap1, ap2 = o.ap2, phone = o.phone, email = o.email, folio = o.folio;
   return {
     folio,
     fecha_registro: new Date().toISOString(),
@@ -4217,6 +4219,8 @@ function buildLeadPayload(o) {
     // canal de captura: '' = formulario · 'plasi_chat' = capturado por Plasi en el chat (mismo contrato)
     canal: o.canal || '',
     notas: o.notas || '',
+    // intencion del registro: 'contacto' · 'cita' · 'ayuda_humana' (medicion y Vambe)
+    lead_intent: o.intent || ((cita && cita.fecha) ? 'cita' : 'contacto'),
     fbclid: sessionStorage.getItem('fbclid') || '',
     gclid: sessionStorage.getItem('gclid') || '',
     gbraid: sessionStorage.getItem('gbraid') || '',
@@ -4261,6 +4265,7 @@ function pushGenerateLeadClient(o) {
     appointment_source: cita.fecha ? (cita.origen || 'cliente') : '',
     qa: QA_MODE ? 'true' : 'false',
     lead_channel: o.canal || 'form',
+    lead_intent: o.intent || ((cita && cita.fecha) ? 'cita' : 'contacto'),
     event_id: o.folio + '_Lead',    // dedup key Pixel↔CAPI Meta
     folio: o.folio,
     currency: 'MXN',
@@ -4725,12 +4730,12 @@ function sortInventoryDom() {
     .plasi-fab .plasi-fab-txt small { display: none; }
   }
 
-  .plasi-panel { position: fixed; right: 16px; bottom: 16px; z-index: var(--plasi-z); width: min(400px, calc(100vw - 32px)); height: auto; max-height: min(680px, calc(100vh - 32px)); display: none; flex-direction: column; background: #fff; border-radius: 18px; box-shadow: 0 32px 64px -16px rgba(15,23,42,0.35), 0 0 0 1px rgba(15,23,42,0.06); overflow: hidden; }
+  .plasi-panel { position: fixed; right: 16px; bottom: 16px; z-index: var(--plasi-z); width: min(400px, calc(100vw - 32px)); height: min(680px, calc(100vh - 32px)); max-height: calc(100vh - 32px); display: none; flex-direction: column; background: #fff; border-radius: 18px; box-shadow: 0 32px 64px -16px rgba(15,23,42,0.35), 0 0 0 1px rgba(15,23,42,0.06); overflow: hidden; }
   .plasi-panel.is-open { display: flex; animation: plasiIn 220ms var(--ease, ease); }
   @keyframes plasiIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
   @media (max-width: 640px) {
-    .plasi-panel { right: 0; bottom: 0; left: 0; width: 100%; height: auto; max-height: min(92svh, 100vh); border-radius: 18px 18px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
-    .plasi-msgs { min-height: 140px; }
+    .plasi-panel { right: 0; bottom: 0; left: 0; width: 100%; height: min(92svh, 100vh); max-height: 100dvh; border-radius: 18px 18px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .plasi-msgs { min-height: 0; }
   }
   @media (prefers-reduced-motion: reduce) { .plasi-panel.is-open { animation: none; } .plasi-fab:hover { transform: none; } }
 
@@ -4743,7 +4748,9 @@ function sortInventoryDom() {
   .plasi-close:hover { background: rgba(255,255,255,0.16); }
   .plasi-close:focus-visible { outline: 2px solid var(--plasi-gold); }
 
-  .plasi-msgs { flex: 1 1 auto; min-height: 96px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 14px 8px; background: var(--ink-50, #F7F9FC); display: flex; flex-direction: column; gap: 10px; }
+  .plasi-msgs { flex: 1 1 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; padding: 16px 14px 8px; background: var(--ink-50, #F7F9FC); display: flex; flex-direction: column; gap: 10px; }
+  .plasi-msgs > * { flex: 0 0 auto; }
+  .plasi-head, .plasi-chips, .plasi-foot, .plasi-compose, .plasi-inputrow { flex: 0 0 auto; }
   .plasi-msg { max-width: 86%; padding: 10px 13px; border-radius: 14px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
   .plasi-msg.is-bot { align-self: flex-start; background: #fff; color: var(--ink-800, #1A202C); border: 1px solid var(--ink-200, #E2E8F0); border-top-left-radius: 4px; box-shadow: var(--shadow-sm); }
   .plasi-msg.is-user { align-self: flex-end; background: var(--plasi-navy); color: #fff; border-top-right-radius: 4px; }
@@ -5028,6 +5035,9 @@ function sortInventoryDom() {
       // Transferida a un agente de atención a clientes: Plasi se calla, el agente
       // contesta desde el CRM y el widget lo muestra aquí (sondeo cada 5 s).
       startTransfer();
+      // Regla (Chucho 4-sep): quien pide ayuda humana con nombre y celular es un lead:
+      // entra a Por contactar y a Vambe por el mismo camino que el formulario.
+      leadPorAyudaHumana(res);
     }
   }
 
@@ -5082,6 +5092,30 @@ function sortInventoryDom() {
       history.push({ role: 'assistant', content: 'Registro de contacto confirmado (folio ' + folio + ').' });
       setChips(['Ver más opciones', 'Agendar visita', 'Gracias']);
     });
+  }
+
+  var leadAyudaEnviado = false;
+  function leadPorAyudaHumana(res) {
+    if (leadAyudaEnviado || !res || !res.cliente) return;
+    var tel = String(res.cliente.telefono || '').replace(/\D/g, '').slice(-10);
+    var n = splitNombre(res.cliente.nombre);
+    if (tel.length !== 10 || !n.nombre) return;
+    var autoId = (res.escalacion && res.escalacion.auto_id) || res.auto_id || lastCtxAutoId || '';
+    var car = findCar(autoId);
+    var motivo = (res.escalacion && res.escalacion.motivo) || 'pide atención humana';
+    var folio = generateFolio('GP-SEM');
+    var payload = buildLeadPayload({
+      folio: folio, car: car, nombre: n.nombre.toUpperCase(), ap1: n.ap1.toUpperCase(), ap2: n.ap2.toUpperCase(),
+      phone: tel, email: String(res.cliente.email || '').toUpperCase(), sucursal: car ? (car.loc || '') : 'LOPEZ MATEOS',
+      cita: { fecha: '', hora: '' }, privacy: true, marketing: false,
+      canal: 'plasi_chat', intent: 'ayuda_humana', notas: ('Pidió atención humana en el chat del sitio: ' + motivo).slice(0, 300),
+    });
+    leadAyudaEnviado = true;
+    sendToWebhook(payload);
+    try { pushGenerateLeadClient({ folio: folio, car: car, cita: {}, marketing: false, canal: 'plasi_chat', intent: 'ayuda_humana' }); } catch (e) {}
+    window._submitCompleted = true;
+    track('plasi_action', { plasi_action: 'lead_ayuda_humana', plasi_target_id: autoId ? String(autoId) : '' });
+    addMsg('sys', 'Quedaste registrado (folio ' + folio + '). También te contacta un asesor de ' + (car ? (car.loc || 'la sucursal') : 'López Mateos') + '.');
   }
 
   // ── transferencia a agente humano ──
