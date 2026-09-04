@@ -4718,6 +4718,8 @@ function sortInventoryDom() {
   .plasi-msg { max-width: 86%; padding: 10px 13px; border-radius: 14px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
   .plasi-msg.is-bot { align-self: flex-start; background: #fff; color: var(--ink-800, #1A202C); border: 1px solid var(--ink-200, #E2E8F0); border-top-left-radius: 4px; box-shadow: var(--shadow-sm); }
   .plasi-msg.is-user { align-self: flex-end; background: var(--plasi-navy); color: #fff; border-top-right-radius: 4px; }
+  .plasi-msg.is-agent { background: #FFF7E6; border-color: #F5C36B; }
+  .plasi-agent-label { font-size: 10.5px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; color: #92400E; margin-bottom: 4px; }
   .plasi-msg.is-sys { align-self: center; background: transparent; color: var(--ink-500, #64748B); font-size: 12px; text-align: center; padding: 2px 8px; }
   .plasi-msg a { color: #0B62BD; font-weight: 600; }
   .plasi-typing { align-self: flex-start; display: flex; gap: 4px; padding: 12px 14px; background: #fff; border: 1px solid var(--ink-200, #E2E8F0); border-radius: 14px; border-top-left-radius: 4px; }
@@ -4804,7 +4806,7 @@ function sortInventoryDom() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       </button>
     </form>
-    <div class="plasi-foot">Plasi es el asistente de IA de Grupo Plasencia. ¿Prefieres una persona? <a id="plasiWaLink" href="https://wa.me/523321016742?text=Hola%2C%20quiero%20hablar%20con%20un%20asesor%20de%20Seminuevos%20Plasencia" target="_blank" rel="noopener">Escríbenos por WhatsApp</a></div>
+    <div class="plasi-foot">Plasi es el asistente de IA de Grupo Plasencia. ¿Prefieres una persona? Pídeselo a Plasi y te transfiere. <a id="plasiWaLink" hidden href="https://wa.me/523321016742?text=Hola%2C%20quiero%20hablar%20con%20un%20asesor%20de%20Seminuevos%20Plasencia" target="_blank" rel="noopener">Escríbenos por WhatsApp</a></div>
   </section>
   <div class="plasi-toast" id="plasiToast" role="status" aria-live="polite"></div>
 </div>
@@ -4823,6 +4825,7 @@ function sortInventoryDom() {
   var history = [];          // [{role, content}] lo que ve el modelo
   var visitor = { nombre: '', telefono: '', email: '' };
   var busy = false, opened = false, greeted = false, turns = 0, openedAt = 0, lastAction = '', openCount = 0;
+  var transferred = false, lastAgentId = 0, pollT = null;
   var sid = (function () {
     try {
       var s = sessionStorage.getItem('plasi_sid');
@@ -4979,13 +4982,34 @@ function sortInventoryDom() {
       return;
     }
     if (action === 'humano') {
-      var url = (res && res.handoff && res.handoff.whatsapp_url) || ('https://wa.me/' + WA_PLASI + '?text=' + encodeURIComponent('Hola, quiero hablar con un asesor de Seminuevos Plasencia.'));
       if (res && res.handoff && res.handoff.needs_contact) return; // Plasi ya pidió nombre y teléfono
-      var el = document.createElement('div'); el.className = 'plasi-msg is-bot';
-      el.innerHTML = (res && res.handoff && res.handoff.notified ? 'Listo, ya avisé al equipo con tus datos. ' : '') + 'Si prefieres seguir por WhatsApp con una persona: <a href="' + url + '" target="_blank" rel="noopener">abrir WhatsApp</a>.';
-      msgs.appendChild(el); scrollBottom();
-      setChips(['Mientras, muéstrame opciones', 'Gracias']);
+      // Transferida a un agente de atención a clientes: Plasi se calla, el agente
+      // contesta desde el CRM y el widget lo muestra aquí (sondeo cada 5 s).
+      startTransfer();
     }
+  }
+
+  // ── transferencia a agente humano ──
+  function addAgentMsg(m) {
+    var el = document.createElement('div'); el.className = 'plasi-msg is-bot is-agent';
+    el.textContent = m.content; var lab = document.createElement('div'); lab.className = 'plasi-agent-label'; lab.textContent = 'Agente de atención a clientes';
+    el.prepend(lab); msgs.appendChild(el); scrollBottom();
+    if (!opened) { badge.textContent = '1'; badge.classList.add('is-on'); }
+  }
+  function pollAgent() {
+    fetch(API.replace(/\/plasi\/seminuevos$/, '/plasi/seminuevos/messages') + '?session_id=' + encodeURIComponent(sid) + '&after=' + lastAgentId)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (!j) return;
+        (j.messages || []).forEach(function (m) { lastAgentId = Math.max(lastAgentId, m.id); addAgentMsg(m); history.push({ role: 'assistant', content: m.content }); });
+        if (j.state && j.state !== 'escalated' && transferred) { transferred = false; clearInterval(pollT); pollT = null; addMsg('sys', 'Plasi vuelve a atenderte.'); }
+      }).catch(function () {});
+  }
+  function startTransfer() {
+    if (transferred) return;
+    transferred = true; setChips([]);
+    input.placeholder = 'Escribe aquí, el agente te contesta…';
+    if (!pollT) pollT = setInterval(pollAgent, 5000);
   }
 
   // ── enviar ──
@@ -5001,6 +5025,7 @@ function sortInventoryDom() {
       .then(function (r) { return r.json().then(function (j) { j.__status = r.status; return j; }); })
       .then(function (j) {
         typing(false);
+        if (j.handoff && j.handoff.transferred && j.response == null) { startTransfer(); addMsg('sys', 'Tu mensaje llegó al agente. Te contesta aquí o por WhatsApp.'); return; }
         var reply = j.response || 'Se me fue la señal un segundo. ¿Me lo repites?';
         addMsg('bot', reply); history.push({ role: 'assistant', content: reply }); persist();
         if (j.cliente) { visitor = { nombre: j.cliente.nombre || visitor.nombre, telefono: j.cliente.telefono || visitor.telefono, email: j.cliente.email || visitor.email }; persist(); }
