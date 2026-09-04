@@ -4672,7 +4672,7 @@ function sortInventoryDom() {
 
 
 <!-- ═══════════════════════════════════════════════════════════════════
-     PLASI · asistente IA de Seminuevos Plasencia (widget de chat)
+     PLASI · el asistente de IA de Grupo Plasencia, aquí para Seminuevos (widget de chat)
      Isotipo Plasi: mismo SVG que el Marketplace MVP v1 (icons.js → plasi).
      Backend: crm-worker POST /api/lead/plasi-seminuevos
      Acciones que ejecuta: ver_auto (abre ficha) · agendar (abre el
@@ -4790,8 +4790,8 @@ function sortInventoryDom() {
     <header class="plasi-head">
       <span class="plasi-avatar" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="plgHd" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1E2740"/><stop offset="100%" stop-color="#0F1A2E"/></linearGradient><radialGradient id="plgspHd" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFE89B"/><stop offset="60%" stop-color="#ECC94B"/><stop offset="100%" stop-color="#B7791F"/></radialGradient></defs><circle cx="20" cy="20" r="19" fill="url(#plgHd)"/><path d="M20 7 L23 17 L33 20 L23 23 L20 33 L17 23 L7 20 L17 17 Z" fill="url(#plgspHd)"/><circle cx="20" cy="20" r="2.5" fill="#fff" opacity=".9"/></svg></span>
       <div class="plasi-head-txt">
-        <strong id="plasiTitle">Plasi · Seminuevos Plasencia</strong>
-        <span>Asistente de IA · te responde al momento</span>
+        <strong id="plasiTitle">Plasi · Grupo Plasencia</strong>
+        <span>Asistente de IA para Seminuevos · te responde al momento</span>
       </div>
       <button class="plasi-close" id="plasiClose" type="button" aria-label="Cerrar chat">×</button>
     </header>
@@ -4804,7 +4804,7 @@ function sortInventoryDom() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       </button>
     </form>
-    <div class="plasi-foot">Plasi es un asistente de IA. ¿Prefieres una persona? <a id="plasiWaLink" href="https://wa.me/523321016742?text=Hola%2C%20quiero%20hablar%20con%20un%20asesor%20de%20Seminuevos%20Plasencia" target="_blank" rel="noopener">Escríbenos por WhatsApp</a></div>
+    <div class="plasi-foot">Plasi es el asistente de IA de Grupo Plasencia. ¿Prefieres una persona? <a id="plasiWaLink" href="https://wa.me/523321016742?text=Hola%2C%20quiero%20hablar%20con%20un%20asesor%20de%20Seminuevos%20Plasencia" target="_blank" rel="noopener">Escríbenos por WhatsApp</a></div>
   </section>
   <div class="plasi-toast" id="plasiToast" role="status" aria-live="polite"></div>
 </div>
@@ -4912,8 +4912,8 @@ function sortInventoryDom() {
     var c = pageCtx();
     if (!greeted) {
       var hi = c.auto_id
-        ? 'Hola, soy Plasi, la asistente de IA de Seminuevos Plasencia. Estás viendo el ' + c.auto_nombre + (c.auto_sucursal ? ' en ' + c.auto_sucursal : '') + '. ¿Te agendo una cita para verlo, o buscamos algo parecido?'
-        : 'Hola, soy Plasi, la asistente de IA de Seminuevos Plasencia. Dime qué auto buscas o para qué lo necesitas y te muestro opciones reales del inventario de hoy.';
+        ? 'Hola, soy Plasi, el asistente de IA de Grupo Plasencia. Estás viendo el ' + c.auto_nombre + (c.auto_sucursal ? ' en ' + c.auto_sucursal : '') + '. ¿Te agendo una cita para verlo, o buscamos algo parecido?'
+        : 'Hola, soy Plasi, el asistente de IA de Grupo Plasencia. Dime qué seminuevo buscas o para qué lo necesitas y te muestro opciones reales del inventario de hoy.';
       addMsg('bot', hi); history.push({ role: 'assistant', content: hi }); greeted = true; lastCtxAutoId = c.auto_id || '';
       setChips(c.auto_id ? ['Quiero agendar cita para este auto', 'Muéstrame opciones parecidas', 'Quiero hablar con un asesor'] : ['Busco una SUV para la familia', 'Algo económico para la ciudad', 'Quiero hablar con un asesor']);
     } else if (c.auto_id && c.auto_id !== lastCtxAutoId) {
