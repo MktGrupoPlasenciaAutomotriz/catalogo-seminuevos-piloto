@@ -5174,12 +5174,9 @@ function sortInventoryDom() {
         if (j.handoff && j.handoff.transferred && j.response == null) { startTransfer(); addMsg('sys', 'Tu mensaje llegó al agente. Te contesta aquí o por WhatsApp.'); return; }
         var reply = j.response || 'Se me fue la señal un segundo. ¿Me lo repites?';
         addMsg('bot', reply); history.push({ role: 'assistant', content: reply }); persist();
-        if (j.cliente) { visitor = { nombre: j.cliente.nombre || visitor.nombre, telefono: j.cliente.telefono || visitor.telefono, email: j.cliente.email || visitor.email }; persist(); }
-        var ids = (j.auto_ids && j.auto_ids.length) ? j.auto_ids : (j.auto_id ? [j.auto_id] : []);
-        if (j.action !== 'ver_auto' && j.action !== 'agendar') addCars(ids);
-        setChips(j.suggestions || []);
-        if (j.action) setTimeout(function () { doAction(j.action, j.auto_id, j); }, j.action === 'humano' ? 0 : 900);
-        if (j.__status === 429) setChips(['Abrir WhatsApp']);
+        // A partir de aqui son adornos (tarjetas, chips, acciones): si algo truena en un
+        // navegador raro, la respuesta ya esta en pantalla y NO se muestra "No pude conectar".
+        try { renderExtras(j); } catch (e) { try { track('plasi_error', { plasi_error: 'render_' + String(e && e.message || e).slice(0, 80), plasi_api: API }); } catch (e2) {} }
       })
       .catch(function () {
         typing(false);
@@ -5189,6 +5186,14 @@ function sortInventoryDom() {
         msgs.appendChild(el); scrollBottom();
       })
       .finally(function () { setBusy(false); if (opened) input.focus({ preventScroll: true }); });
+    function renderExtras(j) {
+        if (j.cliente) { visitor = { nombre: j.cliente.nombre || visitor.nombre, telefono: j.cliente.telefono || visitor.telefono, email: j.cliente.email || visitor.email }; persist(); }
+        var ids = (j.auto_ids && j.auto_ids.length) ? j.auto_ids : (j.auto_id ? [j.auto_id] : []);
+        if (j.action !== 'ver_auto' && j.action !== 'agendar') addCars(ids);
+        setChips(j.suggestions || []);
+        if (j.action) setTimeout(function () { doAction(j.action, j.auto_id, j); }, j.action === 'humano' ? 0 : 900);
+        if (j.__status === 429) setChips(['Abrir WhatsApp']);
+    }
   }
   form.addEventListener('submit', function (e) { e.preventDefault(); send(input.value); });
   input.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.keyCode === 13) && !e.shiftKey) { e.preventDefault(); send(input.value); } });
