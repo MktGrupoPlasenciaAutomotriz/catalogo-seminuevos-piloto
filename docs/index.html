@@ -5115,7 +5115,7 @@ function sortInventoryDom() {
     turns++;
     track('plasi_message_sent', { plasi_message_len: text.length });
     var pc = pageCtx(); lastCtxAutoId = pc.auto_id || lastCtxAutoId;
-    var body = { session_id: sid, history: history.slice(-14), page: pc, visitor: visitor, utm: utmCtx() };
+    var body = { session_id: sid, history: history.slice(-14), page: pc, visitor: visitor, utm: utmCtx(), qa: !!QA_MODE };
     fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       .then(function (r) { return r.json().then(function (j) { j.__status = r.status; return j; }); })
       .then(function (j) {
