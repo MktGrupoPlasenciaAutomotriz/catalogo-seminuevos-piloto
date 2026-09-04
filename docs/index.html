@@ -5150,8 +5150,25 @@ function sortInventoryDom() {
     track('plasi_message_sent', { plasi_message_len: text.length });
     var pc = pageCtx(); lastCtxAutoId = pc.auto_id || lastCtxAutoId;
     var body = { session_id: sid, history: history.slice(-14), page: pc, visitor: visitor, utm: utmCtx(), qa: !!QA_MODE };
-    fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-      .then(function (r) { return r.json().then(function (j) { j.__status = r.status; return j; }); })
+    // Un reintento automatico ante fallo de red/respuesta no JSON (redes corporativas,
+    // bloqueos de workers.dev, cortes breves). El detalle del fallo va a GA4 como plasi_error.
+    var attempt = 0; var lastErr = '';
+    function doFetch() {
+      attempt++;
+      return fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+        .then(function (r) {
+          return r.text().then(function (t) {
+            var j; try { j = JSON.parse(t); } catch (e) { lastErr = 'http_' + r.status + '_no_json'; throw new Error(lastErr); }
+            j.__status = r.status; return j;
+          });
+        })
+        .catch(function (e) {
+          if (!lastErr) lastErr = 'network_' + String(e && e.message || e).slice(0, 60);
+          if (attempt < 2) return new Promise(function (res) { setTimeout(res, 1500); }).then(doFetch);
+          throw e;
+        });
+    }
+    doFetch()
       .then(function (j) {
         typing(false);
         if (j.handoff && j.handoff.transferred && j.response == null) { startTransfer(); addMsg('sys', 'Tu mensaje llegó al agente. Te contesta aquí o por WhatsApp.'); return; }
@@ -5166,8 +5183,9 @@ function sortInventoryDom() {
       })
       .catch(function () {
         typing(false);
+        try { track('plasi_error', { plasi_error: lastErr || 'unknown', plasi_api: API, plasi_online: navigator.onLine ? 'true' : 'false' }); } catch (e) {}
         var el = document.createElement('div'); el.className = 'plasi-msg is-bot';
-        el.innerHTML = 'No pude conectar. Intenta de nuevo o <a href="https://wa.me/' + WA_PLASI + '" target="_blank" rel="noopener">escríbenos por WhatsApp</a>.';
+        el.innerHTML = 'No pude conectar (' + (lastErr || 'sin detalle') + '). Intenta de nuevo o <a href="https://wa.me/' + WA_PLASI + '" target="_blank" rel="noopener">escríbenos por WhatsApp</a>.';
         msgs.appendChild(el); scrollBottom();
       })
       .finally(function () { setBusy(false); if (opened) input.focus({ preventScroll: true }); });
