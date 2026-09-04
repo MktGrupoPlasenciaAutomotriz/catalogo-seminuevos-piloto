@@ -4684,11 +4684,12 @@ function sortInventoryDom() {
     .plasi-fab .plasi-fab-txt small { display: none; }
   }
 
-  .plasi-panel { position: fixed; right: 16px; bottom: 16px; z-index: var(--plasi-z); width: min(400px, calc(100vw - 32px)); height: min(640px, calc(100vh - 32px)); display: none; flex-direction: column; background: #fff; border-radius: 18px; box-shadow: 0 32px 64px -16px rgba(15,23,42,0.35), 0 0 0 1px rgba(15,23,42,0.06); overflow: hidden; }
+  .plasi-panel { position: fixed; right: 16px; bottom: 16px; z-index: var(--plasi-z); width: min(400px, calc(100vw - 32px)); height: auto; max-height: min(680px, calc(100vh - 32px)); display: none; flex-direction: column; background: #fff; border-radius: 18px; box-shadow: 0 32px 64px -16px rgba(15,23,42,0.35), 0 0 0 1px rgba(15,23,42,0.06); overflow: hidden; }
   .plasi-panel.is-open { display: flex; animation: plasiIn 220ms var(--ease, ease); }
   @keyframes plasiIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
   @media (max-width: 640px) {
-    .plasi-panel { right: 0; bottom: 0; left: 0; width: 100%; height: min(92svh, 100vh); border-radius: 18px 18px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .plasi-panel { right: 0; bottom: 0; left: 0; width: 100%; height: auto; max-height: min(92svh, 100vh); border-radius: 18px 18px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .plasi-msgs { min-height: 140px; }
   }
   @media (prefers-reduced-motion: reduce) { .plasi-panel.is-open { animation: none; } .plasi-fab:hover { transform: none; } }
 
@@ -4701,7 +4702,7 @@ function sortInventoryDom() {
   .plasi-close:hover { background: rgba(255,255,255,0.16); }
   .plasi-close:focus-visible { outline: 2px solid var(--plasi-gold); }
 
-  .plasi-msgs { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 14px 8px; background: var(--ink-50, #F7F9FC); display: flex; flex-direction: column; gap: 10px; }
+  .plasi-msgs { flex: 1 1 auto; min-height: 96px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 14px 8px; background: var(--ink-50, #F7F9FC); display: flex; flex-direction: column; gap: 10px; }
   .plasi-msg { max-width: 86%; padding: 10px 13px; border-radius: 14px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
   .plasi-msg.is-bot { align-self: flex-start; background: #fff; color: var(--ink-800, #1A202C); border: 1px solid var(--ink-200, #E2E8F0); border-top-left-radius: 4px; box-shadow: var(--shadow-sm); }
   .plasi-msg.is-user { align-self: flex-end; background: var(--plasi-navy); color: #fff; border-top-right-radius: 4px; }
@@ -4817,22 +4818,24 @@ function sortInventoryDom() {
       return s;
     } catch (e) { return 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); }
   })();
-  try {
-    var saved = JSON.parse(sessionStorage.getItem('plasi_hist') || 'null');
-    if (saved && Array.isArray(saved.history)) { history = saved.history.slice(-14); visitor = saved.visitor || visitor; greeted = !!saved.greeted; }
-  } catch (e) {}
-  function persist() { try { sessionStorage.setItem('plasi_hist', JSON.stringify({ history: history.slice(-14), visitor: visitor, greeted: greeted })); } catch (e) {} }
+  // El historial vive solo en memoria de esta carga de pagina. Persistirlo
+  // entre recargas dejaba un saludo viejo ("veo que estas viendo el X") que
+  // ya no correspondia a lo que la persona tenia en pantalla.
+  try { sessionStorage.removeItem('plasi_hist'); } catch (e) {}
+  var lastCtxAutoId = '';
+  function persist() {}
   function track(ev, extra) { try { window.dataLayer = window.dataLayer || []; dataLayer.push(Object.assign({ event: ev, plasi_session: sid }, extra || {}, (typeof getTrackingContext === 'function' ? getTrackingContext() : {}))); } catch (e) {} }
 
   // ── helpers de catalogo (usa `vehicles` global de la SPA) ──
   function findCar(id) { if (!id || typeof vehicles === 'undefined') return null; return vehicles.find(function (v) { return String(v.id) === String(id); }) || null; }
   function money(n) { var x = Number(n); return isFinite(x) && x > 0 ? '$' + x.toLocaleString('es-MX') : ''; }
+  function carName(c) { var n = String((c && c.name) || '').trim().replace(/^(\S+)\s+\1\b/i, '$1'); return (n + ' ' + ((c && c.year) || '')).trim(); }
   function pageCtx() {
     var c = (typeof currentCar !== 'undefined' && currentCar) ? currentCar : null;
     var modalOpen = false; try { modalOpen = document.getElementById('vehicleModal').classList.contains('open'); } catch (e) {}
     return {
       auto_id: (c && modalOpen) ? String(c.id) : '',
-      auto_nombre: (c && modalOpen) ? (c.name + ' ' + (c.year || '')).trim() : '',
+      auto_nombre: (c && modalOpen) ? carName(c) : '',
       auto_precio: (c && modalOpen) ? c.price : '',
       auto_sucursal: (c && modalOpen) ? (c.loc || '') : '',
       sucursal_filtro: (typeof currentLocFilter !== 'undefined' && currentLocFilter && currentLocFilter !== 'all') ? currentLocFilter : ''
@@ -4855,7 +4858,7 @@ function sortInventoryDom() {
     cars.forEach(function (c) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'plasi-car'; b.setAttribute('data-id', String(c.id));
       b.innerHTML = '<img alt="" loading="lazy"><div class="plasi-car-t"><b></b><span></span></div><div class="plasi-car-p"></div>';
-      b.querySelector('img').src = c.img || ''; b.querySelector('b').textContent = (c.name + ' ' + (c.year || '')).trim();
+      b.querySelector('img').src = c.img || ''; b.querySelector('b').textContent = carName(c);
       var km = Number(c.km) > 0 ? Number(c.km).toLocaleString('es-MX') + ' km · ' : '';
       b.querySelector('span').textContent = km + (c.loc || ''); b.querySelector('.plasi-car-p').textContent = money(c.price);
       b.addEventListener('click', function () { doAction('ver_auto', String(c.id), null); });
@@ -4884,15 +4887,18 @@ function sortInventoryDom() {
   function open() {
     opened = true; panel.classList.add('is-open'); panel.setAttribute('aria-hidden', 'false'); fab.setAttribute('aria-expanded', 'true');
     document.body.classList.add('plasi-open'); badge.classList.remove('is-on');
+    var c = pageCtx();
     if (!greeted) {
-      var c = pageCtx();
       var hi = c.auto_id
-        ? 'Hola, soy Plasi, la asistente de IA de Seminuevos Plasencia. Veo que estás viendo el ' + c.auto_nombre + '. ¿Quieres que te ayude a agendar tu cita para verlo, o buscamos algo parecido?'
+        ? 'Hola, soy Plasi, la asistente de IA de Seminuevos Plasencia. Estás viendo el ' + c.auto_nombre + (c.auto_sucursal ? ' en ' + c.auto_sucursal : '') + '. ¿Te agendo una cita para verlo, o buscamos algo parecido?'
         : 'Hola, soy Plasi, la asistente de IA de Seminuevos Plasencia. Dime qué auto buscas o para qué lo necesitas y te muestro opciones reales del inventario de hoy.';
-      addMsg('bot', hi); history.push({ role: 'assistant', content: hi }); greeted = true; persist();
+      addMsg('bot', hi); history.push({ role: 'assistant', content: hi }); greeted = true; lastCtxAutoId = c.auto_id || '';
       setChips(c.auto_id ? ['Quiero agendar cita para este auto', 'Muéstrame opciones parecidas', 'Quiero hablar con un asesor'] : ['Busco una SUV para la familia', 'Algo económico para la ciudad', 'Quiero hablar con un asesor']);
-    } else if (!msgs.children.length) {
-      history.forEach(function (m) { addMsg(m.role === 'user' ? 'user' : 'bot', m.content); });
+    } else if (c.auto_id && c.auto_id !== lastCtxAutoId) {
+      // La persona abrio otro auto desde que hablamos: Plasi lo reconoce en vez de seguir con el anterior.
+      var re = 'Ahora estás viendo el ' + c.auto_nombre + (c.auto_sucursal ? ' en ' + c.auto_sucursal : '') + '. ¿Seguimos con este?';
+      addMsg('bot', re); history.push({ role: 'assistant', content: re }); lastCtxAutoId = c.auto_id;
+      setChips(['Sí, agenda cita para este', 'Muéstrame parecidos', 'Quiero hablar con un asesor']);
     }
     track('plasi_open', pageCtx().auto_id ? { item_id: pageCtx().auto_id } : {});
     setTimeout(function () { input.focus({ preventScroll: true }); }, 250);
@@ -4963,7 +4969,8 @@ function sortInventoryDom() {
     addMsg('user', text); history.push({ role: 'user', content: text }); persist();
     input.value = ''; input.style.height = ''; setChips([]); setBusy(true); typing(true);
     track('plasi_message_sent');
-    var body = { session_id: sid, history: history.slice(-14), page: pageCtx(), visitor: visitor, utm: utmCtx() };
+    var pc = pageCtx(); lastCtxAutoId = pc.auto_id || lastCtxAutoId;
+    var body = { session_id: sid, history: history.slice(-14), page: pc, visitor: visitor, utm: utmCtx() };
     fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       .then(function (r) { return r.json().then(function (j) { j.__status = r.status; return j; }); })
       .then(function (j) {
