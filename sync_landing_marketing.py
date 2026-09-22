@@ -5,6 +5,7 @@ Sincroniza textos de marketing del HTML de la landing con el inventario REAL
 title, og:title, og:description proviene del inventario actual.
 
 Lugares actualizados (cada uno con su regex acotado):
+  - <lastmod> de docs/sitemap.xml (fecha del sync)
   - <title>
   - <meta name="description" ...>
   - <meta property="og:title" ...>
@@ -34,6 +35,25 @@ def fmt_price_compact(n):
     return f"${round(n / 1000)}K"
 
 
+SITEMAP_PATH = os.path.join(ROOT, "docs", "sitemap.xml")
+
+
+def sync_sitemap():
+    """Mantiene <lastmod> del sitemap en la fecha del último sync (UTC).
+    El catálogo cambia a diario; un lastmod fijo le dice a Google lo contrario."""
+    if not os.path.exists(SITEMAP_PATH):
+        return
+    from datetime import datetime, timezone
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    with open(SITEMAP_PATH, "r", encoding="utf-8") as f:
+        xml = f.read()
+    new_xml = re.sub(r"<lastmod>[^<]*</lastmod>", f"<lastmod>{today}</lastmod>", xml, count=1)
+    if new_xml != xml:
+        with open(SITEMAP_PATH, "w", encoding="utf-8") as f:
+            f.write(new_xml)
+        print(f"sitemap.xml: lastmod → {today}")
+
+
 def main():
     if not os.path.exists(JSON_PATH):
         print(f"ERROR: {JSON_PATH} no existe (corre primero export_catalogo_piloto.py)", file=sys.stderr)
@@ -58,11 +78,12 @@ def main():
     # Composicion de textos alineados con el concepto rector "Sin Sorpresas"
     # y la propuesta de valor: 8 sucursales en GDL, 75 años de operación,
     # inventario actualizado al día. Inventario (n_cars) se inyecta dinámico.
-    new_title = "Seminuevos Plasencia · Sin sorpresas · 8 sucursales en Guadalajara · 75 años"
+    # Title ≤ 60 caracteres (Google corta ~60) con marca + intención de búsqueda.
+    new_title = "Seminuevos Plasencia · Autos certificados en Guadalajara"
+    # Description ≤ 160 caracteres (Google corta ~155-160).
     new_desc = (
-        f"Tu próximo seminuevo, sin sorpresas. {n_cars} autos certificados en 8 sucursales "
-        f"de Guadalajara. Inspección de 150 puntos, garantía de un año y factura original "
-        f"verificada. Crédito desde 12 meses."
+        f"{n_cars} seminuevos certificados en 8 sucursales de Guadalajara. Inspección de "
+        f"150 puntos, garantía de un año y factura original. Tu asesor te escribe por WhatsApp."
     )
     new_og_title = "Seminuevos Plasencia · Sin sorpresas · 75 años en Guadalajara"
     new_og_desc = (
@@ -96,6 +117,8 @@ def main():
         lambda m: m.group(1) + new_og_desc + m.group(2),
         html, count=1
     )
+
+    sync_sitemap()
 
     if html == original:
         print("HTML ya sincronizado con el inventario. Sin cambios.")
