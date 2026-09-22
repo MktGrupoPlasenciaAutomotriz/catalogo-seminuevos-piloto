@@ -9,7 +9,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-WKV7LZ7T');</script>
 <!-- End Google Tag Manager -->
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="preload" as="image" href="hero-seminuevos-1600.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
 <link rel="preload" as="image" href="hero-seminuevos-900.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
 <title>Seminuevos Plasencia · Autos certificados en Guadalajara</title>
@@ -963,6 +963,50 @@ details.filter-group[open] > summary::after { transform: rotate(-135deg); margin
   backdrop-filter: blur(6px);
 }
 .v-card-photos svg { width: 12px; height: 12px; }
+.v-card-photos { z-index: 2; font-variant-numeric: tabular-nums; }
+
+/* ── Galería en la tarjeta: swipe nativo (scroll-snap) en móvil, flechas en
+   escritorio, contador arriba a la derecha y puntos abajo al centro.
+   Solo la primera foto viene en el HTML; el resto se inserta al primer
+   gesto (touchstart / pointerdown / scroll / flecha) para no descargar
+   16 fotos por tarjeta que nadie pidió. ── */
+.v-card-gal { position: absolute; inset: 0; }
+.v-card-track {
+  position: absolute; inset: 0; display: flex;
+  overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory; scrollbar-width: none;
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y;
+}
+.v-card-track::-webkit-scrollbar { display: none; }
+.v-card-slide { flex: 0 0 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; overflow: hidden; background: var(--ink-100); }
+.v-card-nav {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+  width: 44px; height: 44px; padding: 0; border: 0; background: transparent;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  opacity: 0; transition: opacity var(--duration-normal) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.v-card-nav::before { content: ''; position: absolute; width: 32px; height: 32px; border-radius: 50%; background: rgba(15,26,46,0.72); backdrop-filter: blur(6px); box-shadow: 0 2px 8px rgba(0,0,0,0.28); }
+.v-card-nav svg { position: relative; width: 18px; height: 18px; color: #fff; }
+.v-card-nav.prev { left: 4px; }
+.v-card-nav.next { right: 4px; }
+.v-card-nav[aria-disabled="true"] { opacity: 0 !important; pointer-events: none; }
+.v-card-nav:focus-visible { opacity: 1; outline: 3px solid var(--color-accent); outline-offset: -6px; border-radius: 50%; }
+@media (hover: hover) and (pointer: fine) {
+  .v-card:hover .v-card-nav, .v-card:focus-within .v-card-nav { opacity: 1; }
+}
+@media (pointer: coarse) { .v-card-nav { opacity: 0.92; } }
+.v-card-dots { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); z-index: 2; overflow: hidden; pointer-events: none; }
+.v-card-dots-in { display: flex; transition: transform var(--duration-normal) var(--ease); }
+.v-card-dots i { flex: 0 0 12px; height: 14px; display: flex; align-items: center; justify-content: center; }
+.v-card-dots i::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.6); box-shadow: 0 0 0 1px rgba(0,0,0,0.28); transition: transform var(--duration-normal) var(--ease), background var(--duration-normal) var(--ease); }
+.v-card-dots i.on::before { background: var(--color-accent); transform: scale(1.3); }
+.v-card-dots i.sm::before { transform: scale(0.66); }
+@media (prefers-reduced-motion: reduce) {
+  .v-card-track { scroll-behavior: auto; }
+  .v-card-dots-in, .v-card-dots i::before, .v-card-nav { transition: none; }
+}
 .v-card-body { padding: 20px; }
 .v-card-title { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--ink-900); margin-bottom: 4px; letter-spacing: -0.01em; }
 .v-card-specs { font-size: 12px; color: var(--ink-500); margin-bottom: 16px; line-height: 1.5; }
@@ -1002,7 +1046,7 @@ details.filter-group[open] > summary::after { transform: rotate(-135deg); margin
 .modal-close:hover { background: rgba(11,18,40,0.92); transform: rotate(90deg); }
 .modal-close svg { width: 18px; height: 18px; }
 
-.modal-gallery { position: relative; aspect-ratio: 16/9; background: var(--ink-100); }
+.modal-gallery { position: relative; aspect-ratio: 16/9; background: var(--ink-100); touch-action: pan-y; }
 .modal-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .modal-gallery::after {
   content: ''; position: absolute; inset: auto 0 0 0; height: 30%;
@@ -3180,6 +3224,8 @@ function badgeClass(b) {
 }
 
 const PIN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+const GAL_CHEV_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
+const GAL_CHEV_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
 const CAM_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>';
 
 // ── RENDER CARDS ──
@@ -3562,31 +3608,153 @@ function renderCards(filter) {
   }
 }
 
+// ── Galería en tarjeta ───────────────────────────────────────────────────
+// Swipe nativo con scroll-snap (sin librería ni gestos a mano), flechas como
+// alternativa sin arrastre (WCAG 2.5.7) y contador "3/16" como indicador.
+// El HTML solo trae la primera foto; las demás se insertan al primer gesto.
+const GAL_DOT_WINDOW = 7;   // puntos visibles a la vez (ventana deslizante estilo Instagram)
+function galImgs(v) { return (v.gallery && v.gallery.length) ? v.gallery : [v.img]; }
+function galCount(v) { return galImgs(v).length; }
+function galIdx(card) { var g = card && card.querySelector ? card.querySelector('.v-card-gal') : null; return g ? (parseInt(g.dataset.idx, 10) || 0) : 0; }
+
+function buildCardGalleryHTML(v) {
+  const imgs = galImgs(v), n = imgs.length;
+  const alt = (v.name + ' ' + (v.year || '')).trim();
+  const slides = imgs.map((u, i) => i === 0
+    ? `<div class="v-card-slide"><img class="v-card-img" src="${u}" alt="${alt}" loading="lazy" decoding="async"></div>`
+    : `<div class="v-card-slide" data-src="${u}"></div>`).join('');
+  if (n <= 1) return `<div class="v-card-gal" data-n="1" data-idx="0"><div class="v-card-track">${slides}</div></div>`;
+  const dots = imgs.map((_, i) => `<i class="${i === 0 ? 'on' : ''}${(n > GAL_DOT_WINDOW && i === GAL_DOT_WINDOW - 1) ? ' sm' : ''}"></i>`).join('');
+  return `<div class="v-card-gal" data-id="${v.id}" data-n="${n}" data-idx="0" role="group" aria-roledescription="carrusel" aria-label="Fotos de ${alt}">
+        <div class="v-card-track">${slides}</div>
+        <button type="button" class="v-card-nav prev" aria-label="Foto anterior" aria-disabled="true" onclick="event.stopPropagation();if(event.detail)this.blur();galStep(this,-1)" onkeydown="event.stopPropagation()">${GAL_CHEV_L}</button>
+        <button type="button" class="v-card-nav next" aria-label="Foto siguiente" aria-disabled="false" onclick="event.stopPropagation();if(event.detail)this.blur();galStep(this,1)" onkeydown="event.stopPropagation()">${GAL_CHEV_R}</button>
+        <div class="v-card-dots" aria-hidden="true" style="width:${Math.min(n, GAL_DOT_WINDOW) * 12}px"><div class="v-card-dots-in">${dots}</div></div>
+      </div>`;
+}
+
+// Inserta fotos en el DOM en dos niveles. Nivel 1 (hover o touchstart):
+// solo la foto 2, con carga inmediata, para que el primer swipe no muestre
+// un hueco. Nivel 2 (scroll real o flecha): las demás, con loading="lazy",
+// así una tarjeta que solo se rozó al hacer scroll vertical no baja 16 fotos.
+function galHydrate(gal, all) {
+  if (!gal) return;
+  const level = all ? 2 : 1;
+  if ((parseInt(gal.dataset.hydrated, 10) || 0) >= level) return;
+  gal.dataset.hydrated = level;
+  const alt = (gal.getAttribute('aria-label') || '').replace(/^Fotos de /, '');
+  gal.querySelectorAll('.v-card-slide[data-src]').forEach(function (s, i) {
+    if (!all && i > 0) return;
+    const img = document.createElement('img');
+    img.className = 'v-card-img'; img.alt = alt; img.decoding = 'async';
+    if (i > 0) img.loading = 'lazy';
+    img.src = s.dataset.src; s.removeAttribute('data-src'); s.appendChild(img);
+  });
+}
+
+function galSetIndex(gal, idx, method) {
+  const n = parseInt(gal.dataset.n, 10) || 1;
+  idx = Math.max(0, Math.min(n - 1, idx));
+  const changed = (parseInt(gal.dataset.idx, 10) || 0) !== idx;
+  gal.dataset.idx = idx;
+  const W = GAL_DOT_WINDOW;
+  const start = n > W ? Math.max(0, Math.min(n - W, idx - Math.floor(W / 2))) : 0;
+  gal.querySelectorAll('.v-card-dots i').forEach(function (d, i) {
+    d.classList.toggle('on', i === idx);
+    d.classList.toggle('sm', n > W && ((i === start && start > 0) || (i === start + W - 1 && start + W < n)));
+  });
+  const inner = gal.querySelector('.v-card-dots-in');
+  if (inner) inner.style.transform = 'translateX(' + (-start * 12) + 'px)';
+  const prev = gal.querySelector('.v-card-nav.prev'), next = gal.querySelector('.v-card-nav.next');
+  if (prev) prev.setAttribute('aria-disabled', idx === 0 ? 'true' : 'false');
+  if (next) next.setAttribute('aria-disabled', idx === n - 1 ? 'true' : 'false');
+  const cnt = gal.parentElement ? gal.parentElement.querySelector('[data-gal-count]') : null;
+  if (cnt) cnt.textContent = (idx + 1) + '/' + n;
+  if (changed && method && !gal.dataset.tracked) {
+    gal.dataset.tracked = '1';   // un evento por tarjeta y vista: mide adopción, no cada foto
+    try { dataLayer.push({ event: 'card_gallery_nav', item_id: gal.dataset.id || '', method: method, ...getTrackingContext() }); } catch (e) {}
+  }
+}
+
+function galStep(btn, dir) {
+  const gal = btn.closest('.v-card-gal'); if (!gal) return;
+  galHydrate(gal, true);
+  const track = gal.querySelector('.v-card-track');
+  const n = parseInt(gal.dataset.n, 10) || 1;
+  const idx = Math.max(0, Math.min(n - 1, (parseInt(gal.dataset.idx, 10) || 0) + dir));
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  track.scrollTo({ left: idx * track.clientWidth, behavior: reduce ? 'auto' : 'smooth' });
+  galSetIndex(gal, idx, 'arrow');
+}
+
+// Un solo juego de listeners en el grid (renderCards reemplaza el innerHTML,
+// así que no se enlaza nada por tarjeta). scroll no burbujea: se captura.
+(function initCardGalleries() {
+  const grid = document.getElementById('inventoryGrid'); if (!grid) return;
+  const hydrateNext = function (e) {
+    const gal = e.target && e.target.closest ? e.target.closest('.v-card-gal') : null;
+    if (gal && (parseInt(gal.dataset.n, 10) || 1) > 1) galHydrate(gal, false);
+  };
+  grid.addEventListener('touchstart', hydrateNext, { passive: true });
+  grid.addEventListener('mouseover', hydrateNext, { passive: true });
+  let raf = 0;
+  grid.addEventListener('scroll', function (e) {
+    const track = e.target;
+    if (!track || !track.classList || !track.classList.contains('v-card-track')) return;
+    if (raf) return;
+    raf = requestAnimationFrame(function () {
+      raf = 0;
+      const gal = track.parentElement; galHydrate(gal, true);
+      galSetIndex(gal, Math.round(track.scrollLeft / Math.max(1, track.clientWidth)), 'swipe');
+    });
+  }, { capture: true, passive: true });
+})();
+
+// Galería de la ficha: swipe horizontal en touch y ←/→ en teclado. Se suma a
+// los botones y al tap-para-avanzar que ya existían; no los reemplaza.
+(function initModalGalleryGestures() {
+  var g = document.getElementById('modalGallery'); if (!g) return;
+  var sx = 0, sy = 0, swipedAt = 0;
+  g.addEventListener('touchstart', function (e) { var t = e.touches[0]; sx = t.clientX; sy = t.clientY; }, { passive: true });
+  g.addEventListener('touchend', function (e) {
+    var t = e.changedTouches[0]; var dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) { swipedAt = Date.now(); galleryNav(dx < 0 ? 1 : -1); }
+  }, { passive: true });
+  // Un swipe no debe contar además como tap-para-avanzar
+  g.addEventListener('click', function (e) { if (swipedAt && Date.now() - swipedAt < 400) { e.stopPropagation(); e.preventDefault(); } }, true);
+  document.addEventListener('keydown', function (e) {
+    if (!document.body.classList.contains('gp-modal-open')) return;
+    var tag = (e.target && e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select' || (e.target && e.target.isContentEditable)) return;
+    if (e.key === 'ArrowRight') { galleryNav(1); } else if (e.key === 'ArrowLeft') { galleryNav(-1); }
+  });
+})();
+
 // Card template unificado
 function buildVCardHTML(v) {
   return `
-    <div class="v-card" onclick="openModal(${v.id})" tabindex="0" role="button" aria-label="${v.name} ${v.year} - ${fmt(v.price)}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openModal(${v.id})}">
+    <div class="v-card" onclick="openModal(${v.id}, galIdx(this))" tabindex="0" role="button" aria-label="${v.name} ${v.year} - ${fmt(v.price)}" onkeydown="if((event.key==='Enter'||event.key===' ')&&event.target===this){event.preventDefault();openModal(${v.id}, galIdx(this))}">
       <div class="v-card-img-wrap">
-        <img class="v-card-img" src="${v.img}" alt="${v.name}" loading="lazy">
+        ${buildCardGalleryHTML(v)}
         ${v.badge ? `<div class="v-card-badge ${badgeClass(v.badge)}">${v.badge}</div>` : ''}
         <div class="v-card-loc">${PIN_SVG} ${v.loc}</div>
-        <div class="v-card-photos">${CAM_SVG} ${v.photos}</div>
+        <div class="v-card-photos">${CAM_SVG} <span data-gal-count>${galCount(v) > 1 ? '1/' + galCount(v) : '1'}</span></div>
       </div>
       <div class="v-card-body">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;flex-wrap:wrap;">
-          <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 6px;border-radius:4px;background:var(--ink-100,#EDF2F7);color:var(--ink-600,#475569);">${v.brand||''}</span>
-          <span style="font-size:9px;color:var(--ink-400,#94A3B8);">${v.loc||''}</span>
-          ${isCashOnly(v) ? '<span class="cash-only-chip" title="Este modelo no aplica a financiamiento" style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 6px;border-radius:4px;background:var(--color-accent-light,#EBF8FF);color:var(--color-accent,#2B6CB0);border:1px solid rgba(66,153,225,0.35);">No aplica financiamiento</span>' : ''}
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 7px;border-radius:4px;background:var(--ink-100,#EDF2F7);color:var(--ink-600,#475569);">${v.brand||''}</span>
+          <span style="font-size:11px;color:var(--ink-500,#64748B);">${v.loc||''}</span>
+          ${isCashOnly(v) ? '<span class="cash-only-chip" title="Este modelo no aplica a financiamiento" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 7px;border-radius:4px;background:var(--color-accent-light,#EBF8FF);color:var(--color-accent,#2B6CB0);border:1px solid rgba(66,153,225,0.35);">No aplica financiamiento</span>' : ''}
         </div>
         <div class="v-card-title">${v.name} ${v.year}</div>
         <div class="v-card-specs">${[v.km > 0 ? v.km.toLocaleString() + ' km' : '', v.trans, v.fuel].filter(Boolean).join(' &middot; ')}</div>
         <div class="v-card-price-row">
           <div class="v-card-price" title="Precio publicado, IVA incluido. Sujeto a disponibilidad. Tu asesor te confirma el total final, sin sorpresas en el papel.">${fmt(v.price)}</div>
         </div>
-        <div class="v-card-price-disclaimer" style="font-size:10px;color:var(--ink-400,#94A3B8);margin-top:4px;line-height:1.3;">Precio publicado de lista, IVA incluido, con fines ilustrativos. No constituye oferta vinculante. La oferta final depende de la cotización del asesor.</div>
+        <div class="v-card-price-disclaimer" style="font-size:12px;color:var(--ink-500,#64748B);margin-top:6px;line-height:1.35;">Precio publicado de lista, IVA incluido, con fines ilustrativos. No constituye oferta vinculante. La oferta final depende de la cotización del asesor.</div>
         <div style="margin-top:10px;display:flex;gap:6px;">
           ${v.badge ? `<button onclick="event.stopPropagation();var d=this.nextElementSibling;var open=d.style.display==='block';d.style.display=open?'none':'block';this.setAttribute('aria-expanded', String(!open));" aria-expanded="false" aria-controls="promo-${v.id}" style="flex:1;padding:12px;min-height:44px;background:transparent;color:var(--color-accent,#FBC645);border:1.5px solid var(--color-accent,#FBC645);border-radius:8px;font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:0.2px;cursor:pointer;transition:all 0.15s;">Ver promoción</button><div style="display:none;position:absolute;left:12px;right:12px;bottom:52px;background:#1A1A1A;color:#F7FAFC;padding:12px 14px;border-radius:10px;font-size:12px;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,0.3);z-index:5;"><strong style="color:var(--color-accent,#FBC645);">${v.badge}</strong><br>Tasa de referencia 14.9%. Enganche desde 25%.<br><span style="font-size:10px;color:#A0AEC0;">Promoción aplicable a esta unidad. Tu asesor confirma los detalles en el contacto. Sujeto a disponibilidad y cambios sin previo aviso.</span></div>` : ''}
-          <button onclick="event.stopPropagation();openModal(${v.id})" style="flex:1;padding:12px;min-height:44px;background:var(--color-accent,#FBC645);color:#1A1A1A;border:none;border-radius:8px;font-family:var(--font-display);font-weight:700;font-size:14px;letter-spacing:0.2px;cursor:pointer;transition:transform 0.15s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">Ver detalle y cotizar</button>
+          <button onclick="event.stopPropagation();openModal(${v.id}, galIdx(this.closest('.v-card')))" style="flex:1;padding:12px;min-height:44px;background:var(--color-accent,#FBC645);color:#1A1A1A;border:none;border-radius:8px;font-family:var(--font-display);font-weight:700;font-size:14px;letter-spacing:0.2px;cursor:pointer;transition:transform 0.15s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">Ver detalle y cotizar</button>
         </div>
       </div>
     </div>`;
@@ -4013,7 +4181,7 @@ window.addEventListener('popstate', function() {
   } finally { _spaNavigating = false; }
 });
 
-function openModal(id) {
+function openModal(id, startIdx) {
   try { document.body.classList.add('gp-modal-open'); } catch (e) {}
   if (typeof resetSubmitState === 'function') resetSubmitState();
   currentCar = vehicles.find(v => v.id === id);
@@ -4022,15 +4190,15 @@ function openModal(id) {
   dataLayer.push({ event: 'view_item', item_id: currentCar.id || '', vin: currentCar.vin || '', item_name: currentCar.name + ' ' + currentCar.year, item_price: currentCar.price, item_brand: currentCar.brand || '', vehicle_year: currentCar.year, sede: currentCar.loc || '', ...getTrackingContext() });
 
   // Gallery setup
-  galleryIdx = 0;
   galleryImgs = (currentCar.gallery && currentCar.gallery.length > 0) ? currentCar.gallery : [currentCar.img];
-  document.getElementById('modalImg').src = galleryImgs[0];
+  galleryIdx = (startIdx > 0 && startIdx < galleryImgs.length) ? startIdx : 0;   // la tarjeta manda la foto en la que iba el usuario
+  document.getElementById('modalImg').src = galleryImgs[galleryIdx];
   document.getElementById('modalImg').alt = `${currentCar.name} ${currentCar.year || ''}`.trim();
   var photoCountEl = document.getElementById('modalPhotoCount');
   var prevBtn = document.getElementById('galleryPrev');
   var nextBtn = document.getElementById('galleryNext');
   if (galleryImgs.length > 1) {
-    photoCountEl.textContent = '1 de ' + galleryImgs.length + ' fotos';
+    photoCountEl.textContent = (galleryIdx + 1) + ' de ' + galleryImgs.length + ' fotos';
     photoCountEl.style.display = 'block';
     prevBtn.style.display = 'block';
     nextBtn.style.display = 'block';
@@ -4714,8 +4882,21 @@ function loadLogoSeminuevosData() {
     .catch(function(){ return null; });
 }
 
+function loadScriptOnce(src) {
+  return new Promise(function (resolve) {
+    var existing = document.querySelector('script[src="' + src + '"]');
+    if (existing && window.jspdf) return resolve(true);
+    var sc = document.createElement('script'); sc.src = src; sc.async = true;
+    sc.onload = function () { resolve(true); }; sc.onerror = function () { resolve(false); };
+    document.head.appendChild(sc);
+  });
+}
 async function generateRegistrationPDF() {
-  if (!lastAppointment || !window.jspdf) return;
+  if (!lastAppointment) return;
+  if (!window.jspdf) {   // el script va con defer; si el usuario es más rápido, se carga aquí
+    await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    if (!window.jspdf) { console.warn('jspdf no disponible'); return; }
+  }
   const logoData = await loadLogoSeminuevosData();
   const a = lastAppointment;
   const cfg = BRAND_CONFIG;
