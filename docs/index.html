@@ -378,8 +378,13 @@ body {
 /* Logo Seminuevos: PNG con fondo blanco → mix-blend-mode: screen
    para que el blanco se "queme" sobre el header oscuro y solo se
    vea la marca. NUNCA dejar fondo blanco visible. */
-.header-logo { height: 42px; max-width: 200px; width: auto; opacity: 1; display: block; mix-blend-mode: screen; }
-@media(min-width:768px){ .header-logo { height: 52px; max-width: 240px; } }
+/* Logo Seminuevos Plasencia (PNG 1200x142, muy ancho). Se fija SOLO el ancho y la
+   altura sale de la proporcion real: fijar altura y ancho por separado lo deformaba
+   (encabezado comprimido 45 %, footer estirado 456 %, medido 8-oct-2026). */
+.header-logo { width: 280px; max-width: calc(100vw - 110px); height: auto; opacity: 1; display: block; mix-blend-mode: screen; }
+@media(min-width:768px){ .header-logo { width: 380px; max-width: none; } }
+.footer-logo-sem { width: 220px; max-width: 100%; height: auto; display: block; mix-blend-mode: screen; }
+@media(min-width:768px){ .footer-logo-sem { width: 260px; } }
 .header-logo-gp-wrap { display: inline-flex; align-items: center; justify-content: center; }
 .header-logo-gp { height: 32px; width: auto; opacity: 0.95; display: block; mix-blend-mode: screen; }
 @media(min-width:768px){ .header-logo-gp { height: 40px; } }
@@ -2476,7 +2481,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <img src="assets/logo-grupo-plasencia.png" width="133" height="120" alt="Grupo Plasencia" style="height:24px;width:auto;display:block;">
       </span>
       <span style="width:1px;height:24px;background:rgba(255,255,255,0.18);"></span>
-      <img src="assets/logo-seminuevos-plasencia.png" width="1200" height="142" alt="Seminuevos Plasencia" style="height:30px;padding:5px 10px;border-radius:6px;mix-blend-mode:screen;">
+      <img src="assets/logo-seminuevos-plasencia.png" width="1200" height="142" alt="Seminuevos Plasencia" class="footer-logo-sem">
     </div>
     <p><strong>Seminuevos Plasencia</strong> &middot; Establecido en Guadalajara desde 1947<br>Av. López Mateos Sur No. 2600, Col. La Calma, Zapopan, Jalisco &middot; Lun a Vie 9:00 a 18:00 &middot; Sáb 9:00 a 14:00 &middot; Tel. (33) 3344 4400<br><span style="opacity:0.75;">8 sucursales en GDL &middot; <span id="footerTotalCars">232</span> autos certificados &middot; Red multimarca con postventa propia</span></p>
     <div style="margin-top:14px;"><a href="https://grupoplasencia.com/aviso_de_privacidad/" target="_blank" rel="noopener" style="color: rgba(255,255,255,0.72); text-decoration: underline; font-size: 12px;">Aviso de Privacidad</a></div>
