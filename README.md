@@ -66,5 +66,4 @@ Para correr el sync manualmente sin esperar al cron: pestaña Actions del repo �
 
 ## Repos relacionados
 
-- **Infraestructura Claude Code:** [`MktGrupoPlasenciaAutomotriz/claude`](https://github.com/MktGrupoPlasenciaAutomotriz/claude) — skills, MCPs, setup de Mac, configuracion de Claude Code. Repo separado porque es infraestructura de desarrollo, no aplicacion de negocio.
 - **Este repo** es la aplicacion de negocio (catalogo de seminuevos). Los dos repos son independientes: este corre su GitHub Action diaria sin depender del otro.
