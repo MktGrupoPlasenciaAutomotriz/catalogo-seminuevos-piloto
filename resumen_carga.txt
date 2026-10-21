@@ -1,4 +1,5 @@
 Catálogo Seminuevos Plasencia
+<<<<<<< Updated upstream
 Fecha ejecución: 2026-08-29T11:37:15.965556
 Fuente: https://inventory-feed.maxipublica.com/campaigns/xml/group/vehicle_feed_group_e1490ae1e92f.xml
 Total listings: 691
@@ -71,3 +72,77 @@ Agencias (23):
     [3913] Ford Plasencia Mazatlan: 8
     [4332] Seminuevos Plasencia Colima Tecnologico: 7
     [4293] Hyundai Carretera 57: 2
+=======
+Fecha ejecución: 2026-06-01T16:09:39.018653
+Fuente: https://inventory-feed.maxipublica.com/campaigns/xml/group/vehicle_feed_group_e1490ae1e92f.xml
+Total listings: 631
+Del piloto Otero: 239 (agencias [3736, 3737, 3852, 3885, 3886, 3888, 4054, 4199])
+Años: 2007–2026
+Precios: $79,900–$3,289,000
+
+Marcas (38):
+  Chevrolet: 153
+  Mazda: 86
+  Nissan: 40
+  Hyundai: 39
+  Ford: 39
+  GMC: 28
+  Kia: 27
+  Volkswagen: 26
+  Renault: 25
+  MG: 20
+  Jeep: 19
+  Buick: 19
+  Toyota: 14
+  Mitsubishi: 12
+  Suzuki: 10
+  Honda: 9
+  HAVAL: 9
+  Seat: 7
+  Peugeot: 7
+  Dodge: 5
+  BMW: 4
+  GWM: 4
+  BYD: 3
+  Omoda: 3
+  Chirey: 3
+  Mercedes-Benz: 3
+  Audi: 2
+  Changan: 2
+  King Long: 2
+  RAM: 2
+  GAC: 2
+  JAC: 1
+  Jetour: 1
+  Fiat: 1
+  SEV: 1
+  Chrysler: 1
+  Cupra: 1
+  Porsche: 1
+
+Agencias (24):
+    [3891] Chevrolet Aeropuerto: 95
+  ★ [4054] Seminuevos Plasencia Bugambilias: 58
+    [3893] Chevrolet Huauchinango: 54
+    [3889] Buick Gmc Coapa: 46
+  ★ [3852] Seminuevos Plasencia Lopez Mateos: 45
+    [3890] Seminuevos Plasencia Tepic: 42
+  ★ [4199] Mazda Plasencia: 39
+    [3895] Seminuevos Certificados Chevrolet tepic: 37
+  ★ [3736] Mazda Americas: 28
+  ★ [3886] Mazda Galerias: 25
+    [3962] Seminuevos Certificados BuickGmc Tepic: 21
+    [3938] Hyundai Plasencia Puerto Vallarta: 18
+  ★ [3737] Mazda Gonzalez Gallo: 17
+  ★ [3888] Mazda Acueducto: 16
+    [4293] Hyundai Carretera 57: 15
+    [3883] Seminuevos Plasencia Colima Carranza: 13
+    [3913] Ford Plasencia Mazatlan: 12
+  ★ [3885] Mazda Santa Anita: 11
+    [3882] Hyundai Lomas: 8
+    [4332] Seminuevos Plasencia Colima Tecnologico: 8
+    [3954] Ford Tepic: 7
+    [4319] Ford Plasencia Puerto Vallarta: 6
+    [3887] Mazda Plasencia Vallarta: 5
+    [3905] Mazda Manzanillo: 5
+>>>>>>> Stashed changes
